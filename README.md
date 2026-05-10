@@ -1,6 +1,5 @@
-![Fourier analysis](examples/analysis_fourier.png)
-
 # vesuvius-topological-grid
+![Fourier analysis](examples/analysis_fourier.png)
 
 A geometric validation tool for the segmentation of Herculaneum scrolls in the [Vesuvius Challenge](https://scrollprize.org).
 

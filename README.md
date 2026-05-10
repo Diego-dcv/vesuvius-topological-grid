@@ -133,7 +133,7 @@ Note: the resolution parameter (`PIXEL_SIZE_UM` in the scripts, default 7.91 µm
 
 If this work is useful to your research or pipeline, please reference:
 
-> Diego [Apellido]. *Topological grid as an iterative selection criterion in segmentation of Herculaneum scrolls*. Technical proposal, May 2026. https://github.com/Diego-dcv/vesuvius-topological-grid
+> Diego_dcv *Topological grid as an iterative selection criterion in segmentation of Herculaneum scrolls*. Technical proposal, May 2026. https://github.com/Diego-dcv/vesuvius-topological-grid
 
 ---
 

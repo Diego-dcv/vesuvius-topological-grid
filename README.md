@@ -60,7 +60,7 @@ scripts.
 ## Quick start
 ```bash
 pip install -r requirements.txt
-python scripts/grid_metric.py --help
+python scripts/grid_metric.py analyze IMAGE --width-mm 129
 python scripts/epoch_folding_prototype.py --input surface.png --width-mm 129 --noise-test
 ```
 
@@ -80,7 +80,8 @@ vesuvius-topological-grid/
 │   ├── experiment_A_degradation.py
 │   └── delta_beta_ink.py
 ├── figures/             
-├── archive/             
+├── archive/
+│   └── results/            
 └── requirements.txt     
     └── data_sources.md              ← how to obtain the input images
 ```

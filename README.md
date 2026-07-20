@@ -246,4 +246,9 @@ MIT License. See `LICENSE` file.
 
 This work is offered as a contribution to the open scientific effort of the Vesuvius Challenge. It does not claim priority on any specific finding, nor does it require attribution beyond standard scientific citation. If equivalent approaches have been explored internally by the team, the author would be glad to be informed and would withdraw any claim of novelty.
 
+---
+
+## DOI
+DOI: 10.5281/zenodo.21464028
+
 

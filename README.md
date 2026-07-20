@@ -111,7 +111,8 @@ vesuvius-topological-grid/
 ├── docs/
 │   └── technical_note_revised.pdf
 ├── scripts
-│   ├── grid_metric.py          
+│   ├── grid_metric.py
+│   ├── make_rank_candidates.py        
 │   ├── epoch_folding_prototype.py
 │   ├── experiment_A_degradation.py
 │   └── delta_beta_ink.py

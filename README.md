@@ -96,6 +96,7 @@ vesuvius-topological-grid/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)
 │   └── data_sources.md                ← how to obtain the input images
 ├── scripts/
+│   ├── void_aware_expected_n.py
 │   ├── grid_metric.py                 ← analyze / compare / rank
 │   ├── make_rank_candidates.py        ← acceptance test for rank mode
 │   ├── epoch_folding_prototype.py

@@ -90,11 +90,16 @@ def void_aware_expected(positions, v_merge=2.5, v_void=4.0):
     """positions: 1D array of crossing positions along one ray (any length unit).
     Returns dict with counted, expected_naive, expected_va, ratios, void_fraction,
     n_fragment, n_ambiguous. None if fewer than 3 crossings."""
-    r = np.sort(np.asarray(positions, dtype=float))
+    r = np.unique(np.asarray(positions, dtype=float))   # sort + dedupe:
+    # duplicate positions (rounded centroids) drive the gap median to 0 and
+    # p_ref to 0 -> ZeroDivisionError. Field-reported by iyando on the full
+    # PHerc1218 run; dedupe here makes the function safe regardless of input.
     if r.size < 3:
         return None
     gaps = np.diff(r)
     med = np.median(gaps)
+    if not np.isfinite(med) or med <= 0:
+        return None
     band = gaps[(gaps >= 0.5 * med) & (gaps <= 2.0 * med)]
     p_ref = float(np.median(band)) if band.size else float(med)
     span = float(r[-1] - r[0])

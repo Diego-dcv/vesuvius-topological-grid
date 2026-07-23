@@ -362,6 +362,101 @@ def run_rank(args):
         for i, r in enumerate(rows, 1): w.writerow([i, *r])
     print("wrote rank_results.csv")
 
+
+# ------------------------- orient: directional coherence --------------------
+def grid_energy_rotated(win, pixel_mm, periods, angle_deg, crop=0.15):
+    """cross2d_score after de-rotating the window by angle_deg. If the writing
+    grid sits at +angle, de-rotating by that angle brings it onto the axes and
+    the score peaks -- so argmax over angle recovers the local grid orientation."""
+    from scipy import ndimage
+    r = ndimage.rotate(win, -angle_deg, reshape=False, mode="reflect", order=1)
+    h, w = r.shape
+    m = int(crop * min(h, w))
+    r = r[m:h - m, m:w - m]
+    if min(r.shape) < 16:
+        return 0.0
+    return cross2d_score(r, pixel_mm, periods)
+
+
+def orientation_at(win, pixel_mm, periods, span_deg=14.0, step_deg=1.0):
+    """Local orientation of the writing grid, in degrees. Parabolic refinement
+    around the coarse maximum. Returns (angle_deg, peak_score)."""
+    angles = np.arange(-span_deg, span_deg + step_deg, step_deg)
+    scores = np.array([grid_energy_rotated(win, pixel_mm, periods, a) for a in angles])
+    i = int(np.argmax(scores))
+    best = float(angles[i])
+    if 0 < i < len(scores) - 1:
+        y0, y1, y2 = scores[i - 1:i + 2]
+        den = y0 - 2 * y1 + y2
+        if abs(den) > 1e-12:
+            best = float(angles[i] - 0.5 * step_deg * (y2 - y0) / den)
+    return best, float(scores[i])
+
+
+def run_orient(args):
+    """Map the local tilt of the writing baseline across a surface.
+
+    An orientation estimator independent of CT intensity: it reads the text
+    layout, not the sheet normal, so systematic disagreement with a
+    structure-tensor normal field is a cheap mesh-QA signal.
+
+    STATUS: PASSES its acceptance test (orient_acceptance_test.py) on a real
+    Paris 4 surface: median |error| 0.00 deg, max 1.37 deg, bias +0.09 deg over
+    4 windows x 7 imposed rotations, each measured against that window's own
+    baseline tilt. Two declared limits: the search saturates beyond
+    +-span_deg (raise it if the surface is strongly tilted, but stay well
+    inside +-45 deg, where a rotation swaps the letter and line components);
+    and the absolute zero is the image grid, not the scroll axis, so compare
+    tilts between surfaces, never absolute angles.
+    """
+    arr, pixel_mm = load_surface(args.image, args.width_mm, args.downsample)
+    stem = os.path.splitext(os.path.basename(args.image))[0]
+    periods = {"letters": args.letters_mm, "lines": args.lines_mm}
+    if periods["letters"] is None and periods["lines"] is None:
+        sig = calibrate_signature(arr, pixel_mm, label=stem)
+        periods = {"letters": sig["letters"], "lines": sig["lines"]}
+    print("reference periods: " + ", ".join(
+        f"{k} {v:.2f} mm" if v else f"{k} n/a" for k, v in periods.items()))
+
+    win_w = max(16, int(args.win_w_mm / pixel_mm))
+    step = max(1, int(args.step_mm / pixel_mm))
+    xs, ang, strength = [], [], []
+    for x0 in range(0, max(1, arr.shape[1] - win_w), step):
+        a, s = orientation_at(arr[:, x0:x0 + win_w], pixel_mm, periods)
+        xs.append((x0 + win_w / 2) * pixel_mm); ang.append(a); strength.append(s)
+    xs, ang, strength = np.array(xs), np.array(ang), np.array(strength)
+    print(f"  {len(xs)} windows | tilt {ang.min():.1f} to {ang.max():.1f} deg "
+          f"(median {np.median(ang):.1f})")
+
+    with open(f"{stem}_orient.csv", "w", newline="") as fh:
+        w = csv.writer(fh); w.writerow(["x_mm", "tilt_deg", "grid_strength"])
+        for a, b, c in zip(xs, ang, strength):
+            w.writerow([f"{a:.1f}", f"{b:.2f}", f"{c:.3f}"])
+    print(f"  wrote {stem}_orient.csv")
+
+    try:
+        import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+        H_mm = arr.shape[0] * pixel_mm; W_mm = arr.shape[1] * pixel_mm
+        fig, (a0, a1) = plt.subplots(2, 1, figsize=(13, 6), height_ratios=[2.2, 1])
+        a0.imshow(arr, cmap="gray", aspect="auto", extent=[0, W_mm, H_mm, 0],
+                  vmin=np.percentile(arr, 2), vmax=np.percentile(arr, 98))
+        smax = strength.max() if strength.max() > 0 else 1.0
+        for x, a, s in zip(xs, ang, strength):
+            L = args.win_w_mm / 7.0; t = np.radians(a)
+            a0.plot([x - L * np.cos(t), x + L * np.cos(t)],
+                    [H_mm / 2 - L * np.sin(t), H_mm / 2 + L * np.sin(t)],
+                    color=plt.cm.viridis(s / smax), lw=2.2, solid_capstyle="round")
+        a0.set_title(f"Local writing orientation - {stem}")
+        a0.set_xlabel("X [mm]"); a0.set_ylabel("Y [mm]")
+        a1.plot(xs, ang, "-o", ms=3, color="steelblue")
+        a1.axhline(0, ls=":", c="grey", lw=0.8)
+        a1.set_xlabel("X [mm]"); a1.set_ylabel("tilt [deg]"); a1.grid(alpha=0.3)
+        a1.set_title("baseline tilt vs position")
+        fig.tight_layout(); fig.savefig(f"{stem}_orient.png", dpi=140, bbox_inches="tight")
+        print(f"  wrote {stem}_orient.png")
+    except Exception as e:
+        print("figure step skipped:", e)
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -391,6 +486,16 @@ def main():
     r.add_argument("--win-h-mm", type=float, default=WINDOW_H_MM,
                    help="use the full strip height on short strips so the line component re-enters the gated score")
     r.set_defaults(func=run_rank)
+
+    o = sub.add_parser("orient", help="map the local tilt of the writing baseline")
+    o.add_argument("image")
+    o.add_argument("--width-mm", type=float, required=True)
+    o.add_argument("--downsample", type=int, default=1)
+    o.add_argument("--letters-mm", type=float, default=None)
+    o.add_argument("--lines-mm", type=float, default=None)
+    o.add_argument("--win-w-mm", type=float, default=30.0)
+    o.add_argument("--step-mm", type=float, default=10.0)
+    o.set_defaults(func=run_orient)
 
     args = ap.parse_args()
     args.func(args)

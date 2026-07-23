@@ -1,6 +1,6 @@
 # vesuvius-topological-grid
 
-**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, screen.**
+**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, screen, orient, reconcile.**
 
 Ancient writing has a grid: equally spaced lines, regular letter pitch, columns on a
 module — like the structural grid of a building. If a virtual unwrapping is correct,
@@ -69,6 +69,82 @@ candidates. Two earlier scoring designs failed this same test (1-D projections; 
 calibration); their diagnoses are preserved in the commit history — the acceptance test
 is the gate, and it stays in the repo.
 
+## 5 — Orient (`scripts/grid_metric.py orient`)
+
+Maps the local tilt of the writing baseline across a surface, by rotating the
+analysis axis and finding the orientation of maximum grid coherence.
+
+```bash
+python scripts/grid_metric.py orient IMAGE.png --width-mm 129 \
+    --letters-mm 4.16 --lines-mm 2.79
+```
+
+The point is independence: this reads **text layout**, whereas structure-tensor
+methods read **CT intensity**. Two estimators of the same local geometry through
+unrelated physics, so systematic disagreement between them is a cheap mesh-QA
+signal — and neither needs labels. On the public Paris 4 surfaces the baseline
+tilt swings from −9° to +6° across the strip: the deformation of the sheet
+showing up directly in the orientation of the text.
+
+**Validation.** `scripts/orient_acceptance_test.py` measures each window's own
+baseline tilt, imposes a known rotation, and checks that the recovered angle
+minus the baseline equals the imposed one. That subtraction is the whole test —
+without it, every window's own tilt reads as a constant error and the estimator
+looks broken. Pre-registered criteria and results on a real Paris 4 surface
+(4 windows × 7 imposed rotations):
+
+| criterion | threshold | result |
+|---|---|---|
+| median \|error\| | < 1.0° | **0.00°** |
+| max \|error\| | < 2.0° | **1.37°** |
+| bias (mean error) | < 0.5° | **+0.09°** |
+
+**Two declared limits.** The search saturates beyond `±span_deg` — raise it for
+strongly tilted surfaces, but stay well inside ±45°, where a rotation swaps the
+roles of the letter and line components. And the absolute zero is the image
+grid, not the scroll axis: compare tilts between surfaces, never absolute
+angles.
+
+---
+
+## 6 — Reconcile (`scripts/void_aware_expected_n.py`)
+
+Layer-count QA compares how many windings a ray crosses against how many it
+*should* cross. The naive expectation, `span/pitch + 1`, assumes compact
+winding — false on a crushed scroll, where internal voids inflate the span and
+drive the ratio far below 1 for reasons that have nothing to do with labeling
+quality.
+
+This reformulates the expectation so that voids contribute nothing: each gap
+explains the crossing on its far side, so a void contributes exactly one
+expected winding (its far boundary) and nothing for the empty interior. In
+short: **don't count the air.** The residual then isolates labeling pathology —
+below 1 means merge excess, above 1 means fragmentation.
+
+```bash
+python scripts/void_aware_expected_n.py                    # acceptance test
+python scripts/void_aware_expected_n.py --csv cells.csv    # aggregate-bound demo
+```
+
+**Validation.** The acceptance test injects each pathology into synthetic rays
+and checks the estimator separates them: with 30% injected voids the naive
+ratio collapses to 0.70 while the void-aware ratio holds at 1.00; merges read
+below 1, fragmentation above 1, and merge detection survives voids.
+
+**In production.** Run over the full PHerc1218 per-ray positions (1.46M
+crossings, 21,070 cells) by another contributor, the acceptance test passed
+unchanged on their machine before anything else ran. Two findings came out of
+it: fragmentation-excess cells line up with slab boundaries — independently
+re-detecting a labeling edge effect found by a different method — and merge
+excess concentrates on the flattened axis of the scroll.
+
+**Declared limits.** A run of ≥3 consecutive merged windings looks like a void
+from positions alone; `v_void` is the knob, CT intensity the disambiguator.
+Duplicate crossing positions (rounded centroids) are deduped inside the
+function — a field report from the full-scroll run.
+
+---
+
 ## Supporting analyses
 - `scripts/experiment_A_degradation.py` — controlled-degradation validation of the
   metric (rotation, shear, warp, noise, erasure): the score falls monotonically, which
@@ -77,6 +153,12 @@ is the gate, and it stays in the repo.
   tabulated scattering data. Key result: the exploitable channel is **K-edge
   subtraction (~88 keV)**, not differential phase — with the caveat that
   phase-retrieved public volumes may suppress exactly that absorption signal.
+- `scripts/make_rank_candidates.py` and `scripts/orient_acceptance_test.py` —
+  the acceptance tests for the `rank` and `orient` modes. They ship with the
+  code deliberately: every mode in this repository carries the test that
+  gates it, including the ones that failed before they passed.
+
+---
 
 ## Lessons (kept on purpose)
 Our first line-spacing estimate (4.45 mm) was a resolution artifact: on a 13 mm strip
@@ -96,7 +178,8 @@ vesuvius-topological-grid/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)
 │   └── data_sources.md                ← how to obtain the input images
 ├── scripts/
-│   ├── void_aware_expected_n.py       ← supporting analyses
+│   ├── void_aware_expected_n.py       ← layer-count reconciliation
+│   ├── orient_acceptance_test.py      ← acceptance test for orient mode
 │   ├── grid_metric.py                 ← analyze / compare / rank
 │   ├── make_rank_candidates.py        ← acceptance test for rank mode
 │   ├── epoch_folding_prototype.py
@@ -133,6 +216,13 @@ python scripts/grid_metric.py rank candA.png candB.png candC.png \
 
 # 7. Detect buried line structure by epoch folding
 python scripts/epoch_folding_prototype.py --input surface.png --width-mm 129 --noise-test
+
+# 8. Map the local tilt of the writing baseline
+python scripts/grid_metric.py orient IMAGE.png --width-mm 129 \
+    --letters-mm 4.16 --lines-mm 2.79
+
+# 9. Void-aware layer-count reconciliation (runs its acceptance test with no args)
+python scripts/void_aware_expected_n.py
 ```
 
 Scripts write PNG figures (and CSVs) to the working directory. A Paris-4-sized image

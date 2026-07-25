@@ -73,79 +73,104 @@ data, only over the analysis tool itself (MIT license, see `LICENSE`).
 
 Every headline number in mode 7 rests on the parameters below. They are
 **inputs, not results**: if any of them is wrong, the twin and the predictor
-are wrong with it, and a reader must be able to check them without asking.
+are wrong with it. Provenance and status are given for each, because two of
+them are weaker than the word "measured" would suggest.
 
-| parameter | value | where it comes from | status |
+| parameter | value | provenance | status |
 |---|---|---|---|
-| winding pitch | 173 µm | | measured |
-| winding turns | ~70 | | measured |
-| crushed section | 42 × 21 mm (2:1) |  | measured |
-| fold positions | 0° / 180° on the long axis | | measured |
-| edge discontinuities | 265–280° and 75–110° | community (z, θ) ray-profile work on stitched PHerc1218 — see Community validation in the README | independent |
+| crushed section | 42 × 21 × ~190 mm, flattened 2:1 | reconstructed by this author from iyando's published aggregates on stitched PHerc1218 (`vesuvius-sheet-tools`); cross-confirmed by two independent quantities — the `ratio_va` dips and the `pitch_ref` values on the 0/180 vs 90/270 axis | **derived from community data, cross-confirmed** |
+| fold positions | 0° / 180° on the long axis | same reconstruction; predicted in advance from the onion-skin-paper analogy and then confirmed | **predicted, then confirmed** |
+| edge discontinuities | 265–280° (15° wide) and 75–110° (35° wide) | iyando's terminus-cluster hunt; the two clusters remain unresolved at one-slab margin. Together with the creases they explain the 90°-period harmonic (phase minima at 87/177/267/357°) | **measured, ambiguous** |
+| winding pitch | 173 µm | the community's **human anchor** value. pscamillo's 35-scroll winding atlas, corrected to pyramid level 1, gives a median of **187.3 µm** — a +4.1 % bias against the anchor (it was 207 µm and +17 % at level 2, before the correction) | **contested — see sensitivity below** |
+| winding turns | ~70 | **not an independent measurement.** It follows from the section, the pitch and the assumed umbilicus: `n = (r_out − r₀) / p` | **derived** |
+| umbilicus radius r₀ | 4.1 mm | **assumed.** Chosen as the value that makes ~70 turns consistent with a 173 µm pitch. Plausible for a Herculaneum roll, but not measured here | **free parameter** |
+| page height | 200 mm | conventional for Herculaneum rolls; not measured on PHerc1218 in this work | **assumed** |
 
-> ⚠ **Do not publish this table with the FILL INs open.** The three
-> measured rows are what the Discord post stands on; a reader who cannot
-> trace them will (correctly) discount the rest. If a number came from a
-> community thread rather than a publication, say exactly that and link the
-> thread — provenance from a Discord message is perfectly respectable when
-> it is labelled as such.
+### Two consequences that must travel with any number quoted from mode 7
+
+**1. The turn count cannot corroborate the section, because it is derived
+from it.** Test C in `synthetic_scroll_twin.py` reports that the measured
+section implies ~69.7 turns "against ~70 measured independently". That
+framing is wrong: with the section and the pitch fixed, the turn count is a
+function of r₀ alone, and r₀ was chosen to give 70.
+
+| r₀ assumed | implied work | implied turns |
+|---|---|---|
+| 3.0 mm | 99 columns | 76.3 |
+| 3.5 mm | 97 columns | 73.2 |
+| **4.1 mm** | **95 columns** | **69.7** |
+| 5.0 mm | 92 columns | 64.7 |
+| 6.0 mm | 87 columns | 58.8 |
+
+The honest statement is the inverse one, and it is still falsifiable: *if*
+the winding count is ~70 and the pitch is 173 µm, *then* the umbilicus must
+be ~4.1 mm — which a raw-CT look at the core would confirm or kill.
+
+**2. The implied length of the work moves with the pitch**, and the pitch is
+the contested number:
+
+| pitch | source | implied work | implied turns |
+|---|---|---|---|
+| 173 µm | human anchor | 95 columns | 69.7 |
+| **187.3 µm** | **pscamillo atlas, level 1 (current best automated estimate)** | **88 columns** | **64.7** |
+| 207 µm | atlas at level 2, since corrected | 78 columns | 58.2 |
+
+A ~7 % change in pitch moves the implied work by ~7 columns. Any "the section
+implies N columns" claim must name the pitch it assumed.
 
 ### Writing grid (Paris 4, applied to the twin)
 
-| parameter | value | source |
-|---|---|---|
-| letter pitch | 4.16 mm | measured in this repository (mode 1) and independently replicated — see README §Community validation |
-| line spacing | 2.79 mm | as above; supersedes the earlier 4.45 mm, which was a resolution artefact (README §Lessons) |
-| column period | 43.0 mm | as above |
-| page height | 200 mm | conventional for Herculaneum rolls |
+| parameter | value | provenance | status |
+|---|---|---|---|
+| letter pitch | 4.16 mm | measured in this repository (mode 1) on public Grand Prize 2023 renders of PHerc. Paris 4; replicated by independent implementations | **measured** |
+| line spacing | 2.79 mm | as above, by spatial per-column estimation. Supersedes an earlier 4.45 mm, which was a resolution artefact (README §Lessons) — dispersion is large | **measured, dispersed** |
+| column period | 43.0 mm | as above | **measured** |
+
+> The Paris 4 grid is applied to PHerc1218 on the assumption of workshop
+> standardization. Different scroll, possibly different scribe: this is an
+> assumption, not a measurement, and a column-width drift would show up as a
+> smooth residual trend.
 
 ### Papyrus manufacture (kollesis model)
 
 - **Sheet joins and roll length.** Pliny the Elder, *Naturalis Historia*
-  XIII.74–82, on papyrus manufacture: the *scapus* is described as not
-  exceeding twenty sheets, giving a roll of roughly 11–12 Roman feet. This
-  yields kollemata of ~17–19 cm, the basis for the default
-  `--kollesis-mm 180`. Pliny is a first-century source describing
-  contemporary practice, which is the right period for Herculaneum, but the
-  passage is textually debated — treat 180 mm as a **default to be varied**,
+  XIII.74–82: the *scapus* is described as not exceeding twenty sheets,
+  giving a roll of roughly 11–12 Roman feet, hence kollemata of ~17–19 cm.
+  This is the basis for the default `--kollesis-mm 180`. Pliny is a
+  first-century source describing contemporary practice — the right period —
+  but the passage is textually debated. Treat 180 mm as a **default to vary**,
   not a constant.
-- **Kollesis as double thickness.** Standard papyrological description of
-  the glued overlap. The twin models it as an extra layer over an overlap
-  width of `--kollesis-ov-mm` (default 15 mm).
+- **Kollesis as double thickness.** Standard papyrological description of the
+  glued overlap; modelled as an extra layer over `--kollesis-ov-mm`
+  (default 15 mm). Not measured on any Herculaneum roll here.
 
 ### Latin at Herculaneum (layout regimes)
 
 - The Latin portion of the Villa dei Papiri library is small relative to the
-  Greek: a figure of roughly 60 Latin papyri is commonly reported. Verify
+  Greek; a figure of roughly 60 Latin papyri is commonly reported. Verify
   against a current catalogue before citing a specific count.
 - Identified Latin texts are largely **verse** (*Carmen de bello Actiaco*,
   Ennius, Lucretius, Caecilius Statius); PHerc. 1067 is the principal prose
-  item. This is why `--script latin-verse` exists and why the verse regime
-  is not a hypothetical.
-- **Interpuncts** separating words appear in early rustic capital books
-  including the Herculaneum *Carmen*, and fall out of use in Latin literary
-  books by roughly the mid-second century AD.
+  item. This is why `--script latin-verse` exists.
+- **Interpuncts** appear in early rustic capital books including the
+  Herculaneum *Carmen*, and fall out of use in Latin literary books by
+  roughly the mid-second century AD.
 - **No Latin Herculaneum roll has been measured to the precision of the
-  Paris 4 Greek grid here.** The `latin-prose` and `latin-verse` letter and
-  line metrics in `SCRIPTS` are therefore **declared placeholders**; the
-  script prints a runtime warning and they must be overridden with
-  `--letter-mm` / `--line-mm` before any number derived from them is
-  quoted.
+  Paris 4 Greek grid here.** The `latin-prose` and `latin-verse` metrics are
+  **declared placeholders**; the script prints a runtime warning.
 
 ### Egyptian-language material
 
-None is attested in the Villa dei Papiri library, which is a Greek
-philosophical collection with a Latin appendix. The Egyptian element in this
-work is the **support**, not the text: all papyrus was Egyptian manufacture,
-which is precisely what the kollesis model encodes.  [scrollprize.org](https://scrollprize.org). Active technical discussion
-  and pointers to derived datasets.
+None is attested in the Villa dei Papiri library, a Greek philosophical
+collection with a Latin appendix. The Egyptian element here is the
+**support**, not the text: all papyrus was Egyptian manufacture, which is what
+the kollesis model encodes.
 
-This tool operates on rendered surfaces (2D images), not on the 3D volumes
-directly, so the lighter-weight download is sufficient for the analysis here.
+### Community sources
 
-## Citing the data
-
-If you use these images in your own work, please cite the Vesuvius Challenge
-team and the Grand Prize 2023 winners according to their respective
-guidelines. The author of this repository claims no rights over the input
-data, only over the analysis tool itself (MIT license, see `LICENSE`).
+The PHerc1218 quantities above come from open work by other Vesuvius
+Challenge contributors, principally **iyando** (`vesuvius-sheet-tools`:
+instance stitching, layer counting, the (z, θ) ray profile on stitched
+PHerc1218) and **pscamillo** (35-scroll winding atlas). Provenance from a
+Discord thread is legitimate when labelled as such; where a number below is
+traceable to a specific thread or dataset release, the link belongs here.

@@ -148,9 +148,13 @@ function — a field report from the full-scroll run.
 ## 7 — Twin & Predict (`scripts/synthetic_scroll_twin.py`, `scripts/text_layout_predictor.py`)
 
 Two scripts, **one geometry**: a scroll is a single sheet wound on an
-Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four measured
-numbers are — winding pitch (173 µm), crushed section (42 × 21 mm), column
-period (43.0 mm) and the lead-in before column 1. The twin runs that geometry
+Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four numbers
+are — winding pitch, crushed section, column period and the lead-in before
+column 1. Only two of the four are measured: the section (42 × 21 mm,
+cross-confirmed) and the column period (43.0 mm, Paris 4, replicated). The
+pitch is contested (173 µm human anchor vs 187.3 µm from the corrected
+35-scroll atlas) and the lead-in is assumed. Run `sensitivity` before quoting
+any figure that depends on them. The twin runs that geometry
 **forward** to fabricate ground truth; the predictor runs it **outward** onto
 the real scroll with the uncertainty attached. Neither is allowed to do the
 other's job, and the distinction is the whole point:
@@ -160,7 +164,7 @@ other's job, and the distinction is the whole point:
 | input | a work → the scroll builds itself around it | a work + measured geometry |
 | output | per-letter ground truth, wound and crushed; voxel volumes | a falsifiable map with σ, horizon, calibration |
 | tests | the toolchain | the unwrapping |
-| may claim | nothing about the real scroll (one exception below) | everything, because it can be wrong |
+| may claim | nothing about the real scroll — see the retraction below | everything, because it can be wrong |
 
 The measured PHerc1218 parameters and their provenance are documented in
 [`docs/data_sources.md`](docs/data_sources.md#pherc-1218--geometry-used-by-mode-7-twin--predict).
@@ -174,7 +178,7 @@ python scripts/text_layout_predictor.py predict --columns 95 --csv map.csv
 
 Both scripts run on geometry alone — no input images. Full command set,
 including `sweep`, `kollesis`, `volume`, `calibrate` and the acceptance
-tests, in [Quick start](#quick-start) steps 10-15.
+tests, in [Quick start](#quick-start) steps 10-16.
 
 ### The twin: self-adjusting to the work
 
@@ -284,27 +288,57 @@ Reading direction is encoded in both scripts: the text **start is outermost**
 — the end-title sits deepest, exactly where the PHerc139 subscriptio was
 found.
 
-### The one outward-facing claim the twin is allowed
+### What the twin may claim about the real scroll — and what it may not
 
 A synthetic twin proves the tools work on the twin's assumptions, nothing
-more. The single exception compares twin *output* against an *independent*
-measurement: the crushed **section size vs work length** (`sweep`). Inverted
-against the measured 42 × 21 mm it gives ~95 columns of Greek prose — a work
-that winds to **69.7 turns against ~70 measured independently**. Section →
-obra → turns closes a loop through three measurements that owe each other
-nothing.
+more. An earlier version of this section claimed more than that, and the
+claim was wrong; it is worth stating plainly, because it is the kind of
+error the rest of this repository exists to catch.
+
+**The retracted claim.** *"Inverting the measured 42 × 21 mm section gives
+~95 columns, which winds to 69.7 turns against ~70 measured independently —
+section → obra → turns closes a loop through three measurements that owe each
+other nothing."* It is circular. With the section and the pitch fixed, the
+turn count is a function of the umbilicus r₀ alone — and r₀ = 4.1 mm had been
+chosen precisely because it makes 70 turns come out at a 173 µm pitch. The
+"agreement" restated an identity. Run `sensitivity` to see it:
+
+| assumed r₀ | implied work | implied turns |
+|---|---|---|
+| 3.0 mm | 99 columns | 76.3 |
+| **4.1 mm** (default) | **95 columns** | **69.7** |
+| 6.0 mm | 87 columns | 58.8 |
+
+**What survives, and is still falsifiable outside the model:** the inverse.
+*If* the winding count is ~70 and the pitch is 173 µm, *then* the umbilicus
+must be **~4.1 mm** — which a look at the core in the raw CT confirms or
+kills.
+
+**And no implied work may travel without its pitch.** The pitch is the
+contested input: 173 µm is the community's human anchor, while pscamillo's
+35-scroll winding atlas, corrected to pyramid level 1, gives a median of
+187.3 µm.
+
+| pitch | source | implied work | implied turns |
+|---|---|---|---|
+| 173 µm | human anchor | 95 columns | 69.7 |
+| **187.3 µm** | **atlas level 1, current best automated estimate** | **88 columns** | **64.7** |
+| 207 µm | atlas level 2, since corrected | 78 columns | 58.2 |
+
+**Emergent, and unaffected by either soft input:** equal-perimeter 2:1
+ellipses space ~2× wider along the fold axis than along the flattened axis,
+where the gap falls *below* the nominal pitch. The twin therefore predicts
+merge excess concentrated on the flattened axis, which is what the void-aware
+run found on the real scroll. This follows from the 2:1 ratio alone — which is
+cross-confirmed by two independent quantities — not from the pitch or the
+umbilicus. The absolute figures (~240 µm / ~120 µm at a 173 µm pitch) do scale
+with the pitch.
 
 ![Crushed section as a function of work length](figures/twin_section_sweep.png)
 
-*The section reads the length of the work. Where the curve crosses the
-measured 42 mm sets the implied obra — and the regime sets the column period,
-so the same section means 95 columns of prose or 42 of hexameter.*
-
-**Emergent, not imposed:** equal-perimeter 2:1 ellipses space ~240 µm along
-the fold axis but only ~120 µm along the flattened axis — *below* the 173 µm
-nominal pitch (both verified on the voxel volume). The twin therefore predicts
-merge excess concentrated on the flattened axis, which is what the void-aware
-run found on the real scroll. The geometry was never told this.
+*The section reads the length of the work — once a pitch and an umbilicus are
+assumed. The regime sets the column period, so the same section means 95
+columns of prose or 42 of hexameter.*
 
 ### Validation
 
@@ -317,7 +351,7 @@ Acceptance tests ship inside each script, criteria pre-registered.
 |---|---|---|
 | A — inextensibility | crushed perimeter = wound circumference per turn, rel. err < 0.1 % | **4.6e-10, PASS** |
 | B — ground-truth round trip | analytic un-crush recovers every letter's s to < 10 µm | **0.00 µm, PASS** |
-| C — real-scroll consistency | obra implied by the 42×21 section must wind to 70 ± 3 turns | **69.7, PASS** |
+| C — umbilicus inversion | the inversion round-trips to < 0.1 turns, **and** r₀ is shown to be a free parameter (3–6 mm spans > 10 turns) | **0.000 turns, 18-turn spread, PASS** |
 | D — kollesis chirp | join count = L/W; angular step monotone > 98 % | **19 joins, 745°→2154°, 100 %, PASS** |
 
 **Predictor** (`test`):
@@ -328,7 +362,12 @@ Acceptance tests ship inside each script, criteria pre-registered.
 | B — coverage (blind, 120 independent worlds) | 1σ coverage 0.55–0.90; turn hit > 0.85 where confident | **0.61 / 0.91, PASS** |
 | C — self-regulation (s0 off 120 mm, pitch off 4 µm, 3 anchors) | held-out θ error halved; pitch within 2 µm | **111.8° → 0.2°; 177.3 vs 177.0 µm, PASS** |
 
-Three failed designs are kept in the docstrings on purpose: coverage measured
+A fourth is kept in the README itself, above: exam C originally read the
+section and the turn count as mutually corroborating when the second is
+derived from the first through a chosen umbilicus. It passed for weeks
+because it could not fail.
+
+Three further failed designs are kept in the docstrings on purpose: coverage measured
 across columns of one world instead of across worlds (nearly binary — all
 columns share one parameter draw); a first production run returning a
 zero-column θ-horizon (not a bug — the honest headline that angles are earned
@@ -457,12 +496,15 @@ python scripts/synthetic_scroll_twin.py volume --columns 95 --z-window 8 \
 python scripts/text_layout_predictor.py predict --columns 95 --csv map.csv
 python scripts/text_layout_predictor.py calibrate --anchors anchors.csv
 
-# 15. Acceptance tests for both (no arguments, no data required)
+# 15. What the implied work depends on (never quote a figure without this)
+python scripts/synthetic_scroll_twin.py sensitivity
+
+# 16. Acceptance tests for both (no arguments, no data required)
 python scripts/synthetic_scroll_twin.py test
 python scripts/text_layout_predictor.py test
 ```
 
-Steps 10-15 need no input images: the twin and the predictor run on geometry
+Steps 10-16 need no input images: the twin and the predictor run on geometry
 alone.
 
 Scripts write PNG figures (and CSVs) to the working directory. A Paris-4-sized image

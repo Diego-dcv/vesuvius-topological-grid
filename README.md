@@ -430,7 +430,7 @@ vesuvius-topological-grid/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)
 │   └── data_sources.md                ← how to obtain the input images
 ├── scripts/
-│   ├── synthetic_scroll_twin.py       ← the twin: obra → scroll → crush
+│   ├── synthetic_scroll_twin.py       ← the twin: opus → scroll → crush
 │   ├── text_layout_predictor.py       ← the falsifiable column map
 │   ├── void_aware_expected_n.py       ← layer-count reconciliation
 │   ├── orient_acceptance_test.py      ← acceptance test for orient mode

@@ -164,7 +164,7 @@ other's job, and the distinction is the whole point:
 | input | a work → the scroll builds itself around it | a work + measured geometry |
 | output | per-letter ground truth, wound and crushed; voxel volumes | a falsifiable map with σ, horizon, calibration |
 | tests | the toolchain | the unwrapping |
-| may claim | nothing about the real scroll — see the retraction below | everything, because it can be wrong |
+| may claim | nothing about the real scroll, bar two conditioned statements below | everything, because it can be wrong |
 
 The measured PHerc1218 parameters and their provenance are documented in
 [`docs/data_sources.md`](docs/data_sources.md#pherc-1218--geometry-used-by-mode-7-twin--predict).
@@ -288,57 +288,50 @@ Reading direction is encoded in both scripts: the text **start is outermost**
 — the end-title sits deepest, exactly where the PHerc139 subscriptio was
 found.
 
-### What the twin may claim about the real scroll — and what it may not
+### What the twin may claim about the real scroll
 
 A synthetic twin proves the tools work on the twin's assumptions, nothing
-more. An earlier version of this section claimed more than that, and the
-claim was wrong; it is worth stating plainly, because it is the kind of
-error the rest of this repository exists to catch.
+more — it is a test bench, not a microscope. Two statements are allowed out,
+and both carry their conditions.
 
-**The retracted claim.** *"Inverting the measured 42 × 21 mm section gives
-~95 columns, which winds to 69.7 turns against ~70 measured independently —
-section → obra → turns closes a loop through three measurements that owe each
-other nothing."* It is circular. With the section and the pitch fixed, the
-turn count is a function of the umbilicus r₀ alone — and r₀ = 4.1 mm had been
-chosen precisely because it makes 70 turns come out at a 173 µm pitch. The
-"agreement" restated an identity. Run `sensitivity` to see it:
+**1. The section constrains the length of the work — once a pitch and an
+umbilicus are assumed.** Inverting the measured 42 × 21 mm section gives ~95
+columns of Greek prose. But neither of the two inputs that figure depends on
+is measured on PHerc1218 here, and both move it materially. Run `sensitivity`:
 
-| assumed r₀ | implied work | implied turns |
+| assumed umbilicus r₀ | implied work | implied turns |
 |---|---|---|
 | 3.0 mm | 99 columns | 76.3 |
 | **4.1 mm** (default) | **95 columns** | **69.7** |
 | 6.0 mm | 87 columns | 58.8 |
 
-**What survives, and is still falsifiable outside the model:** the inverse.
-*If* the winding count is ~70 and the pitch is 173 µm, *then* the umbilicus
-must be **~4.1 mm** — which a look at the core in the raw CT confirms or
+| assumed pitch | source | implied work | implied turns |
+|---|---|---|---|
+| 173 µm | community human anchor | 95 columns | 69.7 |
+| **187.3 µm** | **35-scroll winding atlas, level 1** | **88 columns** | **64.7** |
+| 207 µm | same atlas at level 2, since corrected | 78 columns | 58.2 |
+
+Because the turn count is a function of r₀ once the section and pitch are
+fixed, the section cannot corroborate the winding count — it is not an
+independent check. The useful statement runs the other way and is falsifiable
+outside the model: **if the winding count is ~70 and the pitch is 173 µm,
+the umbilicus must be ~4.1 mm**, which the core in the raw CT confirms or
 kills.
 
-**And no implied work may travel without its pitch.** The pitch is the
-contested input: 173 µm is the community's human anchor, while pscamillo's
-35-scroll winding atlas, corrected to pyramid level 1, gives a median of
-187.3 µm.
-
-| pitch | source | implied work | implied turns |
-|---|---|---|---|
-| 173 µm | human anchor | 95 columns | 69.7 |
-| **187.3 µm** | **atlas level 1, current best automated estimate** | **88 columns** | **64.7** |
-| 207 µm | atlas level 2, since corrected | 78 columns | 58.2 |
-
-**Emergent, and unaffected by either soft input:** equal-perimeter 2:1
-ellipses space ~2× wider along the fold axis than along the flattened axis,
-where the gap falls *below* the nominal pitch. The twin therefore predicts
-merge excess concentrated on the flattened axis, which is what the void-aware
-run found on the real scroll. This follows from the 2:1 ratio alone — which is
-cross-confirmed by two independent quantities — not from the pitch or the
-umbilicus. The absolute figures (~240 µm / ~120 µm at a 173 µm pitch) do scale
-with the pitch.
+**2. Crushing spaces the layers anisotropically — and this one is free of
+those assumptions.** Equal-perimeter 2:1 ellipses sit ~2× further apart along
+the fold axis than along the flattened axis, where the gap falls *below* the
+nominal pitch. The twin therefore predicts merge excess concentrated on the
+flattened axis, which is what the void-aware run found on the real scroll.
+It follows from the 2:1 ratio alone — cross-confirmed by two independent
+quantities — not from the pitch or the umbilicus. Only the absolute figures
+(~240 µm / ~120 µm at a 173 µm pitch) scale with the pitch.
 
 ![Crushed section as a function of work length](figures/twin_section_sweep.png)
 
-*The section reads the length of the work — once a pitch and an umbilicus are
-assumed. The regime sets the column period, so the same section means 95
-columns of prose or 42 of hexameter.*
+*The section reads the length of the work, once a pitch and an umbilicus are
+assumed. The layout regime sets the column period, so the same section means
+95 columns of prose or 42 of hexameter.*
 
 ### Validation
 
@@ -362,12 +355,17 @@ Acceptance tests ship inside each script, criteria pre-registered.
 | B — coverage (blind, 120 independent worlds) | 1σ coverage 0.55–0.90; turn hit > 0.85 where confident | **0.61 / 0.91, PASS** |
 | C — self-regulation (s0 off 120 mm, pitch off 4 µm, 3 anchors) | held-out θ error halved; pitch within 2 µm | **111.8° → 0.2°; 177.3 vs 177.0 µm, PASS** |
 
-A fourth is kept in the README itself, above: exam C originally read the
-section and the turn count as mutually corroborating when the second is
-derived from the first through a chosen umbilicus. It passed for weeks
-because it could not fail.
+Exam C of the twin was originally written as a three-way consistency check:
+the measured section implies ~70 turns, "against ~70 measured independently".
+It was circular. With the section and the pitch fixed, the turn count is a
+function of the umbilicus alone, and the umbilicus had been chosen to make 70
+come out. The exam passed every run because it could not fail. It is now an
+umbilicus inversion, and it explicitly tests that the umbilicus is a *free*
+parameter — a test that the earlier framing was unfounded. The general lesson
+is the one this repository keeps relearning: an acceptance test that cannot
+fail is not an acceptance test.
 
-Three further failed designs are kept in the docstrings on purpose: coverage measured
+Three failed designs are kept in the docstrings on purpose: coverage measured
 across columns of one world instead of across worlds (nearly binary — all
 columns share one parameter draw); a first production run returning a
 zero-column θ-horizon (not a bug — the honest headline that angles are earned
@@ -430,7 +428,7 @@ vesuvius-topological-grid/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)
 │   └── data_sources.md                ← how to obtain the input images
 ├── scripts/
-│   ├── synthetic_scroll_twin.py       ← the twin: opus → scroll → crush
+│   ├── synthetic_scroll_twin.py       ← the twin: obra → scroll → crush
 │   ├── text_layout_predictor.py       ← the falsifiable column map
 │   ├── void_aware_expected_n.py       ← layer-count reconciliation
 │   ├── orient_acceptance_test.py      ← acceptance test for orient mode

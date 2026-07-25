@@ -371,6 +371,8 @@ vesuvius-topological-grid/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)
 │   └── data_sources.md                ← how to obtain the input images
 ├── scripts/
+│   ├── synthetic_scroll_twin.py
+│   ├── text_layout_predictor.py
 │   ├── void_aware_expected_n.py       ← layer-count reconciliation
 │   ├── orient_acceptance_test.py      ← acceptance test for orient mode
 │   ├── grid_metric.py                 ← analyze / compare / rank

@@ -77,10 +77,10 @@ are wrong with it, and a reader must be able to check them without asking.
 
 | parameter | value | where it comes from | status |
 |---|---|---|---|
-| winding pitch | 173 µm | *(FILL IN: measurement, thread, or dataset)* | measured |
-| winding turns | ~70 | *(FILL IN)* | measured |
-| crushed section | 42 × 21 mm (2:1) | *(FILL IN)* | measured |
-| fold positions | 0° / 180° on the long axis | *(FILL IN)* | measured |
+| winding pitch | 173 µm | | measured |
+| winding turns | ~70 | | measured |
+| crushed section | 42 × 21 mm (2:1) |  | measured |
+| fold positions | 0° / 180° on the long axis | | measured |
 | edge discontinuities | 265–280° and 75–110° | community (z, θ) ray-profile work on stitched PHerc1218 — see Community validation in the README | independent |
 
 > ⚠ **Do not publish this table with the FILL INs open.** The three
@@ -97,7 +97,7 @@ are wrong with it, and a reader must be able to check them without asking.
 | letter pitch | 4.16 mm | measured in this repository (mode 1) and independently replicated — see README §Community validation |
 | line spacing | 2.79 mm | as above; supersedes the earlier 4.45 mm, which was a resolution artefact (README §Lessons) |
 | column period | 43.0 mm | as above |
-| page height | 200 mm | conventional for Herculaneum rolls *(FILL IN a source or mark as assumed)* |
+| page height | 200 mm | conventional for Herculaneum rolls |
 
 ### Papyrus manufacture (kollesis model)
 

@@ -5,7 +5,7 @@ message: If you use this software or its results, please cite it using the
   metadata below.
 type: software
 authors:
-- family-names: FILL-IN-OR-DELETE-THIS-LINE
+- family-names: CV
   given-names: Diego
   alias: Diego_dcv
   city: Madrid

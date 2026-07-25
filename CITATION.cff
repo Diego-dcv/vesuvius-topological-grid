@@ -11,7 +11,7 @@ authors:
     given-names: Diego
     city: Madrid
     country: ES
-    # orcid: "https://orcid.org/0000-0000-0000-0000"   # <- add if you have one
+    
 repository-code: >-
   https://github.com/Diego-dcv/vesuvius-topological-grid
 license: MIT

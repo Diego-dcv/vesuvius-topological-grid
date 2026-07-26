@@ -622,7 +622,7 @@ present section is a **lower bound**.
 
 ### The catalogue, and the rule that keeps it honest
 
-`data/roll_catalogue.csv` carries one row per roll or work, in columns where
+`archives/results/roll_catalogue.csv` carries one row per roll or work, in columns where
 possible, and **every sized row must name its source**. Exam C fails on any
 number without one, so the catalogue cannot degrade quietly as it grows. An
 empty cell is information; an invented one is damage.

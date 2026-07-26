@@ -262,6 +262,11 @@ A useful discriminator falls out. A uniform horizontal scale error would move
 the letter pitch and the column period **together**. The column period
 (43.0 mm) is plausible as it stands, which argues against a large scale error
 and points instead at a harmonic misidentification of the letter pitch alone.
+(The same split has a physical consequence for the material, not just for
+the measurement — see mode 8, where the curvature field of the crushed
+section predicts where the sheet cracks, where it merges, and where it is
+left untouched.)
+
 `scripts/band_sensitivity.py` settles it: it sweeps the search band and
 reports whether a detected period is a property of the image (STABLE) or of
 the band we chose to look in (TRACKING / JUMP). Both `BAND_LETTERS` and
@@ -425,6 +430,223 @@ regime exists to invert.
 
 ---
 
+## 8 — Fibre strain (`scripts/fibre_strain.py`)
+
+Where does the papyrus crack when the roll is crushed? Sections 7 and 8 stop
+at geometry; this one asks what the geometry does to the material. It is the
+one mode that makes a claim about the real scroll rather than about a
+phantom, and it earns that by being **derived rather than calibrated**: every
+result below follows from the measured 2:1 section and classical plate
+bending, with nothing fitted to anything.
+
+```bash
+python scripts/fibre_strain.py map --plot fibre.png
+python scripts/fibre_strain.py map --reference flat   # the naive model
+python scripts/fibre_strain.py test
+```
+
+![Bending strain against angle and depth](figures/fibre_strain.png)
+
+### Which fibres, and why
+
+Papyrus is a two-ply cross laminate: recto fibres run along the roll's
+length, verso fibres along its axis. Herculaneum rolls are wound with the
+written recto inward, so at a fold the **verso is the convex face** and takes
+the tension. That tension acts circumferentially — along the arc. The recto
+fibres lie along it and resist it the way fibres are strong, along their own
+axis. The verso fibres lie *across* it and carry nothing, so the only thing
+that can give is the bond between them: **they separate laterally.** It is a
+consequence of the laminate structure, not an assumption.
+
+### The reference state is the wound roll, not a flat sheet
+
+A first pass used absolute curvature and got a fold/flat strain ratio of
+exactly (a/b)³ = 8 for a 2:1 crush. That is the ratio for a sheet that is
+stress-free when **flat** — true of fresh papyrus being wound for the first
+time, false here. These rolls stood wound for decades and then carbonized in
+that shape, so the stress-free reference is the **wound** state and what
+strains the material is the *change* in curvature:
+
+    ε(θ) = (t/2) · | κ_crushed(θ) − 1/r |
+
+That changes the picture. At the fold the sheet is sharpened (κ: 1/r →
+3.084/r); along the flattened sides it is **unbent** (κ: 1/r → 0.386/r) — and
+unbending strains the material too. So the flat sides are not unloaded, only
+less loaded, and the contrast falls from 8.0× to **3.39×**. `--reference
+flat` reproduces the old figure for comparison; `wound` is the default
+because it is the defensible one.
+
+### The neutral angle — the result worth having
+
+Between a fold (κ sharpened above 1/r) and a flat side (κ relaxed below it),
+the curvature must **pass through 1/r**. At that angle the crush leaves the
+sheet exactly as it was wound: unstrained, neither cracked nor unbent.
+
+It sits at **37.64° from the fold axis** — four pristine sectors at 38°,
+142°, 218° and 322° — and it is **scale invariant**: a and b both scale with
+r, so κ·r depends only on θ and the aspect ratio. The same angle at every
+depth, running through the whole roll like spokes.
+
+Which makes it **invertible**, and that is the point:
+
+| crush ratio | neutral angle |
+|---|---|
+| 1.5 : 1 | 40.7° |
+| **2 : 1** | **37.6°** |
+| 3 : 1 | 33.5° |
+| 4 : 1 | 30.8° |
+
+**Measuring where the best-preserved sectors lie measures the crush ratio** —
+with no dependence on the winding pitch, the umbilicus, the sheet thickness
+or the writing grid. None of the numbers this repository currently holds in
+doubt enters that calculation.
+
+### A three-zone angular signature
+
+Put together with the layer spacing from section 7, one geometry predicts
+three different states at three different angles:
+
+| angle | prediction |
+|---|---|
+| 0° / 180° (folds) | **cracking** — strain 3.39× the flat sides, growing as 1/r toward the core |
+| 38° / 142° / 218° / 322° | **intact** — the crush leaves the sheet unstrained |
+| 90° / 270° (flattened axis) | **merging** — layers packed below the nominal winding pitch |
+
+All three are angular, all three are measurable, and none needs a calibration
+constant.
+
+### What is derived and what is assumed
+
+Derived, calibration-free: the curvature field, the 3.39× contrast, the 1/r
+radial gradient, and the neutral angle. These follow from the measured 2:1
+section alone.
+
+Assumed, and dominating only the **absolute** percentages: the sheet
+thickness (0.150 mm) and a failure strain for carbonized papyrus, which is
+not established — `--failure-strain` is a knob and the tool reports the
+threshold crossing for whatever you set. **The map is the result; the
+percentages are provisional.**
+
+### Validation
+
+| exam | criterion | result |
+|---|---|---|
+| A — no crush, no strain | at ratio 1:1 the wound-reference strain must vanish; the flat-reference model must not | **6e-18 vs 1.8e-2, PASS** |
+| B — closed form at the vertices | numeric fold and flat values match the analytic ones; ratio = 3.39 (wound) and 8.00 (flat) | **PASS** |
+| C — radial gradient | inner/outer strain equals r_out/r_in exactly | **3.8513 vs 3.8513, PASS** |
+| D — neutral angle | identical at turn 0 and turn 69, and inverts back to the input crush ratio | **37.64°, ratio 2.00, PASS** |
+
+Exam A exists to catch the error that was actually made: with no crush at
+all, a flat-reference model still reports strain. If anyone reinstates the
+wrong reference state, it fails. Exam B was also earned — its first version
+compared the maximum and minimum over θ, and failed, because the minimum is
+the neutral-angle **zero**, not the flattened-axis value. Finding that is how
+the neutral angle turned up at all.
+
+---
+
+## 9 — Work size (`scripts/work_size.py`, `data/roll_catalogue.csv`)
+
+How big a roll does a work make, and which work fits a roll? Two directions:
+
+- **forward** — a work of N columns → sheet length → roll diameter → crushed
+  section.
+- **inverse** — a measured crushed section → implied column count →
+  candidates from a catalogue. And the outcome worth having: **a roll whose
+  implied size matches nothing known is a candidate for a work that did not
+  survive the medieval tradition** — which turns a curiosity into a priority
+  list of which sealed roll to unwrap next.
+
+```bash
+python scripts/work_size.py identify --section 42 21
+python scripts/work_size.py population --section 42 21
+python scripts/work_size.py test
+```
+
+**Prior art, stated first.** Reconstructing a roll's original length and
+column count from its geometry is standard papyrology, done on opened rolls
+by measuring the width of successive volutions against column beginnings —
+the reconstruction of PHerc. 1004 from 30 pieces is a worked example. Nothing
+here invents the method. The only new input is CT geometry from a roll that
+was never opened, and therefore never disturbed.
+
+### Why columns and not characters
+
+The chain `columns → sheet length → diameter` needs only the **column
+period**. Going through characters — or through *stichoi* for prose — also
+needs the **letter pitch**, because an ancient stichos is a notional
+35-letter unit (the length of a Homeric hexameter), not a physical line. The
+letter pitch is the least trustworthy number in the grid (see mode 8 and
+`band_sensitivity.py`). So columns are
+firm, characters are provisional, and the tool labels which is which. For
+**verse** the stichos *is* the physical line, so that route stays clean —
+which happens to favour the Latin material, most of which is verse.
+
+### The base rate is the cheapest measurement available
+
+An implied column count inherits three unknowns: the umbilicus, the winding
+pitch, and the layout regime. Decomposing the band shows they are not
+comparable:
+
+| resolving… | band becomes | width removed |
+|---|---|---|
+| **the regime** (prose or verse) | 80–98 or 35–43 | **56 %** |
+| the umbilicus | 38–95 | 11 % |
+| the winding pitch | 38–98 | 8 % |
+
+And the regime is not a coin flip. Of ~1826 rolls from this library, **62 are
+Latin** (Sider 2005), and every identified Latin text is **verse** — the
+*Carmen de Bello Actiaco*, Lucretius, Ennius' *Annales*, Caecilius Statius'
+*Obolostates*. The Greek remainder is overwhelmingly Epicurean prose. So
+P(Greek prose) ≈ 0.966, and for PHerc1218 the working band is **80–98
+columns**, with 35–43 as a low-prior alternative.
+
+That reduction cost no scan. It is a base rate, and it removes more
+uncertainty than the umbilicus and the pitch put together.
+
+### A population check that is worth more than the band
+
+The measured 42 × 21 mm section gives an equal-perimeter diameter of
+**3.24 cm**. Intact Herculaneum rolls run **4–6 cm** in diameter and 19–24 cm
+in height. PHerc1218 is therefore ~19 % below the population floor, which
+admits two readings, and they are distinguishable:
+
+- it was a small roll; or
+- **what survives is not what was buried.** The precedent is exact: PHerc.
+  1667 was reduced from 4.9 cm to 2 cm of diameter by 19th- and 20th-century
+  opening attempts, losing more than half its content.
+
+A stripped roll should show a truncated *outer* surface; an intrinsically
+small one should not. If layers are missing, every size estimated from the
+present section is a **lower bound**.
+
+### The catalogue, and the rule that keeps it honest
+
+`data/roll_catalogue.csv` carries one row per roll or work, in columns where
+possible, and **every sized row must name its source**. Exam C fails on any
+number without one, so the catalogue cannot degrade quietly as it grows. An
+empty cell is information; an invented one is damage.
+
+Sizes come from Gigante's *Catalogo dei Papiri Ercolanesi* and Sider's
+*Library of the Villa dei Papiri*, one sourced row at a time. First anchor in
+place: Philodemus' *On Piety* ran to ~367 columns in a single roll — four
+times what fits in PHerc1218, and correctly excluded by the discriminator.
+
+### Validation
+
+| exam | criterion | result |
+|---|---|---|
+| A — round trip | forward(N) → section → inverse returns N, for N = 20…200 | **exact, PASS** |
+| B — the band must stay wide | the raw implied band spans > 2× while the umbilicus is unmeasured | **2.8×, PASS** |
+| C — no unsourced sizes | every row carrying a column or stichoi count names a source | **PASS** |
+
+Exam B is written backwards on purpose: it **fails if the band narrows**
+without anyone having measured the umbilicus. It is a guard against a future
+version of this tool quoting a confident single figure, which is the failure
+mode most likely to produce a wrong attribution.
+
+---
+
 ## Supporting analyses
 - `scripts/experiment_A_degradation.py` — controlled-degradation validation of the
   metric (rotation, shear, warp, noise, erasure): the score falls monotonically, which
@@ -460,6 +682,9 @@ vesuvius-topological-grid/
 ├── scripts/
 │   ├── synthetic_scroll_twin.py       ← the twin: obra → scroll → crush
 │   ├── text_layout_predictor.py       ← the falsifiable column map
+│   ├── fibre_strain.py                ← where the crush cracks the sheet
+│   ├── work_size.py                   ← work ↔ roll size, and the
+│   │                                     unknown-work discriminator
 │   ├── void_aware_expected_n.py       ← layer-count reconciliation
 │   ├── orient_acceptance_test.py      ← acceptance test for orient mode
 │   ├── grid_metric.py                 ← analyze / compare / rank
@@ -527,10 +752,22 @@ python scripts/text_layout_predictor.py calibrate --anchors anchors.csv
 # 15. What the implied work depends on (never quote a figure without this)
 python scripts/synthetic_scroll_twin.py sensitivity
 
-# 16. Acceptance tests for both (no arguments, no data required)
+# 16. Where the crush cracks the sheet, and where it leaves it intact
+python scripts/fibre_strain.py map --plot fibre.png
+
+# 17. Which work fits a measured section, and which rolls match nothing
+python scripts/work_size.py identify --section 42 21
+python scripts/work_size.py population --section 42 21
+
+# 18. Acceptance tests (no arguments, no data required)
 python scripts/synthetic_scroll_twin.py test
 python scripts/text_layout_predictor.py test
+python scripts/fibre_strain.py test
+python scripts/work_size.py test
 ```
+
+Steps 10-18 need no input images: everything from mode 7 onward runs on
+geometry alone.
 
 Steps 10-16 need no input images: the twin and the predictor run on geometry
 alone.

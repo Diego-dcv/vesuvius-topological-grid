@@ -238,6 +238,36 @@ what the section implies — same measured 42 × 21 mm section:
 > overridden with `--letter-mm` / `--line-mm` before any number from them is
 > quoted.
 
+#### Which axis the crush deforms — and which grid numbers survive it
+
+The roll is flattened in the plane **perpendicular to its axis**. That splits
+the writing grid in two, and the split decides how much each number can be
+trusted:
+
+- **Line spacing runs along the roll axis.** The crush does not act in that
+  direction, so neither does any error in undoing it. Whatever an unwrapping
+  gets wrong, it does not stretch the line-to-line distance. This is why
+  ~2.79 mm is the firmest of the three — and it is also the only one
+  estimated in the spatial domain rather than by FFT.
+- **Letter pitch and column period run along the wound arc**, inside the
+  crushed plane. They are exactly the quantities an unwrapping can distort,
+  and they are the two that drive the column count and the character count.
+
+In the twin the sheet is inextensible and the crush is arc-length preserving
+(exam A), so nothing is intrinsically stretched — what changes is where a
+point lands and how the layers *appear* in a slice. Real papyrus does deform
+inelastically; that is not modelled, and it is a declared limit.
+
+A useful discriminator falls out. A uniform horizontal scale error would move
+the letter pitch and the column period **together**. The column period
+(43.0 mm) is plausible as it stands, which argues against a large scale error
+and points instead at a harmonic misidentification of the letter pitch alone.
+`scripts/band_sensitivity.py` settles it: it sweeps the search band and
+reports whether a detected period is a property of the image (STABLE) or of
+the band we chose to look in (TRACKING / JUMP). Both `BAND_LETTERS` and
+`BAND_COLUMNS` currently return values within ~10 % of a band edge; only the
+line spacing sits comfortably interior.
+
 #### Kollesis: the Egyptian manufacture is in the geometry
 
 No Egyptian-language text is plausible at Herculaneum — it is a Greek

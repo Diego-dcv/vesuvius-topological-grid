@@ -95,7 +95,11 @@ def find_catalogue():
 CATALOGUE = find_catalogue()
 
 # geometry defaults, shared with synthetic_scroll_twin.py
-COL_PERIOD_MM = 43.0     # measured, Paris 4, replicated
+COL_PERIOD_MM = 43.0     # measured on Paris 4 and reproducible, but
+                         # CONTRADICTED: implies ~8 letters per line, and
+                         # three external sources give 65-75 mm. Kept as the
+                         # default because it IS the measurement; the mode
+                         # `identify` reports both. See docs/data_sources.md
 LEAD_IN_MM = 150.0       # assumed
 TAIL_MM = 200.0          # assumed
 STICHOS_LETTERS = 35.0   # a Homeric hexameter; ~15-16 syllables

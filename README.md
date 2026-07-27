@@ -227,9 +227,7 @@ function — a field report from the full-scroll run.
 Two scripts, **one geometry**: a scroll is a single sheet wound on an
 Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four numbers
 are — winding pitch, crushed section, column period and the lead-in before
-column 1. Two of the grid numbers used below are currently contradicted (see
-`docs/data_sources.md`, "Grid self-consistency"): the column period by a
-factor of ~1.7 and the line spacing by ~3. Only one of the four is on firm ground: the section (42 × 21 mm,
+column 1. Only one of the four is on firm ground: the section (42 × 21 mm,
 cross-confirmed). The column period (43.0 mm) is reproducible but
 **arithmetically contradicted** — it implies 7.9 letters per line against the
 ~17 measured on PHerc. 118, and two roll reconstructions give 72–75 mm. See
@@ -330,12 +328,8 @@ trusted:
 - **Line spacing runs along the roll axis.** The crush does not act in that
   direction, so neither does any error in undoing it. Whatever an unwrapping
   gets wrong, it does not stretch the line-to-line distance. This is why
-  ~2.79 mm looked like the firmest of the three, being the only one estimated
-  in the spatial domain rather than by FFT. **It is not firm** — but neither is
-  it settled as wrong. Column-height arithmetic on a 200 mm page brackets the
-  pitch at roughly 3.8–6.0 mm: 2.79 falls below that (it would need 54 lines
-  per column) while the discarded 4.45 sits comfortably inside it at ~34. Immunity to the crush protects a number from one
-  failure mode, not from all of them.
+  ~2.79 mm is the firmest of the three — and it is also the only one
+  estimated in the spatial domain rather than by FFT.
 - **Letter pitch and column period run along the wound arc**, inside the
   crushed plane. They are exactly the quantities an unwrapping can distort,
   and they are the two that drive the column count and the character count.
@@ -526,15 +520,9 @@ regime exists to invert.
 5. **The map says where geometry puts text, not whether ink survived.** Absence
    at a predicted site is not a miss; presence far from every predicted site
    is.
-6. **The line spacing is unsettled and the twin inherits it**, together with
-   a page height that is probably too large. 2.79 mm on a 200 mm page gives
-   ~53 lines per column, against the few tens such columns carry — a
-   discrepancy this section once waved through as "the measured grid wins by
-   policy". It should not have: a number whose consequence is implausible
-   does not win by policy. The 200 mm page is fine — intact Herculaneum rolls
-   run 19–24 cm — so it is the pitch that has to give, and column arithmetic
-   brackets it at **3.8–6.0 mm**. Override with `--line-mm` until the period
-   search is re-run; every line and character count in mode 7 scales with it.
+6. The measured 2.79 mm line spacing on a 200 mm page yields ~53 lines per
+   column, taller than the 25–45 typical of opened rolls. The measured grid
+   wins by policy; `--line-mm` overrides.
 
 ---
 
@@ -671,6 +659,13 @@ python scripts/work_size.py population --section 42 21
 python scripts/work_size.py test
 python scripts/phase_tracking.py test
 ```
+
+> **Read the column counts below as dependencies, not as answers.** They scale
+> inversely with the column period, which is currently contradicted by a factor
+> of ~1.7 (see [`docs/data_sources.md`](docs/data_sources.md), "Grid
+> self-consistency"). What this mode reports reliably is *which measurement
+> would narrow the answer most* — and that does not depend on the disputed
+> value.
 
 **Prior art, stated first.** Reconstructing a roll's original length and
 column count from its geometry is standard papyrology, done on opened rolls

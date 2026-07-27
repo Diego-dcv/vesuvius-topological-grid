@@ -227,8 +227,11 @@ function — a field report from the full-scroll run.
 Two scripts, **one geometry**: a scroll is a single sheet wound on an
 Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four numbers
 are — winding pitch, crushed section, column period and the lead-in before
-column 1. Only two of the four are measured: the section (42 × 21 mm,
-cross-confirmed) and the column period (43.0 mm, Paris 4, replicated). The
+column 1. Only one of the four is on firm ground: the section (42 × 21 mm,
+cross-confirmed). The column period (43.0 mm) is reproducible but
+**arithmetically contradicted** — it implies 7.9 letters per line against the
+~17 measured on PHerc. 118, and two roll reconstructions give 72–75 mm. See
+`docs/data_sources.md`, "Grid self-consistency". The
 mean pitch is corroborated for this scroll (iyando's 173 and the winding
 atlas's 172.8 for PHerc1218 agree) but the *local* wrap-to-wrap pitch is not
 usable at all, and the lead-in is assumed. Run `sensitivity` before quoting
@@ -374,10 +377,14 @@ thickness landmarks, no ink needed. Right: the chirp. Fixed arc, growing
 circumference, so the angular step to the next join falls monotonically from
 1953° at the umbilicus to 657° at the outside.*
 
-And a falsifiable arithmetic consequence: 4.43 m of sheet is **24.6 kollemata,
-above Pliny's scapus of twenty** — so either the roll was made by gluing more
-than one scapus, or the sheets were wider than standard. Real kolleseis in the
-CT would say which.
+**The arithmetic that followed has since been answered, and the answer was
+the dull one.** A 4.43 m roll exceeds Pliny's scapus of twenty sheets, which
+looked like it needed explaining. It does not: Philodemus' *On Poems* II "was
+at first a roll of 70 sheets; a further 30 were glued on when the work proved
+to be long". Gluing scapi together was ordinary practice. That roll also
+supplies a **measured** sheet width — 16 m over 100 kollemata, i.e. **160 mm**
+— against the 180 mm assumed here, so the default is 12 % high and the 4.43 m
+roll is 27.7 sheets rather than 24.6.
 
 ### The predictor: the map, with the uncertainty attached
 
@@ -678,18 +685,25 @@ An implied column count inherits three unknowns: the umbilicus, the winding
 pitch, and the layout regime. Decomposing the band shows they are not
 comparable:
 
-| resolving… | band becomes | width removed |
-|---|---|---|
-| **the regime** (prose or verse) | 80–98 or 35–43 | **56 %** |
-| the umbilicus | 38–95 | 11 % |
-| the winding pitch | 38–98 | 8 % |
+| resolving… | band becomes |
+|---|---|
+| **the prose column period** (43 or 72 mm) | 80–98 or 47–58 |
+| the regime (prose or verse) | 47–98 or 35–43 |
+| the umbilicus | 38–95 |
+| the winding pitch | 38–98 |
+
+The column period has become the dominant term, and unlike the others it is
+not a declared assumption but a **measurement that contradicts itself** — see
+the self-consistency check in `docs/data_sources.md`.
 
 And the regime is not a coin flip. Of ~1826 rolls from this library, **62 are
 Latin** (Sider 2005), and every identified Latin text is **verse** — the
 *Carmen de Bello Actiaco*, Lucretius, Ennius' *Annales*, Caecilius Statius'
 *Obolostates*. The Greek remainder is overwhelmingly Epicurean prose. So
-P(Greek prose) ≈ 0.966, and for PHerc1218 the working band is **80–98
-columns**, with 35–43 as a low-prior alternative.
+P(Greek prose) ≈ 0.966, and for PHerc1218 the prose band is **47–98
+columns**, with 35–43 as a low-prior verse alternative. The prose band is wide
+because the column period inside it is contested: 80–98 at 43 mm, 47–58 at
+72 mm.
 
 That reduction cost no scan. It is a base rate, and it removes more
 uncertainty than the umbilicus and the pitch put together.
@@ -718,9 +732,12 @@ number without one, so the catalogue cannot degrade quietly as it grows. An
 empty cell is information; an invented one is damage.
 
 Sizes come from Gigante's *Catalogo dei Papiri Ercolanesi* and Sider's
-*Library of the Villa dei Papiri*, one sourced row at a time. First anchor in
-place: Philodemus' *On Piety* ran to ~367 columns in a single roll — four
-times what fits in PHerc1218, and correctly excluded by the discriminator.
+*Library of the Villa dei Papiri*, one sourced row at a time. Anchors in place: Philodemus' *On Piety* at ~367 columns and *On Poems* II at
+**222 columns in a 16 m roll of 100 kollemata** — both far larger than
+PHerc1218 and correctly excluded. PHerc. 1667 gives ~20 columns over ~1.5 m
+of surviving roll, and PHerc. 172 (*On Vices* I) more than 70. PHerc. 118
+carries no size but supplies the **17 characters per line** that the grid
+self-consistency check turns on.
 
 ### Validation
 

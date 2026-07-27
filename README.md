@@ -229,8 +229,9 @@ Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four numbers
 are — winding pitch, crushed section, column period and the lead-in before
 column 1. Only two of the four are measured: the section (42 × 21 mm,
 cross-confirmed) and the column period (43.0 mm, Paris 4, replicated). The
-pitch is contested (173 µm human anchor vs 187.3 µm from the corrected
-35-scroll atlas) and the lead-in is assumed. Run `sensitivity` before quoting
+mean pitch is corroborated for this scroll (iyando's 173 and the winding
+atlas's 172.8 for PHerc1218 agree) but the *local* wrap-to-wrap pitch is not
+usable at all, and the lead-in is assumed. Run `sensitivity` before quoting
 any figure that depends on them. The twin runs that geometry
 **forward** to fabricate ground truth; the predictor runs it **outward** onto
 the real scroll with the uncertainty attached. Neither is allowed to do the
@@ -417,11 +418,11 @@ is measured on PHerc1218 here, and both move it materially. Run `sensitivity`:
 | **4.1 mm** (default) | **95 columns** | **69.7** |
 | 6.0 mm | 87 columns | 58.8 |
 
-| assumed pitch | source | implied work | implied turns |
+| pitch | what it is | implied work | implied turns |
 |---|---|---|---|
-| 173 µm | community human anchor | 95 columns | 69.7 |
-| **187.3 µm** | **35-scroll winding atlas, level 1** | **88 columns** | **64.7** |
-| 207 µm | same atlas at level 2, since corrected | 78 columns | 58.2 |
+| **173 µm** | **PHerc1218: iyando's stitched 173 and the winding atlas's 172.8 for this scroll, agreeing** | **95 columns** | **69.7** |
+| 187.3 µm | the atlas *median over 36 scrolls* — a collection statistic, not a 1218 value | 88 columns | 64.7 |
+| 207 µm | the same median before the merged-sheet level correction | 78 columns | 58.2 |
 
 Because the turn count is a function of r₀ once the section and pitch are
 fixed, the section cannot corroborate the winding count — it is not an
@@ -487,6 +488,17 @@ regime exists to invert.
 
 ### Limits of the twin and the predictor
 
+0. **No result may rest on a LOCAL pitch.** The mean over ~70 turns is well
+   constrained and corroborated; wrap-to-wrap spacing is reported as
+   inconsistent even between adjacent index pairs. Mean-pitch uses (sheet
+   length, capacity, implied work) are fine. Local-pitch uses — the
+   predictor's per-column angles, and the *smoothness* of the kollesis
+   chirp — are weaker than the idealized figures suggest: those are
+   properties of the twin, not predictions about a real scroll. The chirp's
+   **discriminator** survives regardless, because it turns on which
+   coordinate the periodicity is constant in (arc, not index), not on the
+   spiral being smooth. The neutral angle and the fold/flat strain ratio
+   use no pitch at all.
 1. **The crush is imposed, not simulated.** Fold sharpness, buckling and
    contact mechanics belong to a finite-element sheet model — a separate
    project.

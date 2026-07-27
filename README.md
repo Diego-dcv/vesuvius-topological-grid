@@ -1,6 +1,6 @@
 # vesuvius-topological-grid
 
-**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, screen, orient, reconcile.**
+**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, track, screen, orient, reconcile.**
 
 Ancient writing has a grid: equally spaced lines, regular letter pitch, columns on a
 module — like the structural grid of a building. If a virtual unwrapping is correct,
@@ -33,6 +33,83 @@ so it **destroys text by construction — it detects the presence of structured 
 it cannot read it**. Validated under controlled noise burial (gain ×1 on clean model
 output, ×2 at 4× noise with only ~20 lines). Intended target: raw surface intensity,
 where a period–phase fold search (pulsar-style) is the natural next step.
+
+## 3b — Search & Track (`scripts/phase_tracking.py`)
+
+Mode 3 states its own limit in its docstring: line centres are found on a
+*clean* image, and on real raw data the algorithm
+must **search** for the period and phase by maximizing the contrast of the
+folded profile — "that search is the natural next step". This is that step,
+and it turned up something the prototype was throwing away.
+
+```bash
+python scripts/phase_tracking.py search IMAGE.png --width-mm 129 --axis lines
+python scripts/phase_tracking.py track IMAGE.png --width-mm 129 --plot phase.png
+python scripts/phase_tracking.py test
+```
+
+**The search.** Classic epoch folding: for each trial period, fold the
+profile and score it with the chi-square of the folded bins against a flat
+one. The true period maximizes it. No peak-finding on a clean image, no
+assumed period, and it degrades gracefully instead of collapsing — it
+recovers a 2.79 mm lattice to 0.1 % at SNR 0.3, where peak-finding on the raw
+profile has nothing to work with.
+
+**What the prototype discarded.** `fold_lines` already walks the image in
+windows and computes line centres in each one — then averages every strip
+together, throwing away *where each window sat*. That per-window phase is a
+signal in its own right. In an intact surface it drifts slowly and smoothly;
+a discontinuity in the underlying surface displaces the text and **steps**
+it. A phase glitch, in the pulsar-timing sense.
+
+### A glitch is not a drift
+
+This distinction is the whole tool. Writing that sits slightly skew to the
+roll axis produces a phase that drifts **linearly** across the render — three
+whole periods in the test case, and entirely innocent. A surface
+discontinuity produces a **step**. The drift is fitted and subtracted before
+anything is called a glitch, and exam C enforces it: if a pure linear drift
+raises even one glitch, the tool is reporting skew as damage and fails.
+
+### Which axis says what
+
+| `--axis` | period | what a jump to a neighbouring winding does |
+|---|---|---|
+| `columns` | ~43 mm, along the unrolled arc | **steps** — a skip displaces text by roughly one circumference, not a multiple of the column period |
+| `lines` | ~2.79 mm, along the roll axis | **need not move at all** |
+
+The asymmetry matters and is easy to get backwards. The scribe wrote on a
+flat sheet, so lines sit at the same height on every winding; only skew moves
+them. **A clean line phase is not evidence of an intact surface.**
+
+One practical caveat, worth more than the code in some cases: a render
+carrying only ~10 column periods gives the search very little along that
+axis. Where the periods are few, locating the blank intercolumn bands
+directly and checking the sequence of gap-to-gap distances is more robust and
+needs none of this. This tool earns its place where the periods are many and
+the signal is buried — the raw-intensity case mode 3 was always aimed at.
+
+### Validation
+
+| exam | criterion | result |
+|---|---|---|
+| A — period under noise | recover a known lattice to < 2 % at SNR 0.3, where peak-finding fails | **0.1 %, PASS** |
+| B — glitch localized | exactly one glitch within one window of truth; a clean control raises none | **21.1 vs 21.0 mm, 0 control, PASS** |
+| C — drift is not a glitch | a 3-period linear drift must raise **zero** glitches | **0, PASS** |
+| D — harmonic rejection | recover the fundamental where 2P genuinely scores higher, **and** show the search picks 2P with rejection off | **2.786 vs 5.583 mm, PASS** |
+
+Exam D was rewritten because its first version was vacuous: with a plain
+second harmonic the search returned the right answer with rejection switched
+off, so the exam could not fail. It now checks both halves — the fix, and
+that the fix was needed.
+
+Exam B failed on the first run for a reason worth keeping: the analysis
+window was sized from the lattice period, which runs along the *perpendicular*
+axis. For line spacing on a narrow render that came out wider than the whole
+image, so exactly one window fitted and there was no track to glitch. Window
+size belongs to the walking direction.
+
+---
 
 ## 4 — Screen (`scripts/grid_metric.py rank`)
 Given several candidate renders of the **same region** (e.g. alternative segmentation
@@ -545,7 +622,7 @@ the neutral angle turned up at all.
 
 ---
 
-## 9 — Work size (`scripts/work_size.py`, `data/roll_catalogue.csv`)
+## 9 — Work size (`scripts/work_size.py`, `archives/results/roll_catalogue.csv`)
 
 How big a roll does a work make, and which work fits a roll? Two directions:
 
@@ -561,6 +638,7 @@ How big a roll does a work make, and which work fits a roll? Two directions:
 python scripts/work_size.py identify --section 42 21
 python scripts/work_size.py population --section 42 21
 python scripts/work_size.py test
+python scripts/phase_tracking.py test
 ```
 
 **Prior art, stated first.** Reconstructing a roll's original length and
@@ -689,6 +767,7 @@ vesuvius-topological-grid/
 │   ├── orient_acceptance_test.py      ← acceptance test for orient mode
 │   ├── grid_metric.py                 ← analyze / compare / rank
 │   ├── make_rank_candidates.py        ← acceptance test for rank mode
+│   ├── phase_tracking.py              ← period-phase search; phase glitches
 │   ├── epoch_folding_prototype.py
 │   ├── experiment_A_degradation.py
 │   └── delta_beta_ink.py
@@ -724,49 +803,53 @@ python scripts/grid_metric.py rank candA.png candB.png candC.png \
 # 7. Detect buried line structure by epoch folding
 python scripts/epoch_folding_prototype.py --input surface.png --width-mm 129 --noise-test
 
-# 8. Map the local tilt of the writing baseline
+# 8. Search the period and phase, and track the phase for glitches
+python scripts/phase_tracking.py search IMAGE.png --width-mm 129 --axis lines
+
+# 9. Map the local tilt of the writing baseline
 python scripts/grid_metric.py orient IMAGE.png --width-mm 129 \
     --letters-mm 4.16 --lines-mm 2.79
 
-# 9. Void-aware layer-count reconciliation (runs its acceptance test with no args)
+# 10. Void-aware layer-count reconciliation (runs its acceptance test with no args)
 python scripts/void_aware_expected_n.py
 
-# 10. Build the synthetic twin for a work of N columns (no input images needed)
+# 11. Build the synthetic twin for a work of N columns (no input images needed)
 python scripts/synthetic_scroll_twin.py build --columns 95 --script greek \
     --csv twin_truth.csv --plot twin.png
 
-# 11. What the crushed section implies about the length of the work
+# 12. What the crushed section implies about the length of the work
 python scripts/synthetic_scroll_twin.py sweep --script greek --plot sweep.png
 
-# 12. Sheet joins: the kollesis landmarks and their angular chirp
+# 13. Sheet joins: the kollesis landmarks and their angular chirp
 python scripts/synthetic_scroll_twin.py kollesis --columns 95 --plot koll.png
 
-# 13. Export a voxel volume as a test bench (fused turns, crossed fibers)
+# 14. Export a voxel volume as a test bench (fused turns, crossed fibers)
 python scripts/synthetic_scroll_twin.py volume --columns 95 --z-window 8 \
     --voxel-um 60 --fuse 20,24,60,150 --fibers --out twin_vol.npy
 
-# 14. The falsifiable column map for the real scroll; anchors tighten it
+# 15. The falsifiable column map for the real scroll; anchors tighten it
 python scripts/text_layout_predictor.py predict --columns 95 --csv map.csv
 python scripts/text_layout_predictor.py calibrate --anchors anchors.csv
 
-# 15. What the implied work depends on (never quote a figure without this)
+# 16. What the implied work depends on (never quote a figure without this)
 python scripts/synthetic_scroll_twin.py sensitivity
 
-# 16. Where the crush cracks the sheet, and where it leaves it intact
+# 17. Where the crush cracks the sheet, and where it leaves it intact
 python scripts/fibre_strain.py map --plot fibre.png
 
-# 17. Which work fits a measured section, and which rolls match nothing
+# 18. Which work fits a measured section, and which rolls match nothing
 python scripts/work_size.py identify --section 42 21
 python scripts/work_size.py population --section 42 21
 
-# 18. Acceptance tests (no arguments, no data required)
+# 19. Acceptance tests (no arguments, no data required)
 python scripts/synthetic_scroll_twin.py test
 python scripts/text_layout_predictor.py test
 python scripts/fibre_strain.py test
 python scripts/work_size.py test
+python scripts/phase_tracking.py test
 ```
 
-Steps 10-18 need no input images: everything from mode 7 onward runs on
+Steps 11-18 need no input images: everything from mode 7 onward runs on
 geometry alone.
 
 Steps 10-16 need no input images: the twin and the predictor run on geometry

@@ -85,7 +85,7 @@ them are weaker than the word "measured" would suggest.
 | winding pitch (local) | — | **not usable.** Wrap-to-wrap spacing is reported as inconsistent even between adjacent index pairs, useful at most as an initialization (sean/bruniss, community channel). The mean over ~70 turns is a well-constrained quantity; the local pitch is not, and no result here may rest on it | **unusable — see below** |
 | winding turns | ~70 | **not an independent measurement.** It follows from the section, the pitch and the assumed umbilicus: `n = (r_out − r₀) / p` | **derived** |
 | umbilicus radius r₀ | 4.1 mm | **assumed.** Chosen as the value that makes ~70 turns consistent with a 173 µm pitch. Plausible for a Herculaneum roll, but not measured here | **free parameter** |
-| page height | 200 mm | conventional for Herculaneum rolls; not measured on PHerc1218 in this work | **assumed** |
+| page height | 200 mm (twin default) | inside the measured population envelope for intact Herculaneum rolls, **19–24 cm**, recorded above from the PHerc. 1667 unwrapping paper. (A Wikipedia infobox gives "16 cm" for Paris 4 in an ambiguous field; it was briefly taken here as a correction and should not have been — a catalogue infobox does not outrank a sourced population measurement) | **assumed, and consistent with the population** |
 
 ### Two consequences that must travel with any number quoted from mode 7
 
@@ -138,6 +138,29 @@ resolutions. This is what produced the 207 → 187.3 µm correction above. The
 level behind the PHerc1218 aggregates used here is not recorded — worth
 establishing before any of these figures is quoted outside this repository.
 
+### Only two of the three grid numbers are periods
+
+Worth stating before any of them is measured spectrally, because it decides
+which failures to expect.
+
+**Line spacing is a real period** — the scribe holds a constant line height.
+**Column period is a real period** — columns are laid out at a regular
+interval. **Letter pitch is not.** Greek majuscule is not monospaced: iota is
+narrow, omega and mu are wide, and in prose the right edge of a column is
+ragged precisely because of it. What is called "letter pitch" here is the
+*mean* spacing of variable-width glyphs.
+
+Two consequences:
+
+1. Letters per line is a whole number on each line and a **fraction over a
+   column**, varying line to line as the glyph mix varies. A fractional mean
+   is expected, not an error.
+2. The letter pitch is the member of the grid with the **weakest periodic
+   signal**, so it is the one where a spectral search is least trustworthy —
+   the opposite of the intuition that the smallest, most-repeated feature is
+   the easiest to find. Any pitch measured this way carries a smearing that
+   the other two do not.
+
 ### Grid self-consistency — the check that fails
 
 Three grid numbers are not independent. Letter pitch, letters per line and
@@ -159,7 +182,56 @@ own numbers in:
 not depend on any other scroll: the two numbers measured here are mutually
 incompatible. One of them is wrong.
 
-Two independent roll reconstructions say which:
+**The community's production constants bear on this, but weakly, and an
+earlier version of this file over-read them.** The `spiral-ink-metric-scale`
+branch of `get_ink_metrics` restates the pixel priors physically:
+
+    COL_WIDTH_MM  = 65.0            # expected text column width
+    LINE_PITCH_MM = (6.22, 9.33)    # expected text-line pitch band
+
+**These are scoring tolerances, not measurements.** They are priors for a
+quality metric, derived on Scroll 1, and deliberately wide so that a range of
+scrolls score well. Treating them as the true grid is a category error, and
+this file made it: the line band was briefly written up here as settling the
+question. It does not.
+
+For the COLUMN they are corroborative, because they agree with independent
+roll reconstructions (below) — 65 mm written plus an intercolumn lands on the
+72–75 mm those give. For the LINE PITCH they are not: 9.33 mm would put about
+14 lines in a Herculaneum column, and 6.22 mm about 20, against the few tens
+such columns carry.
+
+The one direct measurement found so far points the other way. The
+phase-contrast tomography work on Herculaneum rolls describes "an 11 mm large
+text of more than three lines" — **≤3.7 mm per line**, and closer to 2.8 mm if
+four lines are meant.
+
+So the honest position on the line pitch is a plausible range, not a value.
+Run it backwards from the column instead: a 200 mm page leaves ~150 mm of
+written height, and Herculaneum columns carry a few tens of lines.
+
+| lines per column | implied line pitch |
+|---|---|
+| 40 | 3.75 mm |
+| 35 | 4.29 mm |
+| 30 | 5.00 mm |
+| 25 | 6.00 mm |
+
+That brackets the pitch at roughly **3.8–6.0 mm**. Two things follow, and
+neither is a theory:
+
+- **2.79 mm sits below the range** — it would need 54 lines in a column.
+- **4.45 mm sits comfortably inside it**, at ~34 lines.
+
+So the value this repository discarded as a resolution artefact is the one
+the column arithmetic prefers, and its replacement is the one that does not
+fit. That is not proof the correction was wrong — the two are not clean
+harmonics of each other (4.45 / 2.79 = 1.60), so no simple aliasing story
+connects them. It does mean the correction should not be treated as settled,
+and that re-running the period search with a widened band is the way to
+settle it.
+
+Two independent roll reconstructions agree on the column figure:Two independent roll reconstructions agree on the column figure:
 
 | roll | evidence | column period |
 |---|---|---|
@@ -168,11 +240,20 @@ Two independent roll reconstructions say which:
 | Paris 4, implied | 4.16 mm x 17 letters + intercolumn | **~75 mm** |
 
 All three cluster at 70–75 mm. The letter pitch survives; the **column period
-does not**. And the failure mode is the expected one: 43.0 mm sits 7 % above
-the bottom edge of `BAND_COLUMNS = (40, 80)` in `grid_metric`, and the source
-already warns that widening the band below 40 mm changes the answer. That two
-implementations reproduced 43.0 does not rescue it — the same method on the
-same render reproduces the same artefact.
+does not**. **Why 43.0 comes out is not explained, and an earlier version of this file
+claimed otherwise.** It said 43.0 sits near the bottom edge of
+`BAND_COLUMNS = (40, 80)` and was therefore a band artefact. That reasoning is
+wrong: the band *contains* 72 mm, so had 72 been the dominant peak the search
+would have found it. Something in that render puts more spectral energy at
+43 mm than at 72 mm, and what it is remains open. `grid_metric` records
+neighbouring structure nobody has accounted for either — "a strong ~8 mm peak
+of unknown origin has a ~32 mm relative at lower freq" — and the 40 mm lower
+edge was chosen to exclude that relative. So the horizontal spectrum of this
+render carries at least three features (~8, ~32, ~43 mm) with no established
+origin, and the column period is being read off it.
+
+That two implementations reproduced 43.0 does not rescue it: the same method
+on the same render reproduces the same artefact.
 
 **Consequence, and it is large.** The implied work for the measured
 42 x 21 mm section scales inversely with the column period:
@@ -194,7 +275,7 @@ render.
 | parameter | value | provenance | status |
 |---|---|---|---|
 | letter pitch | 4.16 mm | measured in this repository (mode 1) on public Grand Prize 2023 renders of PHerc. Paris 4; replicated by independent implementations | **measured** |
-| line spacing | 2.79 mm | as above, by spatial per-column estimation. Supersedes an earlier 4.45 mm, which was a resolution artefact (README §Lessons) — dispersion is large | **measured, dispersed** |
+| line spacing | 2.79 mm | as above, by spatial per-column estimation | **unsettled.** Plausible range from column-height arithmetic is 3–5 mm, which brackets the discarded 4.45 and sits just above 2.79. The production band (6.22–9.33) is a scoring tolerance from another scroll and is too generous — it implies ~14–20 lines per column |
 | column period | 43.0 mm | as above | **contradicted — see the self-consistency check above.** Reproducible, but implies 7.9 letters per line against ~17 observed, and two roll reconstructions give 72–75 mm |
 | letters per line | ~17 | PHerc. 118, established by Oxford papyrologists from the Seales 3D composite and used to reassemble fragments | external, measured |
 

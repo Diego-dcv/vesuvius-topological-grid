@@ -112,6 +112,17 @@ G = dict(
                          # typical practice, which is the only reason this
                          # default moved while the grid constants did not.
     kollesis_ov_mm=15.0, # overlap at the join (double thickness band)
+    kollesis_sigma_mm=0.0,  # per-sheet width variation (0 = the idealized
+                            # roll: every kollema identical, which no real
+                            # roll is). Sheets were cut by hand from a plant;
+                            # a real scapus varies.
+    scapus_sheets=0,     # sheets before a SECOND batch is glued on, with its
+                         # own mean width (see scapus_mm). 0 = single batch.
+                         # On Poems II is documented as 70 sheets with a
+                         # further 30 added when the work ran long -- a second
+                         # batch is a discontinuity in the join sequence, not
+                         # noise, and possibly a different Pliny grade.
+    scapus_mm=0.0,       # mean width of the second batch; 0 = same as first
 )
 SECTION_MEASURED = (42.0, 21.0)   # mm, PHerc1218
 
@@ -334,16 +345,33 @@ def kollesis_map(L_mm, g=G):
     step between successive joins shrinks monotonically outward -- an
     angular chirp no software artefact would imitate.
     """
+    # Sheet widths, laid down from the OUTER end inward in the order they were
+    # glued. Variable by default only if a sigma is given; a second batch, if
+    # declared, starts after `scapus_sheets` and carries its own mean.
     W = g['kollesis_mm']
-    j = np.arange(1, int(L_mm // W) + 1)
-    s_inner = L_mm - j * W                    # arc from the inner end
+    sig = g.get('kollesis_sigma_mm', 0.0)
+    n_first = g.get('scapus_sheets', 0) or 10 ** 9
+    W2 = g.get('scapus_mm', 0.0) or W
+    rng = np.random.default_rng(g.get('kollesis_seed', 12345))
+    widths, total = [], 0.0
+    while total < L_mm:
+        mean = W if len(widths) < n_first else W2
+        w = mean + (rng.normal(0.0, sig) if sig > 0 else 0.0)
+        w = max(w, 0.25 * mean)
+        widths.append(w); total += w
+    widths = np.array(widths[:-1]) if total > L_mm else np.array(widths)
+    if widths.size == 0:
+        widths = np.array([W])
+    s_inner = L_mm - np.cumsum(widths)        # arc from the inner end
+    j = np.arange(1, len(widths) + 1)
     keep = s_inner > 0
-    j, s_inner = j[keep], s_inner[keep]
+    j, s_inner, widths = j[keep], s_inner[keep], widths[keep]
     turn_f, phi, r, x_w, y_w = wound_position(s_inner, g)
     theta = np.degrees(phi) % 360.0
     d_theta = np.abs(np.diff(np.degrees(phi)))
     return dict(index=j, s_inner_mm=s_inner, turn=turn_f, theta_deg=theta,
                 r_mm=r, n_joins=len(j), scapus_sheets=float(L_mm / W),
+                widths_mm=widths,
                 step_deg=np.concatenate([[np.nan], d_theta]))
 
 
@@ -623,6 +651,33 @@ def acceptance_test(verbose=True):
                                  step_last_deg=float(step[-1]),
                                  passed=bool(ok_D))
 
+    # ---- E: how much sheet variation the landmark survives -----------------
+    # A join is useful for registration only if, having found some, you can
+    # say where the next ones are. Widths vary, so extrapolating n sheets
+    # ahead accumulates an error of sigma*sqrt(n); the landmark stops being
+    # locatable when that exceeds half a sheet, i.e. at n = (W / 2 sigma)^2.
+    # This exam checks the empirical horizon against that closed form, and it
+    # is what turns "kollesis is a landmark" into a statement with a
+    # condition attached.
+    W = G['kollesis_mm']
+    rows = []
+    for sig in (5.0, 15.0, 30.0, 50.0):
+        rng2 = np.random.default_rng(4)
+        fails = []
+        for _ in range(400):
+            w = rng2.normal(W, sig, 400)
+            pos = np.cumsum(w)
+            err = np.abs(pos - np.arange(1, 401) * W)
+            bad = np.where(err > W / 2)[0]
+            fails.append(bad[0] + 1 if bad.size else 400)
+        rows.append((sig, float(np.median(fails)), (W / (2 * sig)) ** 2))
+    ok_E = all(0.4 <= m / a <= 2.5 for _, m, a in rows)
+    results['E_landmark_horizon'] = dict(
+        rows=rows,
+        sheets_in_roll=float(meta['length_mm'] / W),
+        sigma_tolerated=float(W / (2 * np.sqrt(meta['length_mm'] / W))),
+        passed=bool(ok_E))
+
     if verbose:
         print("=" * 68)
         print("ACCEPTANCE TEST -- synthetic_scroll_twin (pre-registered)")
@@ -646,6 +701,13 @@ def acceptance_test(verbose=True):
               f"{D['step_first_deg']:.0f} (outer) -> {D['step_last_deg']:.0f} (inner) deg, "
               f"monotone {D['monotone_frac']*100:.0f}% (>98) -> "
               f"{'PASS' if D['passed'] else 'FAIL'}")
+        E = results['E_landmark_horizon']
+        print(f"E landmark horizon extrapolation limit vs (W/2s)^2: "
+              + ", ".join(f"s={s0:.0f}:{m:.0f}/{a:.0f}" for s0, m, a in E['rows'])
+              + f" -> {'PASS' if E['passed'] else 'FAIL'}")
+        print(f"                   this roll holds {E['sheets_in_roll']:.0f} sheets, so "
+              f"kollesis is usable while sheet width varies < {E['sigma_tolerated']:.0f} mm "
+              f"({100*E['sigma_tolerated']/G['kollesis_mm']:.0f} %)")
         allp = all(v['passed'] for v in results.values())
         print("-" * 68)
         print("OVERALL:", "PASS" if allp else "FAIL")
@@ -670,6 +732,12 @@ def main():
     ap.add_argument('--voxel-um', type=float, default=60.0)
     ap.add_argument('--fibers', action='store_true')
     ap.add_argument('--script', choices=list(SCRIPTS), default='greek')
+    ap.add_argument('--kollesis-sigma-mm', type=float, default=0.0,
+                    help='per-sheet width variation; 0 = idealized roll')
+    ap.add_argument('--scapus-sheets', type=int, default=0,
+                    help='sheets before a second batch is glued on')
+    ap.add_argument('--scapus-mm', type=float, default=0.0,
+                    help='mean sheet width of that second batch')
     ap.add_argument('--kollesis-mm', type=float, default=G['kollesis_mm'],
                     help='kollema (sheet) width; 0 disables joins')
     ap.add_argument('--fuse', type=str, default=None,
@@ -764,6 +832,9 @@ def main():
         return
 
     G['kollesis_mm'] = args.kollesis_mm or 1e9
+    G['kollesis_sigma_mm'] = args.kollesis_sigma_mm
+    G['scapus_sheets'] = args.scapus_sheets
+    G['scapus_mm'] = args.scapus_mm
     for w in grid_warnings():
         print(f'[warning] {w}')
     if grid_warnings():
@@ -788,6 +859,15 @@ def main():
         print(f"[kollesis] {ko['n_joins']} joins of {args.kollesis_mm:.0f} mm "
               f"= {ko['scapus_sheets']:.1f} sheets "
               f"(a scapus is 20 sheets; On Poems II glued 70 + 30)")
+        wd = ko['widths_mm']
+        print(f"[sheets] widths {wd.min():.0f}-{wd.max():.0f} mm, "
+              f"sd {wd.std():.1f} mm"
+              + (f"; second batch after {G['scapus_sheets']} sheets"
+                 if G.get('scapus_sheets') else ""))
+        nsh = len(wd); tol = G['kollesis_mm']/(2*np.sqrt(max(nsh,1)))
+        print(f"[usable] over {nsh} sheets the landmark survives width variation "
+              f"below {tol:.0f} mm ({100*tol/G['kollesis_mm']:.0f} %); "
+              f"measured here {wd.std():.1f} mm")
         print(f"[chirp] angular step between successive joins: "
               f"{ko['step_deg'][1]:.0f} deg (outermost) -> "
               f"{ko['step_deg'][-1]:.0f} deg (innermost)")

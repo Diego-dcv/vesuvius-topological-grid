@@ -318,6 +318,55 @@ Which closes a loop worth noting: **measuring where the pristine sectors lie
 would break this tie**, because the neutral angle depends on R and on nothing
 else. The prediction and the open question are the same measurement.
 
+### The neutral angle: tested on the labels, and not found
+
+The scale-invariant prediction of mode 8 — four unstrained sectors at
+37.6–40.3° from the crease axis, at every depth — was put to the labels by
+the author of the per-cell data. **The zones survive; the spokes do not.**
+
+What passed, and strongly:
+
+| | preserved fraction |
+|---|---|
+| crease axis, void-based metric | **0.020** against 0.110 in between |
+| crease axis, ratio-based metric | 0.148 against 0.217 |
+| flattened axis | depressed in the ratio metric (0.173) but **not** in the void metric (0.110, same as between) |
+
+So the two axes fail, and they **fail differently** — the crease axis by void,
+the flattened axis by merging, which is precisely the two-mechanism split mode
+8 predicts. Within 10° of the creases the void-based preserved fraction barely
+exists. The cracking prediction is confirmed harder than anything else in this
+file.
+
+What failed: **no spoke**. The preserved fraction is a broad flat band from
+~20° to ~70°, and the neutral zone [33–47°] does not beat its own flanks in
+either metric — 0.213 vs 0.221 (z = −0.8) and 0.111 vs 0.104 (z = +1.0).
+Peaks sit at 24°/48° and 48–66°. Nothing localizes where the model says it
+should.
+
+**Two things follow, and neither is a rescue.**
+
+The claim that *"measuring where the pristine sectors lie measures the crush
+ratio"* is **withdrawn**. It was tried with the best available observables and
+it does not work; the crush ratio still has to come from the span/pitch
+disagreement, which leaves it bracketed at 1.55–2.0 : 1.
+
+And the joins cannot account for it. Kollesis bands cover 9.1 % of the sheet,
+so ~9 % of ray crossings sit on one — not negligible — but each band spans
+54–173° of angle depending on depth, and their angular distribution is
+compatible with uniform (χ² = 6.3 against 19.7 critical). Broad, uniform
+contamination dilutes a narrow feature by roughly its own fraction; it does
+not turn a real spoke into a flat band.
+
+**The one honest escape, named by the person who ran the test, is that these
+observables measure ray-count behaviour rather than material integrity.** The
+void fraction is dominated by the geometric gap, which the ellipse makes vary
+*monotonically* from crease to flat — so a local dip in strain would sit under
+a much larger monotonic trend. That limit is real, but it is also the kind of
+argument that can excuse any failed prediction, so until someone measures with
+a strain-sensitive observable the neutral angle stands as **predicted, tested,
+and unsupported**.
+
 ### Ancient units: what was bought, and what the hand made
 
 Every figure in this file is in millimetres, which is a unit from 1793 applied

@@ -356,6 +356,40 @@ the band we chose to look in (TRACKING / JUMP). Both `BAND_LETTERS` and
 `BAND_COLUMNS` currently return values within ~10 % of a band edge; only the
 line spacing sits comfortably interior.
 
+#### The grid, measured on the render
+
+The scale-free check that settled it, and the numbers the twin now carries:
+
+| | before | after | normal for Herculaneum |
+|---|---|---|---|
+| letters per line | 7.9 | **16** | 15–25 |
+| lines per column | 54 | **41** | 25–40 |
+| letter pitch | 4.16 mm | **1.83 mm** | — |
+| line spacing | 2.79 mm | **3.69 mm** | — |
+| characters per column | 426 | **649** | — |
+
+The decisive figure was a **ratio**, so no calibration argument could touch
+it: column period / letter pitch measures **23.4** on the render against the
+**10.3** implied by 43 / 4.16. The count is not a clean read, so it was run at
+15, 16 and 17 letters — the discrepancy holds at 2.1–2.4× throughout. Details
+and the failure mechanism in [`docs/data_sources.md`](docs/data_sources.md),
+"Grid self-consistency".
+
+Two cautions that came out of measuring it, both worth carrying:
+
+- **Counting letters needed a human.** An autocorrelation of the line profile
+  peaks at the *stroke* spacing, not the letter spacing — Greek majuscule puts
+  two or more verticals inside a single Π, Η, Μ or Ν, and that periodicity is
+  stronger than the letter one.
+- **Do not expect round numbers.** Everything here is in millimetres, a unit
+  from 1793 applied to a first-century-BC hand. In Roman digiti the grid is
+  2.32, 1.58, 0.20, 0.099 — nothing round, because there was no rule on the
+  scribe's table. Where ancient units *do* bite is the sheet, which was
+  manufactured and sold: Pliny's papyrus grades run 13/11/9/6 digiti
+  (240/204/166/111 mm), and intact rolls stand 190–240 mm tall — 10–13 digiti,
+  whole units. **What was purchased is in ancient units; what the hand made is
+  not.**
+
 #### Kollesis: the Egyptian manufacture is in the geometry
 
 No Egyptian-language text is plausible at Herculaneum — it is a Greek

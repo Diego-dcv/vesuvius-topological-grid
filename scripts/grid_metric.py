@@ -48,7 +48,16 @@ WINDOW_W_MM = 30.0
 WINDOW_H_MM = 8.0
 STEP_MM = 3.0
 
-BAND_LETTERS = (2.0, 4.5)     # mm
+BAND_LETTERS = (1.0, 4.5)     # mm -- the lower edge was 2.0 and EXCLUDED THE
+                              # ANSWER: on the Paris 4 render the letter pitch
+                              # is 24.4 px against a 571 px column period, i.e.
+                              # 1.83 mm at the 43 mm column scale, 8% below the
+                              # old floor. The search returned the strongest
+                              # peak inside a band that could not contain the
+                              # truth, giving 4.16 mm -- a factor 2.27 out.
+                              # band_sensitivity.py returns JUMP on this axis.
+                              # See docs/data_sources.md, "Grid
+                              # self-consistency".
 BAND_COLUMNS = (40.0, 80.0)   # mm -- band edges are a CALIBRATION CHOICE: a strong ~8 mm
                               # peak of unknown origin has a ~32 mm relative at lower freq;
                               # widening the band below 40 mm changes the detected period.

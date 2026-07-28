@@ -140,12 +140,19 @@ SCRIPTS = {
 # tool says so on every run, because a caveat that lives only in the README is
 # a caveat the output does not carry.
 PLAUSIBLE = {
-    'line_mm': (3.8, 6.0),       # from column-height arithmetic: a 200 mm page
-                                 # leaves ~150 mm written, and Herculaneum
-                                 # columns carry a few tens of lines
-    'col_period_mm': (65.0, 80.0),  # On Poems II 72.1, PHerc.1667 ~75,
-                                    # get_ink_metrics 65 mm written + intercolumn
-    'letter_mm': (3.8, 4.3),     # 65 mm column / 15-17 letters per line
+    'line_mm': (3.5, 6.0),       # column-height arithmetic gives 3.8-6.0; the
+                                 # render measurement gives 3.69 at the 43 mm
+                                 # column scale, so the floor is relaxed
+    'col_period_mm': (40.0, 80.0),  # 43 mm measured on Paris 4 and VINDICATED
+                                    # by the render (571 px period against a
+                                    # 24.4 px letter pitch = 23.4, consistent
+                                    # with 16 letters in 68% of the period).
+                                    # Other rolls give 72-75; Herculaneum
+                                    # column widths genuinely vary
+    'letter_mm': (1.5, 2.5),     # 390 px written / 16 letters = 24.4 px, i.e.
+                                 # 1.83 mm at the 43 mm scale. The 4.16 mm on
+                                 # file is a band artefact -- see
+                                 # docs/data_sources.md
 }
 
 

@@ -628,10 +628,16 @@ Which makes it **invertible**, and that is the point:
 | 3 : 1 | 33.5° |
 | 4 : 1 | 30.8° |
 
-**Measuring where the best-preserved sectors lie measures the crush ratio** —
-with no dependence on the winding pitch, the umbilicus, the sheet thickness
-or the writing grid. None of the numbers this repository currently holds in
-doubt enters that calculation.
+It looked like it would also make a ruler — *measure where the best-preserved
+sectors lie and read off the crush ratio*, with no dependence on pitch,
+umbilicus, thickness or grid. **That claim has been tested and withdrawn.**
+Run against per-cell labels on PHerc1218, the zones are there and the spokes
+are not: the crease axis is severely damaged by void and the flattened axis by
+merging — the two-mechanism split, confirmed — but the preserved fraction is a
+broad flat band from ~20° to ~70°, and the neutral zone does not beat its own
+flanks (z = −0.8 and +1.0). Details, and why the joins cannot account for it,
+in [`docs/data_sources.md`](docs/data_sources.md), "The neutral angle: tested
+on the labels, and not found".
 
 ### A three-zone angular signature
 

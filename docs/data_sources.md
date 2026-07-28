@@ -131,12 +131,30 @@ even between adjacent index pairs. Uses divide accordingly:
 | local pitch — per-column angles, the smoothness of the kollesis chirp | weakened; treat the idealized figures as properties of the twin, not predictions about a real scroll |
 | neither — the neutral angle and the fold/flat strain ratio | untouched |
 
-**Resolution levels.** 27 of 41 published surface predictions are level 0
-rather than level 2, and the `L<k>` token in the filename is load-bearing; a
-measurement that assumes one level across the collection silently mixes
-resolutions. This is what produced the 207 → 187.3 µm correction above. The
-level behind the PHerc1218 aggregates used here is not recorded — worth
-establishing before any of these figures is quoted outside this repository.
+**Resolution level — resolved.** 27 of 41 published surface predictions are
+level 0 rather than level 2, and the `L<k>` token in the filename is
+load-bearing; a measurement that assumes one level across the collection
+silently mixes resolutions, which is what produced the 207 → 187.3 µm
+correction above. For the aggregates used here the level is stated by their
+author: the PHerc1218 cell CSV is on the **L1 grid at 17.28 µm/voxel**
+(2 × 8.64 µm, straight from the bucket metadata), with pitch and span already
+converted to physical units. So the section reconstruction is L1, not a mix.
+
+**Phantom sheet — does not reach these figures.** Published m7 surface
+predictions can mark sheet where the masked CT is identically zero; a
+36-scroll audit puts **PHerc1218 at 58.6 %** of predicted voxels in that
+class. That would have been a serious inheritance problem, because the
+section here is reconstructed from aggregates over those predictions. It is
+not one: everything downstream of the cleaning step in
+`vesuvius-sheet-tools` — instance labels, constraint pack, fitted surfaces —
+descends from CT>0-gated data, so the phantom class never enters the
+aggregates. Confirmed by their author on the same crop the cleaning figure
+comes from, where the provable class is exactly 50.0 % of predicted voxels
+and a small-component filter removes a further 18.4 %.
+
+Note the direction: phantom sheet would have made the section *larger*, so
+its absence does not soften the population finding below — the 3.24 cm
+equal-perimeter diameter is a gated measurement, not an inflated one.
 
 ### Only two of the three grid numbers are periods
 
@@ -250,6 +268,56 @@ below 2.0 mm before any letter pitch measured with it can be trusted.
 > assumption, not a measurement, and a column-width drift would show up as a
 > smooth residual trend.
 
+### The crush model tested against the real scroll
+
+The twin's crush is an equal-perimeter 2:1 ellipse per turn. That predicts not
+just "layers are further apart at the creases" but a **specific curve**: the
+radial gap along a ray from the centroid should follow
+
+    gap(theta)  ∝  1 / sqrt( cos²theta / R² + sin²theta )
+
+which can be fitted to real data, and the fit returns R. Run against the
+21,480 interior cells of the public PHerc1218 per-cell table
+(`pitch_qa_cells.csv`, L1, 6° bins):
+
+| | result |
+|---|---|
+| shape of the angular profile | **R² = 0.93** — the ellipse form fits |
+| crease axis recovered by the fit | **0.0°** — independently, from the gap profile alone |
+| crush ratio from the **pitch** | **1.55 : 1** |
+| crush ratio from the **span** | **1.97 : 1** |
+
+The shape is confirmed. The ratio is not: two quantities from the same table
+disagree, and the disagreement is itself informative.
+
+**Why they disagree, and what it confirms.** `counted_over_expected` is 19 %
+**lower on the crease axis** (0.35) than on the flattened axis (0.43) — more
+material unaccounted for at the creases. Void inflates the radial *span*
+without moving the *median* gap, so a void excess at the creases raises the
+span-based ratio and leaves the pitch-based one alone. That is exactly the
+observed pattern.
+
+And the void excess at the creases is what **mode 8 predicts**: bending strain
+there is 3.4× the flattened sides, and carbonized papyrus cracks rather than
+compresses. Cracking makes void. So the discrepancy between the two ratios is
+independent corroboration of the cracking prediction, arriving from a column
+nobody was looking at for that purpose.
+
+**Honest bracket.** The pitch-based figure could itself be biased low if
+cracking produces many *small* gaps rather than a few large ones, which would
+pull the median down at the creases. So the true flattening sits somewhere in
+**1.55–2.0 : 1**, and the neutral angle of mode 8 with it:
+
+| crush ratio | neutral angle |
+|---|---|
+| 1.55 : 1 | 40.3° |
+| 1.70 : 1 | 39.3° |
+| 2.00 : 1 | 37.6° |
+
+Which closes a loop worth noting: **measuring where the pristine sectors lie
+would break this tie**, because the neutral angle depends on R and on nothing
+else. The prediction and the open question are the same measurement.
+
 ### Ancient units: what was bought, and what the hand made
 
 Every figure in this file is in millimetres, which is a unit from 1793 applied
@@ -290,7 +358,13 @@ second.
   **A measured Herculaneum roll now supersedes the inference**: Philodemus'
   *On Poems* II is 16 m long and made of 100 kollemata, i.e. **160 mm per
   sheet**. The repository default of 180 mm is 12 % high and should be read
-  as an upper estimate.
+  as an upper estimate. Pliny is close to these rolls in an arresting way -- he
+  was prefect of the fleet at Misenum, some 30 km across the bay, and died at
+  Stabiae in the very eruption that carbonized them. But close in place is not
+  close in time: he describes the manufacture of the AD 70s, while the
+  Philodeman library was assembled in the first century BC, over a hundred
+  years earlier. His testimony is near-contemporary with the burial, not with
+  the making -- a second reason the measured roll outranks it.
 - **Multiple scapi were glued — this is documented, not hypothetical.** The
   same roll "was at first a roll of 70 sheets; a further 30 were glued on
   when the work proved to be long". This closes the question this repository

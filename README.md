@@ -973,6 +973,7 @@ scripts.
 > Diego_dcv (2026). *vesuvius-topological-grid: an ML-independent structural metric
 > for Herculaneum scroll surfaces.* Zenodo. https://doi.org/10.5281/zenodo.21464028
 
+
 ## Contact
 Diego — Madrid, Spain. For substantive technical discussion, please open an issue in
 this repository.

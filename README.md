@@ -227,11 +227,13 @@ function — a field report from the full-scroll run.
 Two scripts, **one geometry**: a scroll is a single sheet wound on an
 Archimedean spiral, so `column k → (turn, θ, r)` is fixed once four numbers
 are — winding pitch, crushed section, column period and the lead-in before
-column 1. Only one of the four is on firm ground: the section (42 × 21 mm,
-cross-confirmed). The column period (43.0 mm) is reproducible but
-**arithmetically contradicted** — it implies 7.9 letters per line against the
-~17 measured on PHerc. 118, and two roll reconstructions give 72–75 mm. See
-`docs/data_sources.md`, "Grid self-consistency". The
+column 1. Two are on firm ground: the section (42 × 21 mm, cross-confirmed) and the
+column period (43.0 mm), which the Grand Prize render **vindicates** — 571 px
+period against a 24.4 px letter pitch, consistent with 16 letters counted in
+68 % of the period. What the same measurement breaks is the **letter pitch**:
+4.16 mm is out by a factor 2.27, because `BAND_LETTERS` started 8 % above the
+true value and the search could not reach it. See `docs/data_sources.md`,
+"Grid self-consistency". The
 mean pitch is corroborated for this scroll (iyando's 173 and the winding
 atlas's 172.8 for PHerc1218 agree) but the *local* wrap-to-wrap pitch is not
 usable at all, and the lead-in is assumed. Run `sensitivity` before quoting
@@ -660,12 +662,12 @@ python scripts/work_size.py test
 python scripts/phase_tracking.py test
 ```
 
-> **Read the column counts below as dependencies, not as answers.** They scale
-> inversely with the column period, which is currently contradicted by a factor
-> of ~1.7 (see [`docs/data_sources.md`](docs/data_sources.md), "Grid
-> self-consistency"). What this mode reports reliably is *which measurement
-> would narrow the answer most* — and that does not depend on the disputed
-> value.
+> **The column period underpinning these counts is now vindicated** on the
+> Grand Prize render (see [`docs/data_sources.md`](docs/data_sources.md),
+> "Grid self-consistency"), so the 43 mm branch is the working one and the
+> counts below are usable. The 72 mm branch stays in the sensitivity output
+> because Herculaneum column widths genuinely vary between rolls — it is an
+> alternative for *other* scrolls, not a rival reading of this one.
 
 **Prior art, stated first.** Reconstructing a roll's original length and
 column count from its geometry is standard papyrology, done on opened rolls

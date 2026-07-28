@@ -131,12 +131,30 @@ even between adjacent index pairs. Uses divide accordingly:
 | local pitch — per-column angles, the smoothness of the kollesis chirp | weakened; treat the idealized figures as properties of the twin, not predictions about a real scroll |
 | neither — the neutral angle and the fold/flat strain ratio | untouched |
 
-**Resolution levels.** 27 of 41 published surface predictions are level 0
-rather than level 2, and the `L<k>` token in the filename is load-bearing; a
-measurement that assumes one level across the collection silently mixes
-resolutions. This is what produced the 207 → 187.3 µm correction above. The
-level behind the PHerc1218 aggregates used here is not recorded — worth
-establishing before any of these figures is quoted outside this repository.
+**Resolution level — resolved.** 27 of 41 published surface predictions are
+level 0 rather than level 2, and the `L<k>` token in the filename is
+load-bearing; a measurement that assumes one level across the collection
+silently mixes resolutions, which is what produced the 207 → 187.3 µm
+correction above. For the aggregates used here the level is stated by their
+author: the PHerc1218 cell CSV is on the **L1 grid at 17.28 µm/voxel**
+(2 × 8.64 µm, straight from the bucket metadata), with pitch and span already
+converted to physical units. So the section reconstruction is L1, not a mix.
+
+**Phantom sheet — does not reach these figures.** Published m7 surface
+predictions can mark sheet where the masked CT is identically zero; a
+36-scroll audit puts **PHerc1218 at 58.6 %** of predicted voxels in that
+class. That would have been a serious inheritance problem, because the
+section here is reconstructed from aggregates over those predictions. It is
+not one: everything downstream of the cleaning step in
+`vesuvius-sheet-tools` — instance labels, constraint pack, fitted surfaces —
+descends from CT>0-gated data, so the phantom class never enters the
+aggregates. Confirmed by their author on the same crop the cleaning figure
+comes from, where the provable class is exactly 50.0 % of predicted voxels
+and a small-component filter removes a further 18.4 %.
+
+Note the direction: phantom sheet would have made the section *larger*, so
+its absence does not soften the population finding below — the 3.24 cm
+equal-perimeter diameter is a gated measurement, not an inflated one.
 
 ### Only two of the three grid numbers are periods
 
@@ -291,8 +309,15 @@ render.
   giving a roll of roughly 11–12 Roman feet, hence kollemata of ~17–19 cm.
   **A measured Herculaneum roll now supersedes the inference**: Philodemus'
   *On Poems* II is 16 m long and made of 100 kollemata, i.e. **160 mm per
-  sheet**. The repository default of 180 mm is 12 % high and should be read
-  as an upper estimate.
+  sheet**, which is now the default; the earlier 180 mm was 12 % high.
+  Pliny is close to these rolls in an arresting way — he was prefect of the
+  fleet at Misenum, some 30 km across the bay, and died at Stabiae in the
+  very eruption that carbonized them. But close in place is not close in
+  time: he describes the manufacture of the AD 70s, while the Philodeman
+  library was assembled in the first century BC, over a hundred years
+  earlier. His testimony is near-contemporary with the burial, not with the
+  making — a second reason the measured roll outranks it. The passage is
+  also textually debated.
 - **Multiple scapi were glued — this is documented, not hypothetical.** The
   same roll "was at first a roll of 70 sheets; a further 30 were glued on
   when the work proved to be long". This closes the question this repository

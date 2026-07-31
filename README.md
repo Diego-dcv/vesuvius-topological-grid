@@ -16,6 +16,7 @@ window holds ≥3 cycles of its period — see *Lessons*, below).
 On the public PHerc. Paris 4 surfaces it recovers, unsupervised:
 - letter pitch **4.16 mm** and column period **43.0 mm** — replicated exactly by two
   independently written implementations;
+  (*The 4.16 mm value is historical and superseded; use 1.83 mm for all production runs, or omit the flag to let the script measure it).
 - line spacing measured *spatially, per column* (~2–4 mm, wide spread on 13 mm strips
   — the uncertainty is part of the result).
 
@@ -1414,10 +1415,8 @@ python scripts/work_size.py test
 python scripts/phase_tracking.py test
 ```
 
-Steps 11-18 need no input images: everything from mode 7 onward runs on
-geometry alone.
-
-Steps 10-16 need no input images: the twin and the predictor run on geometry
+Steps 10-18 need no input images: everything from mode 7 onward runs on
+geometry alone. The twin and the predictor run on geometry
 alone.
 
 Scripts write PNG figures (and CSVs) to the working directory. A Paris-4-sized image

@@ -153,7 +153,7 @@ analysis axis and finding the orientation of maximum grid coherence.
 
 ```bash
 python scripts/grid_metric.py orient IMAGE.png --width-mm 129 \
-    --letters-mm 4.16 --lines-mm 2.79
+    --letters-mm 1.83 --lines-mm 2.79
 ```
 
 The point is independence: this reads **text layout**, whereas structure-tensor
@@ -1363,7 +1363,7 @@ python scripts/grid_metric.py compare A.png B.png --width-mm 129 --label-a Model
 
 # 6. Screen several candidates of the same region (external reference required)
 python scripts/grid_metric.py rank candA.png candB.png candC.png \
-    --width-mm 129 --letters-mm 4.16 --lines-mm 2.79
+    --width-mm 129 --letters-mm 1.83 --lines-mm 2.79
 
 # 7. Detect buried line structure by epoch folding
 python scripts/epoch_folding_prototype.py --input surface.png --width-mm 129 --noise-test
@@ -1373,7 +1373,7 @@ python scripts/phase_tracking.py search IMAGE.png --width-mm 129 --axis lines
 
 # 9. Map the local tilt of the writing baseline
 python scripts/grid_metric.py orient IMAGE.png --width-mm 129 \
-    --letters-mm 4.16 --lines-mm 2.79
+    --letters-mm 1.83 --lines-mm 2.79
 
 # 10. Void-aware layer-count reconciliation (runs its acceptance test with no args)
 python scripts/void_aware_expected_n.py

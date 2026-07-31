@@ -974,7 +974,7 @@ u(\theta)=
 No analytic ellipse is required. The measured PHerc1218 section profile therefore replaces the idealized crushed section used by the synthetic twin in Mode 7.
 
 <!-- Replace the filename below if the generated figure uses another name. -->
-![Geometry-only reconstruction of PHerc1218](figures/pherc1218_geometry_flatten.png)
+![Geometry-only reconstruction of PHerc1218](figures/rings3d.png)
 
 *Figure 10B-1 — The same material coordinates in two representations. Left: the reconstructed wound geometry. Right: the sections cut at a common reference and laid flat. Colour, where used, identifies corresponding material points rather than ink.*
 
@@ -1034,7 +1034,7 @@ The fit degrades after winding 45, reaching approximately \(R^2=0.94\) by windin
 This test validates one property only: the recovered sequence is geometrically consistent with successive windings of a spiral over the well-resolved range. It does **not** prove that every individual correspondence or crossing label is correct.
 
 <!-- Replace the filename below if needed. -->
-![Spiral consistency and coverage](figures/pherc1218_flatten_validation.png)
+![Spiral consistency and coverage](figures/peel.png)
 
 *Figure 10B-2 — Suggested combined validation figure: equivalent radius against winding index, coverage against flattened distance, measured-versus-integrated length, and reconstruction quality with depth.*
 
@@ -1094,7 +1094,7 @@ The conclusion is practical: the same crush pattern appears throughout the resol
 This is not a claim that every inner winding can already be recovered. It is evidence that a correction field measured outside may transfer inward without requiring an independent deformation model at every depth.
 
 <!-- Replace the filename below if needed. -->
-![Measured displacement field](figures/pherc1218_displacement_field.png)
+![Measured displacement field](figures/sheet.png)
 
 *Figure 10B-3 — Angular displacement expressed in material coordinates across winding depth and scroll height. The persistence of the same pattern is the relevant result; the colour scale should remain fixed across all panels.*
 

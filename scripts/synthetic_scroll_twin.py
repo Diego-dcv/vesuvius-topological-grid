@@ -460,7 +460,8 @@ def obra_implied_by_section(g=G, target=SECTION_MEASURED):
 # Optional voxel volume (a z-slab) for tool testing
 # ---------------------------------------------------------------------------
 def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
-                fibers=False, fuse=None, kollesis=True, rng=None):
+                fibers=False, fuse=None, kollesis=True, rng=None,
+                papyrus=90, ink=200, noise=0.0):
     """uint8 volume (z, y, x) of the crushed slab. Papyrus ~90, ink ~200,
     air 0. --fuse ti,tj,a0,a1 welds turns ti..tj over angles a0..a1 deg
     (their gap set to contact) and labels affected letters in the truth.
@@ -503,10 +504,10 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
         ix = ((xs + a_out + pad) * 1000 / voxel_um).astype(int)
         iy = ((ys + b_out + pad) * 1000 / voxel_um).astype(int)
         ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
-        base = 90
+        base = papyrus
         if fibers:
             # verso striation along winding direction: modulate along t
-            base = 90 + (15 * np.sign(np.sin(t_hi * 40))).astype(int)
+            base = papyrus + (15 * np.sign(np.sin(t_hi * 40))).astype(int)
         for zz in range(nz):
             v = base if not fibers else \
                 np.clip(base + 15 * np.sign(np.sin(zz * 0.9)), 0, 255)
@@ -531,7 +532,8 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
                 ix = ((a * sc_ * np.cos(t_e) + a_out + pad) * 1000 / voxel_um).astype(int)
                 iy = ((b * sc_ * np.sin(t_e) + b_out + pad) * 1000 / voxel_um).astype(int)
                 ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
-                vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]], 130)
+                vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]],
+                                                    min(255, int(papyrus * 130 / 90)))
 
     # ink from the truth table, inside the z window
     inz = (truth['z_mm'] >= z0) & (truth['z_mm'] < z0 + z_window_mm)
@@ -539,7 +541,10 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
     iy = ((truth['y_crushed'][inz] + b_out + pad) * 1000 / voxel_um).astype(int)
     iz = ((truth['z_mm'][inz] - z0) * 1000 / voxel_um).astype(int)
     ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny) & (iz >= 0) & (iz < nz)
-    vol[iz[ok], iy[ok], ix[ok]] = 200
+    vol[iz[ok], iy[ok], ix[ok]] = ink
+    if noise > 0:
+        v = vol.astype(np.float32) + rng.normal(0.0, noise, vol.shape)
+        vol = np.clip(v, 0, 255).astype(np.uint8)
     return vol, dict(z0_mm=z0, voxel_um=voxel_um, shape=vol.shape)
 
 

@@ -882,14 +882,22 @@ scroll. That was a prediction before it was a measurement.
 
 **The amplitude is 40 % higher than the ellipse allows.** The 2.08:1 ellipse
 predicts 12.3° at 54° from the crease axis; the measurement gives 16.5–19.4°
-with maxima at 324° and 138–144°. Fitting the measured boundary gives a = 21.36,
-b = 10.27 mm, ratio **2.08**, R² = 0.948, with a systematic hemispheric residual
-of ±0.25 mm — about 2 % of the semi-major axis, too little to explain a 40 %
-excess. Unresolved.
+with maxima at 324° and 138–144°. Fitting the **median** boundary gives a = 21.36, b = 10.27 mm, ratio 2.08,
+R² = 0.948 — but see the correction below: that fit is to an average shape and
+individual sections are markedly less elliptical. The excess remains
+unexplained.
 
-That ratio does settle something: **2.08 measured directly off the boundary
-geometry** resolves the span-versus-pitch disagreement of mode 8 in favour of
-the span (1.97) rather than the pitch (1.55).
+**That ratio was over-stated here and is now corrected.** An earlier version
+read the 2.08 as a constant measured off the boundary, and used it to settle
+the span-versus-pitch disagreement of Mode 8 in favour of the span. Two things
+were wrong with that. The fit was to the **median** profile over 313 heights,
+and averaging irregular sections manufactures an ellipse that exists at no
+height: fitted individually, real sections give R² **0.848** (range
+0.592–0.934) against the median's 0.948. And the ratio is not one number but a
+wide distribution — **1.35 to 3.16, median 2.01**, with the major axis rotating
+through the roll (standard deviation 85°) rather than holding a fixed
+orientation. The span still looks closer than the pitch, but on a median of a
+broad distribution, not on a constant.
 
 ### What it is for, and the claim that was withdrawn
 
@@ -1404,6 +1412,92 @@ angular step, not a new method.
 
 ---
 
+## 11B — Checked against the raw scan, and what did not survive
+
+Everything above is built on published per-ray crossing positions, which are
+themselves derived from surface predictions. This section goes to the **raw CT
+volume** — 8.64 µm masked scan, read directly from the open bucket — and asks
+whether the reconstruction lands on papyrus. Some of it does. Some of what was
+claimed earlier does not, and that is recorded here rather than quietly fixed.
+
+### What holds
+
+**The reconstructed section matches the scan, per height.** Overlaying the
+measured profile of a given height on the CT slice at that height:
+
+| height (L1) | error against CT | correlation |
+|---|---|---|
+| 2000 | 0.76 mm | **+0.993** |
+| 4500 | 0.66 mm | **+0.990** |
+| 7000 | 0.71 mm | **+0.993** |
+| 9500 | 0.83 mm | **+0.992** |
+
+Under 0.85 mm on a roll of 10–24 mm radius, and the reference angle agrees
+without being fitted — the crossing data and a centre-of-mass on raw CT arrive
+at the same orientation independently.
+
+**The inter-layer spacing is anisotropic in the raw scan too.** Spectrally, the
+period between laminae reads 235 µm on the crease axis against 203 µm on the
+flattened axis, with the signal ~2.8× above the local noise floor. Mode 8's
+angular prediction survives contact with the scanner, not just with derived
+products.
+
+### Three corrections
+
+**The shape correlation quoted earlier was the best of four.** The post that
+introduced this work cited 0.98; the other three heights were 0.97, 0.93 and
+**0.81**. All four were penalised by comparing each slice against a *median*
+profile. Per height they are 0.99 across the board — a better number reached by
+a more honest method, and the earlier figure should not have been quoted
+singly.
+
+**The flat sheet of 11.2 is sheared, and the shear is mine.** The displacement
+within each winding was computed per height, but the **cuts between windings**
+used a median perimeter applied to every height. Measured properly, the
+cumulative arc position after 46 windings varies by **1779 mm between heights —
+44 % of the sheet length**, growing from 5.5 mm of spread after one winding to
+412 mm after forty-five. A 150 mm column would drift ~180 mm horizontally top
+to bottom, four column widths. The code now accumulates per height; the figure
+is a map of deformation and coverage, **not of metric position**.
+
+**Averaging manufactured an ellipse.** The R² = 0.948 elliptical fit cited
+throughout is to the median of 313 sections. Fitted individually those sections
+give 0.848 (down to 0.592), with the aspect ratio spanning 1.35–3.16 and the
+major axis rotating through the roll. The twin's single symmetric section is
+more regular than any real slice.
+
+### What could not be fixed, and why
+
+**The residual accumulation is not ours to remove.** Even accumulating per
+height, each winding's perimeter varies ~9.8 % between heights — and a winding
+of papyrus cannot change length by 9 % over a few millimetres of height. Most
+of that is the segmentation losing or merging windings differently at different
+heights, and summing over 46 windings amplifies it. Removing it means following
+each winding as a continuous object through z rather than slice by slice, which
+is surface tracking and belongs to the project's own pipeline.
+
+**Layer-by-layer overlay on raw CT does not work here.** Three detectors were
+tried against the raw scan — peak counting, spectral-strength gating, spacing
+gating — and the best found **13 %** of the laminae present, with a median
+spacing of 430 µm against the 173 µm pitch: two out of three windings skipped.
+For comparison, the crossing data underlying everything above carries ~70 per
+ray. Tracing laminae on raw CT is what the segmentation pipeline does with
+trained models; it is not a scripting exercise and this repository does not
+attempt it.
+
+**And there is no simple ink statistic.** On Paris 4's published surface volume,
+paired within the same windows, seven per-column statistics were tested against
+the published ink labels — mean, spread, max, min, range, through-thickness
+gradient, recto/verso asymmetry — resolved both pooled and plane by plane
+across the 109 depth planes. **All below d = 0.2**, the best being −0.127 at the
+mid-plane with a between-window sign coherence of only −0.33. Density separates
+worst of all, at −0.049, which is the expected result and confirms the test was
+sound. This is a null with a boundary: it rules out **per-column** statistics,
+not the spatial texture between neighbouring columns, which is what a trained
+model reads and which no single-point summary can express.
+
+---
+
 ## 12 — Contrast phantom (`scripts/contrast_phantom.py`)
 
 A measurement on the published surface model says the sheet it misses is the
@@ -1501,7 +1595,12 @@ than a plausibility argument. The same trick already calibrated the winding-coun
 invariant to a floor of ≳7 % of a slab's windings.
 
 What the twin cannot do, and should not be asked to: it is a prism, identical top to
-bottom, with two analytic folds and no tearing. It does not reproduce the complexity
+bottom, with two analytic folds and no tearing. **That prism assumption now has a
+price tag**: a single section profile fits a given CT slice to 1.1–2.8 mm, while
+that slice's own measured profile fits to 0.66–0.83 mm (see Mode 11B). So
+`--section-profile` taking one shape for the whole roll is itself an
+approximation worth about 2 mm of section error, and the natural next step is to
+let it take a profile per height, which the data already contains. It does not reproduce the complexity
 of real deformation and comparing its slices with real CT by eye would be pointless.
 Its value is that the answer is known, not that it looks convincing — and the modes
 above use it as a unit test with ground truth, never as evidence about a real scroll.
@@ -1524,6 +1623,16 @@ above use it as a unit test with ground truth, never as evidence about a real sc
 ---
 
 ## Lessons (kept on purpose)
+
+**The recurring failure has a shape.** Most errors recorded in this repository
+were not wrong facts but wrong *comparisons*: two quantities that measure the
+same thing in different conventions, compared as though they shared one. Exam A
+of Mode 11 compared a function against its own inverse on the same grid. The
+sheet was compared against a ground truth numbered from the opposite end. Each
+slice was compared against a median of 313. Each looked like a substantive
+result until the comparison was checked, and none was caught by inspecting the
+answer — only by testing the instrument.
+
 Our first line-spacing estimate (4.45 mm) was a resolution artifact: on a 13 mm strip
 the FFT has only 3–4 usable bins in the whole 3–8 mm range, and the "peak" was bin
 k = 3 of the strip height. Finding it, fixing it (cycle gating + spatial-domain

@@ -368,6 +368,9 @@ def main():
                     help='how deep to peel; beyond ~45 the spiral fit degrades')
     ap.add_argument('--rows', type=int, default=5,
                     help='how many runs to cut the flat sheet into')
+    ap.add_argument('--slice-um', type=float, default=17.28,
+                    help='height per slice in the source table (L1 = 17.28 um), '
+                         'so figures carry real millimetres rather than indices')
     args = ap.parse_args()
 
     if args.mode == 'test':
@@ -446,7 +449,7 @@ def main():
               f"cannot change length by 9 % over a few mm of height. Following "
               f"each winding as a continuous object through z -- rather than "
               f"per-slice -- needs surface tracking, which is not in this repo.")
-        zmm = np.arange(R.shape[0], dtype=float)
+        zmm = np.arange(R.shape[0], dtype=float) * args.slice_um / 1000
         print(f"[sheet ] {L.shape[1]} windings x {L.shape[0]} heights x {NS} "
               f"points = {total/1000:.2f} m of sheet, "
               f"{100*np.isfinite(L).mean():.0f} % of cells measured")
@@ -474,7 +477,7 @@ def main():
                               rasterized=True)
                 ax.axvline(a-x0, color='k', lw=.45, alpha=.5)
             ax.set_xlim(0, per_row)
-            ax.set_ylabel(f'{x0/1000:.2f}-{x1/1000:.2f} m', fontsize=8)
+            ax.set_ylabel(f'{x0/1000:.2f}-{x1/1000:.2f} m\nheight (mm)', fontsize=8)
         np.atleast_1d(axes)[-1].set_xlabel('arc position within each run (mm) '
                                            '-- reading runs left to right, '
                                            'outermost winding first')
@@ -510,13 +513,14 @@ def main():
                     X, Y = rc*np.cos(2*np.pi*f)/1000, rc*np.sin(2*np.pi*f)/1000
                 else:
                     X, Y = r*np.cos(thr)/1000, r*np.sin(thr)/1000
-                Z = np.full_like(X, iz * 1.0)
+                Z = np.full_like(X, iz * args.slice_um / 1000)
                 ax.plot(np.append(X, X[0]), np.append(Y, Y[0]),
                         np.append(Z, Z[0]), color='0.55', lw=lw*0.45, zorder=1)
                 ax.scatter(X, Y, Z, c=f, cmap='twilight', s=7*lw,
                            vmin=0, vmax=1, depthshade=False, zorder=3)
         ax.set_title(title, fontsize=11, pad=2)
-        ax.set_xlabel('mm'); ax.set_ylabel('mm'); ax.set_zlabel('height index')
+        ax.set_xlabel('mm'); ax.set_ylabel('mm')
+        ax.set_zlabel('roll height (mm)')
         ax.view_init(elev=22, azim=-58)
     sm = plt.cm.ScalarMappable(cmap='twilight', norm=plt.Normalize(0, 1))
     cb = fig.colorbar(sm, ax=fig.axes, shrink=.55, pad=.04)

@@ -1172,7 +1172,7 @@ The conclusion is practical: the same crush pattern appears throughout the resol
 
 This is not a claim that every inner winding can already be recovered. It is evidence that a correction field measured outside may transfer inward without requiring an independent deformation model at every depth.
 
-![PHerc1218 laid flat](figures/sheet.png)
+![PHerc1218 deformation field, winding by winding](figures/sheet_v2.png)
 
 *Figure 11-3 — Angular displacement expressed in material coordinates across winding depth and scroll height. The persistence of the same pattern is the relevant result; the colour scale should remain fixed across all panels.*
 
@@ -1375,11 +1375,12 @@ Ink is the one everybody wants and PHerc1218 does not have. What it does have is
 per-ray quality table, and projecting that answers a question worth asking **before**
 anyone spends compute here: which parts of this sheet are worth the compute at all.
 
-![Where the geometry is trustworthy, on the flat sheet](figures/quality.png)
+![Where the geometry is trustworthy, winding by winding](figures/quality_v2.png)
 
-*Figure 11-4 — The unrolled sheet classified by geometric trust. The bands repeat
-once per winding, because the damage is organised by angle and each winding sweeps
-360° once.*
+*Figure 11-4 — Geometric trust by winding and angle. With the windings shown
+side by side rather than concatenated, the vertical banding lines up across
+them: the damage is organised by the crush axes, so it recurs at the same place
+in every winding.*
 
 | | fraction of the sheet |
 |---|---|
@@ -1422,8 +1423,19 @@ claimed earlier does not, and that is recorded here rather than quietly fixed.
 
 ### What holds
 
-**The reconstructed section matches the scan, per height.** Overlaying the
-measured profile of a given height on the CT slice at that height:
+**The reconstructed section matches the scan, per height.**
+
+![Reconstructed section overlaid on raw CT slices](figures/seccion_sobre_ct.png)
+
+*Figure 11B-1 — The reconstructed cross-section (cyan) drawn on four raw CT
+slices of PHerc1218, one per height, with each slice carrying its own measured
+profile. The orange curve on the same axes is the single median profile the
+earlier version used, shown for contrast. Nothing here is fitted to the CT: the
+profiles come from published crossing positions and the scan is read
+independently.*
+
+Overlaying the measured profile of a given height on the CT slice at that
+height:
 
 | height (L1) | error against CT | correlation |
 |---|---|---|

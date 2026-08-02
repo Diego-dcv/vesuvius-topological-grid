@@ -907,7 +907,7 @@ fell was that claim, not the use above.**
 `synthetic_scroll_twin.py --section-profile` now takes a **measured** section in
 place of the analytic ellipse, rescaled per turn so the perimeter still equals
 the wound circumference. The shipped profile
-(`scripts/pherc1218_section.csv`, 60 angles, median over 313 L1 slices) moves
+(`archives/results/pherc1218_section.csv`, 60 angles, median over 313 L1 slices) moves
 the twin's crushed section from 41.9 × 21.0 mm to 44.4 × 21.2 mm.
 
 This is the order that was wrong before and is right now: **the data set the

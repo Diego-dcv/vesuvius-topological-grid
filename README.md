@@ -1404,6 +1404,77 @@ angular step, not a new method.
 
 ---
 
+## 12 — Contrast phantom (`scripts/contrast_phantom.py`)
+
+A measurement on the published surface model says the sheet it misses is the
+**faint** sheet: missed voxels run 10.3 % darker than found voxels inside the
+same volume, across 161 of 201 paired volumes, while local thickness and
+component size show no difference at all. That measurement cannot say why.
+In real papyrus brightness and compression travel together, so two
+incompatible readings fit it equally well — *the model cannot learn faint
+sheet*, or *faint regions are geometrically harder and darkness is the
+symptom*. No measurement on real data separates them, because no real scroll
+offers the same geometry at two contrasts.
+
+A phantom does. This mode emits a grid over two axes that are confounded in
+reality and independent here:
+
+```bash
+python scripts/contrast_phantom.py grid --out phantoms/
+python scripts/contrast_phantom.py grid --out phantoms/ --papyrus 35,50,65,90 --pitch 260,180,120
+python scripts/contrast_phantom.py test
+```
+
+Geometry is bit-identical along a contrast row; intensity statistics are
+identical down a geometry column. Every cell carries **per-voxel ground truth**
+derived from the same geometry that painted the volume, so there is no
+annotation step to be wrong. Run a surface model over the grid and the
+confound resolves by inspection:
+
+| recall falls… | reading |
+|---|---|
+| along the contrast axis only | the model cannot learn faint sheet |
+| along the geometry axis only | faint regions are geometrically harder |
+| **only in the corner** | the two interact, and neither alone explains it |
+
+The third outcome is the interesting one and it is **invisible in real data**.
+
+**Why the geometry axis is the winding pitch and not the crush ratio** — the
+obvious choice, and the wrong one. Under an arc-length-preserving crush the
+ratio does not tighten the packing, it *redistributes* it: layers pack closer
+on the flattened axis and further apart at the creases, by the same factor. A
+ratio sweep makes some angles harder and others easier at once, so a
+detector's failure could not be attributed to it. Pitch tightens everywhere,
+monotonically. This was found by exam B failing: it measured the layer gap
+along a mid-height row, which leaves through the crease axis, and the gaps
+*grew* with ratio instead of shrinking.
+
+**Why both axes, when the request was for contrast at fixed geometry.** A
+contrast sweep alone shows that faintness hurts, which was never in doubt.
+Separating the two readings needs the geometry arm as its control — otherwise
+a fall along the contrast axis is still compatible with "the hard cases were
+dark anyway", because one row cannot say what geometry costs.
+
+### Validation
+
+| exam | criterion | result |
+|---|---|---|
+| A — axes independent | geometry bit-identical across a contrast row; papyrus mean within 1 grey level down a geometry column | **identical; 66.85 vs 66.91, PASS** |
+| B — geometry bites | layer gap falls monotonically with pitch | **9.9 > 7.8 > 6.1 vox, PASS** |
+| C — truth exact, not annotated | every labelled surface voxel non-zero in the noiseless volume and vice versa | **0 mismatched, PASS** |
+| D — faint level still detectable | papyrus/air separation above 2σ of the added noise at the faintest level | **33.4 against σ = 6, PASS** |
+
+These check that the phantom is a valid *instrument*, not that any detector
+performs well on it. **Absolute recall on these volumes means nothing** — the
+twin is a prism, identical top to bottom, with two analytic folds and no
+tearing. The shape of the recall surface across the grid is the whole result.
+
+Producing the phantoms and running a surface model on them are naturally
+different hands: a 4 × 4 grid at 25 columns is ~105 MB and runs on a laptop in
+minutes; scoring it needs the model and a GPU.
+
+---
+
 ## What the twin could do next
 
 The synthetic twin (Mode 7) is the only tool here that produces data rather than
@@ -1473,6 +1544,7 @@ vesuvius-topological-grid/
 │   ├── synthetic_scroll_twin.py       ← the twin: obra → scroll → crush
 │   ├── text_layout_predictor.py       ← the falsifiable column map
 │   ├── fibre_strain.py                ← where the crush cracks the sheet
+│   ├── contrast_phantom.py            ← faint vs compressed (mode 12)
 │   ├── displacement_field.py          ← unroll and diagnose (mode 11)
 │   ├── work_size.py                   ← work ↔ roll size, and the
 │   │                                     unknown-work discriminator

@@ -1,12 +1,29 @@
 # vesuvius-topological-grid
 
-**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, track, screen, orient, reconcile.**
+**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, track, screen, orient, reconcile, unroll.**
 
 Ancient writing has a grid: equally spaced lines, regular letter pitch, columns on a
 module — like the structural grid of a building. If a virtual unwrapping is correct,
 that grid survives; if it fails, the grid breaks. This repository turns that
 observation into a few small, reproducible tools. None of them reads text; all of
 them run in seconds on a laptop.
+
+**What this is, and what it is not.** This repository does not trace surfaces, does
+not flatten better than [flatboi](https://github.com/ScrollPrize/villa/blob/main/volume-cartographer/libs/flatboi/flatboi.cpp),
+does not fit spirals better than
+[fit_spiral](https://github.com/ScrollPrize/villa/blob/main/volume-cartographer/scripts/spiral/fit_spiral.py),
+and does not detect ink at all. Those problems have teams and tooling. What it does
+is **measure** — properties of the roll itself and of the segmentation that produced
+its geometry, without labels, without ground truth and without ML anywhere in the
+chain. Winding pitch, fusion rate, crush ratio, where the segmentation stops being
+trustworthy, whether a period is real or an artefact of the band it was searched in.
+
+That is a narrow niche, and it is a stated one: the project's own
+[open-problems page](https://scrollprize.org/2026_open_problems) says twice that "we
+do not always know which part of the pipeline is limiting us" and that "better
+diagnostics matter just as much as better models". Everything here is aimed at that
+sentence. Every mode ships an acceptance test written before the answer was known,
+and several of those tests have failed and are documented where they failed.
 
 ## 1 — Measure (`scripts/grid_metric.py analyze`)
 Detects the scribe's spatial signature on a rendered surface via windowed spectral
@@ -804,7 +821,29 @@ mode most likely to produce a wrong attribution.
 
 ---
 
-## 10 — Displacement (`scripts/displacement_field.py`)
+## 11 — Unroll and diagnose (`scripts/displacement_field.py`)
+
+> **The flattening is the vehicle. The map of where to trust it is the result.**
+
+One argument in three steps, and it only stands as one. The crush displaced every
+point of papyrus; that field is measurable from geometry alone. Invert it and the
+sheet lies flat. Project the per-ray diagnostics onto that flat sheet and you get
+the thing a reader of this repository can actually use: **a map of where the
+recovered geometry is trustworthy and where it is not**, in sheet coordinates
+rather than roll coordinates.
+
+Nothing in the chain uses ink, renders, labels or a fitted model of the crush. The
+only physical premise is that **papyrus bends and crushes but does not stretch** —
+arc length along a winding is conserved.
+
+```bash
+python scripts/displacement_field.py field  --from-csv rays.csv.gz
+python scripts/displacement_field.py rings  --from-csv rays.csv.gz --plot rings3d.png
+python scripts/displacement_field.py sheet  --from-csv rays.csv.gz --plot sheet.png
+python scripts/displacement_field.py test
+```
+
+### 11.1 — The displacement field: where the crush put every point
 
 Where the crush put each point of papyrus, measured rather than modelled.
 Mark points along the axial striations of the wound cylinder, crush it, and ask
@@ -817,12 +856,6 @@ measure the boundary r(θ) of a turn, integrate arc length around it, and a
 point's arc fraction is where it sat on the cylinder. The displacement is the
 difference from its polar angle in the crushed frame. No model of the crush is
 required — only the measured shape, which a per-ray crossing table provides.
-
-```bash
-python scripts/displacement_field.py field --from-csv rays.csv.gz
-python scripts/displacement_field.py rings --from-csv rays.csv.gz --plot rings3d.png
-python scripts/displacement_field.py test
-```
 
 ![Material points before and after the crush](figures/rings3d.png)
 
@@ -933,11 +966,9 @@ nothing, and it reports 0.014°.
 
 ---
 
-## 10B — Geometry-only flattening of PHerc1218
+### 11.2 — Inverting it: the sheet laid flat
 
-> **The flattening is the illustration. The measurements are the result.**
-
-Mode 10B reconstructs the outer resolved part of PHerc1218 as a flat material sheet using only the published per-ray crossing positions. It uses no ink signal, no rendered surface, no OCR, and no fitted model of the crush.
+Mode 11 reconstructs the outer resolved part of PHerc1218 as a flat material sheet using only the published per-ray crossing positions. It uses no ink signal, no rendered surface, no OCR, and no fitted model of the crush.
 
 The physical premise is deliberately small:
 
@@ -951,7 +982,7 @@ This does not yet read the scroll. It establishes a geometry on which later meas
 
 The input is the per-ray crossing geometry published by [@iyando](https://github.com/iyando): ordered radial crossing positions for successive angular rays and transverse sections of PHerc1218.
 
-For each resolved winding and section, Mode 10B:
+For each resolved winding and section, Mode 11:
 
 1. reconstructs the measured closed boundary \(r(\theta)\);
 2. evaluates its perimeter by numerical arc-length integration;
@@ -976,7 +1007,7 @@ No analytic ellipse is required. The measured PHerc1218 section profile therefor
 
 ![Geometry-only reconstruction of PHerc1218](figures/rings3d.png)
 
-*Figure 10B-1 — The same material points before and after the crush. Left: the cylinder reconstructed from the measured shape by arc length. Right: the measured crushed section. Colour identifies corresponding material points, not ink. The flattened sheet itself is Figure 10B-3 below.*
+*Figure 11-1 — The same material points before and after the crush. Left: the cylinder reconstructed from the measured shape by arc length. Right: the measured crushed section. Colour identifies corresponding material points, not ink. The flattened sheet itself is Figure 11-3 below; the trust map is Figure 11-4.*
 
 ### Which way it reads
 
@@ -1066,7 +1097,7 @@ This test validates one property only: the recovered sequence is geometrically c
 
 ![Spiral consistency and coverage](figures/peel.png)
 
-*Figure 10B-2 — Four views of the peel. Top left: the flat sheet with the
+*Figure 11-2 — Four views of the peel. Top left: the flat sheet with the
 crush displacement painted on it. Top right: winding length shrinking toward
 the core. Bottom right: the reconstructed cylinder, the spiral-consistency
 test.*
@@ -1135,7 +1166,7 @@ This is not a claim that every inner winding can already be recovered. It is evi
 
 ![PHerc1218 laid flat](figures/sheet.png)
 
-*Figure 10B-3 — Angular displacement expressed in material coordinates across winding depth and scroll height. The persistence of the same pattern is the relevant result; the colour scale should remain fixed across all panels.*
+*Figure 11-3 — Angular displacement expressed in material coordinates across winding depth and scroll height. The persistence of the same pattern is the relevant result; the colour scale should remain fixed across all panels.*
 
 ---
 
@@ -1155,7 +1186,7 @@ r=+0.084.
 
 A raw correlation between crossing count and outer radius gives approximately \(r=+0.31\), but that follows from the flattened shape of the section and is not evidence of erosion.
 
-Mode 10B therefore makes **no claim of outer material loss** from crossing completeness. The missing crossing indices identified above are interior unresolved or merged turns.
+Mode 11 therefore makes **no claim of outer material loss** from crossing completeness. The missing crossing indices identified above are interior unresolved or merged turns.
 
 Keeping this retraction in the record is part of the method: an acceptance test is useful only when it is allowed to overturn the story that motivated it.
 
@@ -1175,7 +1206,7 @@ The approximately 2% difference between the two hemispheres is too small to expl
 
 Possible causes include localized plastic deformation, inter-layer slip, adhesion, core constraints or nonuniform relaxation, but the present geometry does not distinguish among them. The excess displacement remains unresolved.
 
-For that reason, Mode 10B uses the measured section profile directly. The ellipse remains useful as a controlled analytic reference in the synthetic twin, but it is no longer treated as a complete description of the real crush.
+For that reason, Mode 11 uses the measured section profile directly. The ellipse remains useful as a controlled analytic reference in the synthetic twin, but it is no longer treated as a complete description of the real crush.
 
 ---
 
@@ -1211,7 +1242,7 @@ The exact numerical tolerances should live in the script rather than only in thi
 
 ### Material coordinates: the reusable output
 
-The principal output of Mode 10B is not a PNG. It is a material coordinate system.
+The principal output of Mode 11 is not a PNG. It is a material coordinate system.
 
 Each reconstructed point can be stored as, for example,
 
@@ -1279,7 +1310,7 @@ The acceptance condition must remain strict: transfer is allowed only while held
 
 #### Replace the analytic crush in the synthetic twin
 
-Mode 7 currently uses a controlled analytic section because it provides exact ground truth. Mode 10B adds the complementary object: a measured section profile.
+Mode 7 currently uses a controlled analytic section because it provides exact ground truth. Mode 11 adds the complementary object: a measured section profile.
 
 Both should remain:
 
@@ -1300,7 +1331,7 @@ That creates a common reference frame for methods that currently operate on diff
 
 Modes 1–5 ask whether the scribe's spatial grid survives on a rendered surface. Mode 6 evaluates whether the crossing count is geometrically plausible. Modes 7–9 use an idealized scroll to make predictions about winding, strain and work size.
 
-Mode 10B links those two halves.
+Mode 11 links those two halves.
 
 It reconstructs a material sheet from measured real-scroll geometry, tests whether the winding sequence behaves like a spiral, quantifies unresolved turns, measures the crush displacement, and exposes the point at which segmentation stops supporting the reconstruction.
 
@@ -1325,6 +1356,84 @@ It therefore establishes the substrate on which the earlier text-grid tools may 
 The reconstruction depends on @iyando's publication of per-ray crossing positions rather than only per-scroll aggregates. The flattened sheet, perimeter sums, spiral test and displacement field are derived from those measurements by arc-length integration.
 
 The raw crossing source, preprocessing steps, commit identifier and any filtered subsets used to regenerate the figures should be recorded in `docs/data_sources.md`. Quantitative claims in this section should be regenerated from the scripts and not copied manually into release notes.
+
+---
+
+
+### 11.3 — Where to trust it: diagnostics in sheet coordinates
+
+The flat sheet is a coordinate system, so any per-point quantity registers onto it.
+Ink is the one everybody wants and PHerc1218 does not have. What it does have is the
+per-ray quality table, and projecting that answers a question worth asking **before**
+anyone spends compute here: which parts of this sheet are worth the compute at all.
+
+![Where the geometry is trustworthy, on the flat sheet](figures/quality.png)
+
+*Figure 11-4 — The unrolled sheet classified by geometric trust. The bands repeat
+once per winding, because the damage is organised by angle and each winding sweeps
+360° once.*
+
+| | fraction of the sheet |
+|---|---|
+| clean geometry | **19.5 %** |
+| merge excess — layers stuck together | 73.6 % |
+| void excess — cracked | 25.0 % |
+
+**One fifth of the reconstructed sheet has clean geometry.** That is the headline,
+and it is not a prediction about legibility: it says that four fifths of it carries a
+*known geometric problem* before an ink model is even loaded.
+
+The angular structure of Mode 8 survives the projection. Void concentrates at
+135–225° and 315–360° — the crease axis, where bending strain is 3.4× and carbonized
+papyrus cracks — while the flattened axis fails by merging instead. On the rolled
+scroll that is an angular pattern; on the flat sheet it becomes **periodic banding
+with the period of one winding**, which is directly actionable: it says which part of
+each column is compromised, not just which region of the scroll.
+
+Two honest limits on this map. The void threshold is the **upper quartile**, a
+descriptive cut rather than a physical one — it partitions 25 % by construction, so
+read the three-way split and not the 25 %. And the angular resolution is the source
+data's 6°, which is 1.57 mm of arc on the outer windings against a letter pitch near
+1.8 mm: **under one sample per letter.** This map tells you where to look. It cannot
+tell you what letter is there, and no interpolation would change that — the
+information between rays is not smoothed, it is absent.
+
+Reading a scroll from this geometry would need an extraction at reading resolution,
+roughly 500 rays per slice rather than 60. That is the same tool with a different
+angular step, not a new method.
+
+---
+
+## What the twin could do next
+
+The synthetic twin (Mode 7) is the only tool here that produces data rather than
+consuming it, and that makes it good for exactly one class of problem: **breaking a
+confound that real data cannot break.** Two of those are on the table, both asked for
+rather than invented.
+
+**Separating faint from compressed.** A contributor measured that the published
+surface model misses *faint* sheet rather than thin sheet — missed voxels run 10.3 %
+darker than found voxels inside the same volume, while local thickness and component
+size show no difference at all. But in real papyrus brightness and compression travel
+together, so "the model cannot learn faint sheet" and "faint regions are
+geometrically harder" both fit those numbers, and no measurement on real data
+separates them. A phantom can: **hold the geometry fixed and sweep the contrast
+alone.** The twin already emits a voxel volume with independently controllable
+papyrus and ink intensity and per-voxel ground truth, so the sweep is a parameter
+range rather than a new capability. Producing the phantoms and running a surface
+model on them are naturally different hands.
+
+**Calibrating a fusion detector.** The twin can weld chosen turns over chosen angles
+and label the affected letters, which makes it a source of *known* merge sites with
+ground truth — the thing a merge detector needs to quote a detection floor rather
+than a plausibility argument. The same trick already calibrated the winding-count
+invariant to a floor of ≳7 % of a slab's windings.
+
+What the twin cannot do, and should not be asked to: it is a prism, identical top to
+bottom, with two analytic folds and no tearing. It does not reproduce the complexity
+of real deformation and comparing its slices with real CT by eye would be pointless.
+Its value is that the answer is known, not that it looks convincing — and the modes
+above use it as a unit test with ground truth, never as evidence about a real scroll.
 
 ---
 
@@ -1364,7 +1473,7 @@ vesuvius-topological-grid/
 │   ├── synthetic_scroll_twin.py       ← the twin: obra → scroll → crush
 │   ├── text_layout_predictor.py       ← the falsifiable column map
 │   ├── fibre_strain.py                ← where the crush cracks the sheet
-│   ├── displacement_field.py          ← where the crush put each point
+│   ├── displacement_field.py          ← unroll and diagnose (mode 11)
 │   ├── work_size.py                   ← work ↔ roll size, and the
 │   │                                     unknown-work discriminator
 │   ├── void_aware_expected_n.py       ← layer-count reconciliation

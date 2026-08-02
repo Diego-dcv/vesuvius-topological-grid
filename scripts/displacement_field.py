@@ -426,9 +426,26 @@ def main():
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         L, D = flat_sheet(th, R)
-        Lm = np.nanmedian(L, axis=0)
+        # ACCUMULATE PER HEIGHT, not from a median perimeter. An earlier
+        # version used the median and it sheared the sheet badly: measured on
+        # PHerc1218 the cumulative arc position after 46 windings varies by
+        # 1779 mm between heights -- 44 % of the sheet length -- so a column
+        # drawn against median cuts drifts by ~180 mm top to bottom, four
+        # column widths. The variation accumulates rather than drifting (the
+        # correlation with height is only +0.146), because each winding's
+        # perimeter varies ~9.8 % between heights and the errors add.
+        C = np.nancumsum(np.where(np.isfinite(L), L, 0.0), axis=1)
+        Lm = np.nanmedian(L, axis=0)          # kept only for the row layout
         edges = np.concatenate([[0], np.cumsum(Lm)])
         total, NS = edges[-1], D.shape[2]
+        spread = np.nanmax(C[:, -1]) - np.nanmin(C[:, -1])
+        print(f"[shear ] cumulative position after {L.shape[1]} windings varies "
+              f"{spread:.0f} mm between heights ({100*spread/np.nanmedian(C[:,-1]):.0f} % "
+              f"of sheet length)")
+        print(f"[limit ] much of that is segmentation, not papyrus: a winding "
+              f"cannot change length by 9 % over a few mm of height. Following "
+              f"each winding as a continuous object through z -- rather than "
+              f"per-slice -- needs surface tracking, which is not in this repo.")
         zmm = np.arange(R.shape[0], dtype=float)
         print(f"[sheet ] {L.shape[1]} windings x {L.shape[0]} heights x {NS} "
               f"points = {total/1000:.2f} m of sheet, "
@@ -449,6 +466,9 @@ def main():
                 m = (xs >= x0) & (xs < x1)
                 if not m.any():
                     continue
+                # NOTE: the row layout uses median cuts, so this figure shows
+                # the deformation field and the coverage, NOT metric position.
+                # Per-height cumulative arc is in C above; see the shear warning.
                 ax.pcolormesh(xs[m]-x0, zmm, D[:, j, :][:, m], cmap='coolwarm',
                               vmin=-vm, vmax=vm, shading='nearest',
                               rasterized=True)

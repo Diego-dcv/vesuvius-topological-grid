@@ -90,6 +90,30 @@ import synthetic_scroll_twin as T
 DEF_PAPYRUS = (35, 50, 65, 90)      # air is 0; 90 is the twin's default
 DEF_PITCH = (260.0, 200.0, 150.0, 110.0)   # um between windings
 DEF_NOISE = 6.0
+DEF_GAP = 0.42        # gap as a FRACTION of the pitch, held constant
+DEF_VOXEL = 40.0      # um; keeps the tightest pitch above Nyquist
+
+
+# A DESIGN ERROR AND ITS FIX -------------------------------------------------
+# The first version of this grid held sheet thickness FIXED at 150 um while the
+# pitch swept 260 -> 110. That made the geometry axis sweep two things at once
+# and, past the middle, leave the possible:
+#
+#     pitch   gap        vox/pitch (at 60 um)   sheet/period
+#     260 um  +110 um    4.33                    58 %
+#     200 um   +50 um    3.33                    75 %
+#     150 um     0 um    2.50                   100 %   <- no gaps at all
+#     110 um   -40 um    1.83                   100 %   <- and below Nyquist
+#
+# So at the two tightest cells the phantom was a solid block with no layer
+# structure to find, and at the tightest the sampling could not have resolved
+# layers even if they existed. Any optimum found at 150 um is then a property
+# of where the gap closed, not of the detector.
+#
+# The fix is to make the sheet a constant FRACTION of the pitch, so the gap
+# fraction holds and the axis sweeps tightness alone, and to shrink the voxel
+# until the tightest pitch is comfortably above Nyquist. At 40 um the sweep
+# gives 6.5 / 5.0 / 3.75 / 2.75 voxels per pitch, all resolvable.
 
 
 def contrast_ratio(papyrus, noise):
@@ -102,8 +126,8 @@ def contrast_ratio(papyrus, noise):
     return papyrus / noise if noise > 0 else np.inf
 
 
-def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=6.0,
-              voxel_um=60.0):
+def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=8.0,
+              voxel_um=DEF_VOXEL, gap_fraction=DEF_GAP):
     """One phantom: volume plus per-voxel ground truth.
 
     Ground truth is derived from the same geometry that painted the volume,
@@ -111,6 +135,8 @@ def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=6.0,
     """
     g = dict(T.G)
     g['pitch_um'] = pitch_um
+    # sheet scales with pitch so the gap fraction is constant along the axis
+    g['sheet_um'] = (1.0 - gap_fraction) * pitch_um
     old = dict(T.G)
     T.G.update(g)
     try:
@@ -132,18 +158,21 @@ def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=6.0,
     return vol, gt, gt_ink, dict(meta, **vmeta)
 
 
-def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0):
+def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
+               voxel_um=DEF_VOXEL, gap_fraction=DEF_GAP):
     os.makedirs(out, exist_ok=True)
     rows = []
     for pitch in pitches:
         for pap in papyrus_levels:
             vol, gt, gt_ink, meta = emit_cell(n_columns, pap, pitch, noise,
-                                              seed=seed)
+                                              seed=seed, voxel_um=voxel_um,
+                                              gap_fraction=gap_fraction)
             tag = f"pap{pap:03d}_pitch{pitch:.0f}_noise{noise:.0f}"
             np.savez_compressed(os.path.join(out, tag + '.npz'),
                                 volume=vol, gt_surface=gt, gt_ink=gt_ink,
                                 papyrus=pap, pitch_um=pitch, noise=noise,
-                                voxel_um=60.0,
+                                sheet_um=(1.0-gap_fraction)*pitch,
+                                voxel_um=voxel_um, gap_fraction=gap_fraction,
                                 section_w_mm=meta['section_w_mm'],
                                 section_h_mm=meta['section_h_mm'])
             rows.append((pap, pitch, contrast_ratio(pap, noise),
@@ -173,6 +202,15 @@ def acceptance_test(verbose=True):
     C. GROUND TRUTH IS EXACT, NOT ANNOTATED. Every labelled surface voxel must
        be non-zero in the noiseless volume, and vice versa.
        PASS: exact agreement, zero mismatched voxels.
+
+    E. THE GEOMETRY AXIS SWEEPS ONE THING. Gap fraction must hold constant
+       across the pitch sweep, and the tightest pitch must stay above Nyquist
+       at the chosen voxel. The first version of this grid failed both without
+       noticing: sheet thickness was fixed, so the gap closed at 150 um and
+       went negative at 110, and 110 fell below Nyquist at a 60 um voxel. Any
+       optimum found there measured where the gap closed, not the detector.
+       PASS: sheet-fraction within 1 % across the sweep, and > 2.5 voxels per
+       pitch at the tightest cell.
 
     D. THE CONTRAST AXIS IS DETECTABLE AT ALL. At the faintest level the sheet
        must still be separable from air by some margin, or the row measures
@@ -223,6 +261,16 @@ def acceptance_test(verbose=True):
     res['D_faint_separable'] = dict(separation=sep, sigma=noise,
                                     passed=bool(sep > 2 * noise))
 
+    # E -- the geometry axis sweeps tightness alone
+    fr, vox = [], []
+    for pitch in DEF_PITCH:
+        sheet = (1.0 - DEF_GAP) * pitch
+        fr.append((pitch - sheet) / pitch)
+        vox.append(pitch / DEF_VOXEL)
+    res['E_geometry_isolated'] = dict(
+        gap_fraction=(min(fr), max(fr)), vox_per_pitch=min(vox),
+        passed=bool(max(fr) - min(fr) < 0.01 and min(vox) > 2.5))
+
     if verbose:
         print("=" * 70)
         print("ACCEPTANCE TEST -- contrast_phantom (pre-registered)")
@@ -242,6 +290,11 @@ def acceptance_test(verbose=True):
         print(f"D faint separable   papyrus-air separation {D['separation']:.1f} "
               f"against noise sigma {D['sigma']:.0f} (>2 sigma) -> "
               f"{'PASS' if D['passed'] else 'FAIL'}")
+        E = res['E_geometry_isolated']
+        print(f"E geometry isolated gap fraction {E['gap_fraction'][0]:.3f}-"
+              f"{E['gap_fraction'][1]:.3f} across the sweep; "
+              f"{E['vox_per_pitch']:.2f} voxels per pitch at the tightest "
+              f"(>2.5) -> {'PASS' if E['passed'] else 'FAIL'}")
         print("-" * 70)
         print("OVERALL:", "PASS" if all(v['passed'] for v in res.values())
               else "FAIL")
@@ -257,6 +310,10 @@ def main():
     ap.add_argument('--pitch', type=str, default=None,
                     help='winding pitch in um; the geometry axis')
     ap.add_argument('--noise', type=float, default=DEF_NOISE)
+    ap.add_argument('--gap-fraction', type=float, default=DEF_GAP,
+                    help='gap as a fraction of the pitch, held constant so the '
+                         'geometry axis sweeps tightness alone')
+    ap.add_argument('--voxel-um', type=float, default=DEF_VOXEL)
     ap.add_argument('--seed', type=int, default=0)
     args = ap.parse_args()
 
@@ -270,7 +327,8 @@ def main():
            else list(DEF_PITCH))
     print(f"[grid ] {len(pap)} contrast levels x {len(rat)} winding pitches "
           f"= {len(pap)*len(rat)} phantoms, noise sigma {args.noise:g}")
-    rows = build_grid(args.out, args.columns, pap, rat, args.noise, args.seed)
+    rows = build_grid(args.out, args.columns, pap, rat, args.noise, args.seed,
+                      voxel_um=args.voxel_um, gap_fraction=args.gap_fraction)
     print(f"\n  {'papyrus':>8} {'pitch':>7} {'contrast/sigma':>15} "
           f"{'sheet fraction':>15} {'shape':>18}")
     for p, r, c, f, sh in rows:

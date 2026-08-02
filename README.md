@@ -974,10 +974,40 @@ u(\theta)=
 
 No analytic ellipse is required. The measured PHerc1218 section profile therefore replaces the idealized crushed section used by the synthetic twin in Mode 7.
 
-<!-- Replace the filename below if the generated figure uses another name. -->
 ![Geometry-only reconstruction of PHerc1218](figures/rings3d.png)
 
-*Figure 10B-1 — The same material coordinates in two representations. Left: the reconstructed wound geometry. Right: the sections cut at a common reference and laid flat. Colour, where used, identifies corresponding material points rather than ink.*
+*Figure 10B-1 — The same material points before and after the crush. Left: the cylinder reconstructed from the measured shape by arc length. Right: the measured crushed section. Colour identifies corresponding material points, not ink. The flattened sheet itself is Figure 10B-3 below.*
+
+### Which way it reads
+
+The reconstruction has an orientation, and it is not arbitrary.
+
+**Ring 0 — the outermost winding — is the first column.** A book roll is
+stored with the start of the text on the outside: the reader holds it in the
+right hand, draws the free end leftwards, and winds the read portion onto the
+left. The core is therefore the *end* of the work — which is why Herculaneum
+end-titles survive, protected at the centre, and why loss of outer windings
+costs the **opening** of a text rather than its close.
+
+**The ink is on the inward-facing side, and is never exposed.** Papyrus is
+written on the recto, the face with horizontal fibres, and the roll is wound
+recto-inward. The text faces the core; the blank verso takes the outside. This
+is the same recto-inward assumption the fibre-strain argument of Mode 8 rests
+on, and it answers the obvious objection — writing on an exposed surface would
+have destroyed the text before it could be read.
+
+**One caveat on the horizontal axis.** The winding *sense* is not firmly
+established for PHerc1218: it was set from a single multi-turn instance, and
+the spiral constraints are mirror-symmetric, so a wrong sense mirrors the arc
+axis. Until that is closed, a registered text could come out reversed. The
+fix is at render time and costs nothing, but it has to be checked rather than
+assumed.
+
+This is what the flattening is for. The sheet is a **coordinate system**: once
+each material point has a place, any per-point quantity can be registered onto
+it — ink probability above all, but equally CT intensity, confidence, fibre
+direction or local thickness. Whether the result reads is then a question the
+geometry has made askable.
 
 ### Reconstructed extent
 
@@ -1034,10 +1064,19 @@ The fit degrades after winding 45, reaching approximately \(R^2=0.94\) by windin
 
 This test validates one property only: the recovered sequence is geometrically consistent with successive windings of a spiral over the well-resolved range. It does **not** prove that every individual correspondence or crossing label is correct.
 
-<!-- Replace the filename below if needed. -->
 ![Spiral consistency and coverage](figures/peel.png)
 
-*Figure 10B-2 — Suggested combined validation figure: equivalent radius against winding index, coverage against flattened distance, measured-versus-integrated length, and reconstruction quality with depth.*
+*Figure 10B-2 — Four views of the peel. Top left: the flat sheet with the
+crush displacement painted on it. Top right: winding length shrinking toward
+the core. Bottom right: the reconstructed cylinder, the spiral-consistency
+test.*
+
+*Read the bottom-left panel with care.* It shows the fraction of heights at
+which each crossing index is complete, and that curve **must** fall with index
+whatever the papyrus did: the n-th crossing only exists on rays carrying at
+least n+1 crossings. It is a property of the indexing, not a map of material
+loss — see "A result that did not survive testing" below, where the
+angle-independent control settles the question.
 
 #### 2. Crossing indices are not identical to physical windings
 
@@ -1094,8 +1133,7 @@ The conclusion is practical: the same crush pattern appears throughout the resol
 
 This is not a claim that every inner winding can already be recovered. It is evidence that a correction field measured outside may transfer inward without requiring an independent deformation model at every depth.
 
-<!-- Replace the filename below if needed. -->
-![Measured displacement field](figures/sheet.png)
+![PHerc1218 laid flat](figures/sheet.png)
 
 *Figure 10B-3 — Angular displacement expressed in material coordinates across winding depth and scroll height. The persistence of the same pattern is the relevant result; the colour scale should remain fixed across all panels.*
 

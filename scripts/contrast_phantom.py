@@ -131,7 +131,7 @@ def contrast_ratio(papyrus, noise):
 
 def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=8.0,
               voxel_um=DEF_VOXEL, gap_fraction=DEF_GAP, arm='attribution',
-              sheet_um=DEF_SHEET):
+              sheet_um=DEF_SHEET, kollesis=True):
     """One phantom: volume plus per-voxel ground truth.
 
     Ground truth is derived from the same geometry that painted the volume,
@@ -158,12 +158,12 @@ def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=8.0,
         rng = np.random.default_rng(seed)
         vol, vmeta = T.make_volume(truth, meta, z_window_mm=z_window_mm,
                                    voxel_um=voxel_um, rng=rng,
-                                   papyrus=papyrus,
+                                   papyrus=papyrus, kollesis=kollesis,
                                    ink=min(255, papyrus + 110), noise=noise)
         clean, _ = T.make_volume(truth, meta, z_window_mm=z_window_mm,
                                  voxel_um=voxel_um,
                                  rng=np.random.default_rng(seed),
-                                 papyrus=papyrus,
+                                 papyrus=papyrus, kollesis=kollesis,
                                  ink=min(255, papyrus + 110), noise=0.0)
     finally:
         T.G.clear(); T.G.update(old)
@@ -174,7 +174,7 @@ def emit_cell(n_columns, papyrus, pitch_um, noise, seed=0, z_window_mm=8.0,
 
 def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
                voxel_um=DEF_VOXEL, gap_fraction=DEF_GAP, arm='attribution',
-               sheet_um=DEF_SHEET):
+               sheet_um=DEF_SHEET, kollesis=True):
     os.makedirs(out, exist_ok=True)
     rows = []
     for pitch in pitches:
@@ -182,7 +182,8 @@ def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
             vol, gt, gt_ink, meta = emit_cell(n_columns, pap, pitch, noise,
                                               seed=seed, voxel_um=voxel_um,
                                               gap_fraction=gap_fraction,
-                                              arm=arm, sheet_um=sheet_um)
+                                              arm=arm, sheet_um=sheet_um,
+                                              kollesis=kollesis)
             tag = f"{arm[:4]}_pap{pap:03d}_pitch{pitch:.0f}_noise{noise:.0f}"
             np.savez_compressed(os.path.join(out, tag + '.npz'),
                                 volume=vol, gt_surface=gt, gt_ink=gt_ink,
@@ -193,7 +194,7 @@ def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
                                 # reader wants three dimensions.
                                 turn_id=meta['turn_id'],
                                 papyrus=pap, pitch_um=pitch, noise=noise,
-                                arm=arm,
+                                arm=arm, kollesis=kollesis,
                                 sheet_um=(sheet_um if arm == 'physical'
                                           else (1.0-gap_fraction)*pitch),
                                 voxel_um=voxel_um, gap_fraction=gap_fraction,
@@ -401,6 +402,14 @@ def main():
                          "varies tightness alone. They answer different "
                          "questions and neither replaces the other.")
     ap.add_argument('--sheet-um', type=float, default=DEF_SHEET)
+    ap.add_argument('--no-kollesis', action='store_true',
+                    help='omit the double-layer sheet joins. For single-sheet '
+                         'CONTROL cells: the join is painted one sheet inward '
+                         'of its turn, so with kollesis on, ~9 %% of sites '
+                         'carry own-turn material at ~150 um -- inside a 360 '
+                         'um reader span -- and a false-split control reads '
+                         'locally thickened sheet. Measured at pitch 700: '
+                         'min centre spacing 135 um with joins, 450 without.')
     ap.add_argument('--seed', type=int, default=0)
     args = ap.parse_args()
 
@@ -429,7 +438,8 @@ def main():
         rows += build_grid(args.out, args.columns, pap, pitches, args.noise,
                            args.seed, voxel_um=vox,
                            gap_fraction=args.gap_fraction, arm=arm,
-                           sheet_um=args.sheet_um)
+                           sheet_um=args.sheet_um,
+                           kollesis=not args.no_kollesis)
     print(f"\n  {'papyrus':>8} {'pitch':>7} {'contrast/sigma':>15} "
           f"{'sheet fraction':>15} {'shape':>18}")
     for p, r, c, f, sh in rows:

@@ -304,8 +304,9 @@ fiber-detector idea its first 3D target without the raw CT.
 
 ![Mid-z slice of the voxel volume with fused turns and fibers](figures/twin_volume_slice.png)
 
-*Mid-height slice of the exported volume: turns 20–24 welded over 60–150°,
-crossed-fiber texture on. Papyrus 90, kollesis 130, ink 200, air 0.*
+*Mid slice of the twin volume with finite-thickness sheets: contact on the
+flattened axis, open gaps at the folds. Right: a kollesis join, with the
+exported `kollesis_mask` ground truth overlaid in red.*
 
 #### Layout regime: the frontier is prose vs verse, not Greek vs Latin
 
@@ -1534,7 +1535,12 @@ python scripts/contrast_phantom.py test
 Geometry is bit-identical along a contrast row; intensity statistics are
 identical down a geometry column. Every cell carries **per-voxel ground truth**
 derived from the same geometry that painted the volume, so there is no
-annotation step to be wrong. Run a surface model over the grid and the
+annotation step to be wrong. Each `.npz` also carries exact instance ground truth: `turn_id` (int16, 0 = air,
+turn t → t+1) and `kollesis_mask` (bool, the footprint of the double-thickness
+sheet joins) — both 2-D (ny, nx) and z-invariant by construction, so broadcast
+over z if a reader wants three dimensions. The first feeds fusion readouts; the
+second lets a join detector be validated against known joins, which no real
+scroll can provide.Run a surface model over the grid and the
 confound resolves by inspection:
 
 | recall falls… | reading |

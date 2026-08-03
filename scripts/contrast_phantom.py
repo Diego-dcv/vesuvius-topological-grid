@@ -193,6 +193,10 @@ def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
                                 # broadcast over z to match `volume` if your
                                 # reader wants three dimensions.
                                 turn_id=meta['turn_id'],
+                                # bool (ny, nx), z-invariant like turn_id:
+                                # footprint of the kollesis double-thickness
+                                # joins -- ground truth for join detectors.
+                                kollesis_mask=meta['kollesis_mask'],
                                 papyrus=pap, pitch_um=pitch, noise=noise,
                                 arm=arm, kollesis=kollesis,
                                 sheet_um=(sheet_um if arm == 'physical'
@@ -227,6 +231,14 @@ def acceptance_test(verbose=True):
     C. GROUND TRUTH IS EXACT, NOT ANNOTATED. Every labelled surface voxel must
        be non-zero in the noiseless volume, and vice versa.
        PASS: exact agreement, zero mismatched voxels.
+
+    G. KOLLESIS JOINS ARE PAINTED AT DOUBLE THICKNESS AND LABELLED. The
+       joins had the same wireframe defect the turns had (two one-voxel
+       traces); they are now finite-thickness overlap bands with an exported
+       per-voxel mask. Identify each join's crossing by the mask, the same
+       winding away from the band by turn_id, and compare thickness.
+       PASS: median join/non-join thickness ratio in [1.5, 3.2] over the
+       measurable joins, and an empty mask when kollesis is off.
 
     F. SHEET THICKNESS IS ACTUALLY PAINTED. The defect this guards against
        shipped: half_t was computed and never used, every turn was a one-voxel
@@ -343,6 +355,64 @@ def acceptance_test(verbose=True):
         fraction_ratio=fr2[120.0] / fr2[60.0],
         measured_um={int(k): v for k, v in th2.items()}, passed=bool(okF))
 
+    # G -- kollesis painted at double thickness, with ground-truth mask
+    oldG2 = dict(T.G)
+    try:
+        T.G['pitch_um'] = 300.0; T.G['sheet_um'] = 150.0
+        t, m = T.build_twin(20, seed=0)
+        v, vmt = T.make_volume(t, m, z_window_mm=1.5, voxel_um=30.0,
+                               kollesis=True)
+        km, tidv = vmt['kollesis_mask'], vmt['turn_id']
+        voff = T.make_volume(t, m, z_window_mm=1.5, voxel_um=30.0,
+                             kollesis=False)[1]
+        mid = (v[v.shape[0] // 2] > 0)
+        cy, cx = np.array(np.nonzero(mid)).mean(1)
+        Rm = int(min(cy, cx, mid.shape[0] - cy, mid.shape[1] - cx)) - 2
+        pr = np.arange(Rm)
+        ko = m['kollesis']
+
+        def runs_at(ang):
+            aa = np.radians(ang)
+            yy = (cy + pr * np.sin(aa)).astype(int)
+            xx = (cx + pr * np.cos(aa)).astype(int)
+            col = mid[yy, xx].astype(np.int8); d2 = np.diff(col)
+            st = np.nonzero(d2 == 1)[0] + 1; en = np.nonzero(d2 == -1)[0] + 1
+            if en.size and st.size and en[0] < st[0]:
+                en = en[1:]
+            out = []
+            for s0, e0 in zip(st, en):
+                sl = slice(s0, e0)
+                ids = tidv[yy[sl], xx[sl]]; ids = ids[ids > 0]
+                out.append((int((e0 - s0) * 30),
+                            bool(km[yy[sl], xx[sl]].any()),
+                            int(np.bincount(ids).argmax()) if ids.size else 0))
+            return out
+
+        ratios = []
+        for i in range(len(ko['r_mm'])):
+            tk = float(ko['theta_deg'][i]); rk = float(ko['r_mm'][i])
+            a2, b2 = T.ellipse_axes_for_perimeter(2 * np.pi * rk, T.G['ratio'])
+            per2 = T.ellipse_arc_table(a2, b2)[2]
+            hd = 0.5 * T.G['kollesis_ov_mm'] / per2 * 360
+            rj = [r for r in runs_at(tk) if r[1]]
+            if not rj:
+                continue
+            um_j, _, tj = min(rj, key=lambda r: r[0])
+            ref = [r[0] for sgn in (+1, -1)
+                   for r in runs_at((tk + sgn * (hd + 12)) % 360)
+                   if r[2] == tj and not r[1]]
+            if ref:
+                ratios.append(um_j / np.mean(ref))
+        ratio_med = float(np.median(ratios)) if ratios else 0.0
+        okG = (len(ratios) >= 3 and 1.5 <= ratio_med <= 3.2
+               and vmt['kollesis_mask'].sum() > 0
+               and int(np.count_nonzero(voff['kollesis_mask'])) == 0)
+        res['G_kollesis_painted'] = dict(
+            joins_measured=len(ratios), ratio_median=ratio_med,
+            passed=bool(okG))
+    finally:
+        T.G.clear(); T.G.update(oldG2)
+
     if verbose:
         print("=" * 70)
         print("ACCEPTANCE TEST -- contrast_phantom (pre-registered)")
@@ -369,6 +439,11 @@ def acceptance_test(verbose=True):
               f"{E['attribution_vox']:.2f} vox/pitch | physical: min gap "
               f"{E['physical_min_gap_um']:.0f} um (>0), {E['physical_vox']:.2f} "
               f"vox/pitch -> {'PASS' if E['passed'] else 'FAIL'}")
+        Gk = res['G_kollesis_painted']
+        print(f"G kollesis painted  {Gk['joins_measured']} joins measured; "
+              f"median join/non-join thickness ratio "
+              f"{Gk['ratio_median']:.2f} (in [1.5, 3.2]); mask empty when off "
+              f"-> {'PASS' if Gk['passed'] else 'FAIL'}")
         F = res['F_thickness_painted']
         print(f"F thickness painted fraction(120)/fraction(60) = "
               f"{F['fraction_ratio']:.2f} (>1.4); measured "

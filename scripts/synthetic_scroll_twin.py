@@ -553,22 +553,35 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
             free = tid[iy[ok], ix[ok]] == 0
             tid[iy[ok][free], ix[ok][free]] = t + 1
     # kollesis: double-thickness bands where sheets are glued (Egyptian
-    # manufacture). Painted as an extra papyrus layer just inside the turn.
+    # manufacture). Painted as a FINITE-THICKNESS overlap layer just inside
+    # the turn -- the same normal-offset treatment as the turns themselves.
+    # (The earlier version painted two one-voxel traces via a homothetic
+    # rescale: the joins had the same wireframe defect the turns had, fixed
+    # sampling that opened gaps at fine voxels, and homothety mis-shapes the
+    # offset. The double-thickness band now spans -1.5..+0.5 sheet along the
+    # local normal, and its footprint is exported as ground truth so a
+    # double-thickness join detector can be validated against it.)
     ko = meta.get('kollesis')
+    kmask = np.zeros((ny, nx), bool)
     if ko is not None and kollesis:
+        n_lay_k = max(2, int(np.ceil(2.0 * g['sheet_um'] / (0.5 * voxel_um))) + 1)
+        v_k = np.uint8(min(255, int(papyrus * 130 / 90)))
         for r_k, th_k in zip(ko['r_mm'], ko['theta_deg']):
             a, b = ellipse_axes_for_perimeter(2 * np.pi * r_k, g['ratio'])
-            t_tab, f_tab, _ = ellipse_arc_table(a, b)
-            half = 0.5 * g['kollesis_ov_mm'] / (2 * np.pi * r_k)   # arc frac
-            fr = (th_k / 360.0 + np.linspace(-half, half, 120)) % 1.0
+            t_tab, f_tab, per_k = ellipse_arc_table(a, b)
+            half = 0.5 * g['kollesis_ov_mm'] / per_k               # arc frac
+            n_pt = max(120, int(g['kollesis_ov_mm'] * 1000 / (0.4 * voxel_um)))
+            fr = (th_k / 360.0 + np.linspace(-half, half, n_pt)) % 1.0
             t_e = np.interp(fr, f_tab, t_tab)
-            for dr in (0.0, -g['sheet_um'] / 1000.0):
-                sc_ = (r_k + dr) / r_k
-                ix = ((a * sc_ * np.cos(t_e) + a_out + pad) * 1000 / voxel_um).astype(int)
-                iy = ((b * sc_ * np.sin(t_e) + b_out + pad) * 1000 / voxel_um).astype(int)
+            xs_k, ys_k = a * np.cos(t_e), b * np.sin(t_e)
+            nxk, nyk = b * np.cos(t_e), a * np.sin(t_e)
+            nn = np.hypot(nxk, nyk); nxk, nyk = nxk / nn, nyk / nn
+            for dr in np.linspace(-1.5, 0.5, n_lay_k) * (g['sheet_um'] / 1000.0):
+                ix = ((xs_k + dr * nxk + a_out + pad) * 1000 / voxel_um).astype(int)
+                iy = ((ys_k + dr * nyk + b_out + pad) * 1000 / voxel_um).astype(int)
                 ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
-                vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]],
-                                                    min(255, int(papyrus * 130 / 90)))
+                vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]], v_k)
+                kmask[iy[ok], ix[ok]] = True
 
     # (An earlier hotfix thickened the traces here by in-plane grey dilation.
     # It is removed: with the annulus painting above it double-counted the
@@ -599,7 +612,7 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
         v = vol.astype(np.float32) + rng.normal(0.0, noise, vol.shape)
         vol = np.clip(v, 0, 255).astype(np.uint8)
     return vol, dict(z0_mm=z0, voxel_um=voxel_um, shape=vol.shape,
-                     turn_id=tid)
+                     turn_id=tid, kollesis_mask=kmask)
 
 
 # ---------------------------------------------------------------------------

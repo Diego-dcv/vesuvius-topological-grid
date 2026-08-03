@@ -186,6 +186,12 @@ def build_grid(out, n_columns, papyrus_levels, pitches, noise, seed=0,
             tag = f"{arm[:4]}_pap{pap:03d}_pitch{pitch:.0f}_noise{noise:.0f}"
             np.savez_compressed(os.path.join(out, tag + '.npz'),
                                 volume=vol, gt_surface=gt, gt_ink=gt_ink,
+                                # int16, 0 = air, turn t -> t+1. Two-dimensional
+                                # (ny, nx): the twin is a prism, so turn
+                                # identity is z-invariant by construction --
+                                # broadcast over z to match `volume` if your
+                                # reader wants three dimensions.
+                                turn_id=meta['turn_id'],
                                 papyrus=pap, pitch_um=pitch, noise=noise,
                                 arm=arm,
                                 sheet_um=(sheet_um if arm == 'physical'
@@ -221,6 +227,17 @@ def acceptance_test(verbose=True):
        be non-zero in the noiseless volume, and vice versa.
        PASS: exact agreement, zero mismatched voxels.
 
+    F. SHEET THICKNESS IS ACTUALLY PAINTED. The defect this guards against
+       shipped: half_t was computed and never used, every turn was a one-voxel
+       curve trace, and sweeping sheet_um 60 -> 400 um left the material
+       fraction unchanged at 10.7 % (found by Jinhojeong, issue #1, confirmed
+       by aviad12g). Guard on both symptoms: the material fraction must GROW
+       with declared thickness at fixed pitch, and the measured crossing
+       width on the fold axis must track the declaration to within about one
+       voxel of discretisation.
+       PASS: fraction(sheet=120) / fraction(sheet=60) > 1.4, and measured
+       thickness within [sheet, sheet + 2 voxels] for both.
+
     E. THE GEOMETRY AXIS SWEEPS ONE THING. Gap fraction must hold constant
        across the pitch sweep, and the tightest pitch must stay above Nyquist
        at the chosen voxel. The first version of this grid failed both without
@@ -237,16 +254,17 @@ def acceptance_test(verbose=True):
        2 sigma of the added noise.
     """
     res = {}
-    N = 12
+    N = 8                      # exam cells are small: the checks are about
+    ZW = 2.0                   # geometry and painting, not statistics
     noise = DEF_NOISE
 
     # A -- geometry identical along a contrast row
-    _, gt_a, _, _ = emit_cell(N, 35, 180.0, noise)
-    _, gt_b, _, _ = emit_cell(N, 90, 180.0, noise)
+    _, gt_a, _, _ = emit_cell(N, 35, 180.0, noise, z_window_mm=ZW)
+    _, gt_b, _, _ = emit_cell(N, 90, 180.0, noise, z_window_mm=ZW)
     same_geom = bool(np.array_equal(gt_a, gt_b))
     # and intensity identical down a geometry column
-    va, ga, _, _ = emit_cell(N, 65, 260.0, 0.0)
-    vb, gb, _, _ = emit_cell(N, 65, 120.0, 0.0)
+    va, ga, _, _ = emit_cell(N, 65, 260.0, 0.0, z_window_mm=ZW)
+    vb, gb, _, _ = emit_cell(N, 65, 120.0, 0.0, z_window_mm=ZW)
     ma, mb = va[ga > 0].mean(), vb[gb > 0].mean()
     res['A_axes_independent'] = dict(
         same_geometry=same_geom, papyrus_mean=(float(ma), float(mb)),
@@ -255,7 +273,7 @@ def acceptance_test(verbose=True):
     # B -- the geometry axis bites
     gaps = []
     for pitch in (260.0, 180.0, 120.0):
-        _, gt, _, _ = emit_cell(N, 65, pitch, 0.0)
+        _, gt, _, _ = emit_cell(N, 65, pitch, 0.0, z_window_mm=ZW)
         mid = gt[gt.shape[0] // 2]
         row = mid[mid.shape[0] // 2]
         idx = np.where(row > 0)[0]
@@ -268,13 +286,13 @@ def acceptance_test(verbose=True):
     res['B_geometry_bites'] = dict(gaps=gaps, passed=bool(mono))
 
     # C -- ground truth exact
-    v, gt, _, _ = emit_cell(N, 65, 180.0, 0.0)
+    v, gt, _, _ = emit_cell(N, 65, 180.0, 0.0, z_window_mm=ZW)
     res['C_truth_exact'] = dict(
         mismatched=int(np.sum((v > 0) != (gt > 0))),
         passed=bool(np.sum((v > 0) != (gt > 0)) == 0))
 
     # D -- faintest level still separable
-    v, gt, _, _ = emit_cell(N, DEF_PAPYRUS[0], 180.0, noise)
+    v, gt, _, _ = emit_cell(N, DEF_PAPYRUS[0], 180.0, noise, z_window_mm=ZW)
     sep = float(v[gt > 0].mean() - v[gt == 0].mean())
     res['D_faint_separable'] = dict(separation=sep, sigma=noise,
                                     passed=bool(sep > 2 * noise))
@@ -294,6 +312,35 @@ def acceptance_test(verbose=True):
         physical_min_gap_um=min(gap_p), physical_vox=vox_p,
         passed=bool(max(gapfrac)-min(gapfrac) < 0.01 and vox_a > 2.5
                     and min(gap_p) > 0 and vox_p > 2.5))
+
+    # F -- thickness is painted
+    import synthetic_scroll_twin as T
+    oldG = dict(T.G)
+    fr2, th2 = {}, {}
+    try:
+        T.G['pitch_um'] = 300.0
+        for sheet in (60.0, 120.0):
+            T.G['sheet_um'] = sheet
+            t, m = T.build_twin(8)
+            v, _ = T.make_volume(t, m, z_window_mm=2.0, voxel_um=30.0,
+                                 kollesis=False)
+            fr2[sheet] = float((v > 0).mean())
+            mid = v[v.shape[0] // 2]
+            cy = int(np.array(np.nonzero(mid > 0)).mean(1)[0])
+            row = (mid[cy, :] > 0).astype(np.int8)
+            d2 = np.diff(row)
+            st = np.nonzero(d2 == 1)[0]; en = np.nonzero(d2 == -1)[0]
+            if en.size and st.size and en[0] < st[0]:
+                en = en[1:]
+            k = min(len(st), len(en))
+            th2[sheet] = float(np.median((en[:k] - st[:k]) * 30.0))
+    finally:
+        T.G.clear(); T.G.update(oldG)
+    okF = (fr2[120.0] / fr2[60.0] > 1.4
+           and all(s0 <= th2[s0] <= s0 + 60.0 for s0 in (60.0, 120.0)))
+    res['F_thickness_painted'] = dict(
+        fraction_ratio=fr2[120.0] / fr2[60.0],
+        measured_um={int(k): v for k, v in th2.items()}, passed=bool(okF))
 
     if verbose:
         print("=" * 70)
@@ -321,6 +368,12 @@ def acceptance_test(verbose=True):
               f"{E['attribution_vox']:.2f} vox/pitch | physical: min gap "
               f"{E['physical_min_gap_um']:.0f} um (>0), {E['physical_vox']:.2f} "
               f"vox/pitch -> {'PASS' if E['passed'] else 'FAIL'}")
+        F = res['F_thickness_painted']
+        print(f"F thickness painted fraction(120)/fraction(60) = "
+              f"{F['fraction_ratio']:.2f} (>1.4); measured "
+              f"{F['measured_um'][60]:.0f} um at 60, {F['measured_um'][120]:.0f} "
+              f"um at 120 (each within [sheet, sheet+2 vox]) -> "
+              f"{'PASS' if F['passed'] else 'FAIL'}")
         print("-" * 70)
         print("OVERALL:", "PASS" if all(v['passed'] for v in res.values())
               else "FAIL")

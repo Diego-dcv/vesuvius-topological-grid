@@ -243,7 +243,7 @@ def crush_points(turn_idx, phi, r, ratio=2.0):
 # ---------------------------------------------------------------------------
 # The twin: obra -> ink ground truth, wound and crushed
 # ---------------------------------------------------------------------------
-def build_twin(n_columns, g=G, script='greek', seed=0):
+def build_twin(n_columns, g=None, script='greek', seed=0):
     """Build the twin. `script` selects the layout REGIME, which matters more
     than the language:
 
@@ -260,9 +260,15 @@ def build_twin(n_columns, g=G, script='greek', seed=0):
     continua does not have -- a spectral discriminator, not noise.
     """
     sc = SCRIPTS[script]
-    g = dict(g)
-    g['letter_mm'] = sc.get('letter_mm', g['letter_mm'])
-    g['line_mm'] = sc.get('line_mm', g['line_mm'])
+    g = dict(g) if g is not None else {}
+    # Work on a COPY: an earlier version mutated the module-level G here, so
+    # every call contaminated the next, and script presets silently overrode
+    # values a caller had set. Caller-set values now win over the preset.
+    caller = dict(g) if g is not None else {}
+    g = dict(G); g.update(caller)
+    for k in ('letter_mm', 'line_mm'):
+        if k not in caller and sc.get(k) is not None:
+            g[k] = sc[k]
     rng = np.random.default_rng(seed)
 
     lines_per_col = int((g['page_mm'] - 2 * g['margin_mm']) // g['line_mm'])
@@ -485,12 +491,33 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
         ti, tj, a0, a1 = fuse
         fuse_set = set(range(int(ti), int(tj) + 1))
 
-    # paint papyrus turn by turn on the crushed ellipses
-    t_hi = np.linspace(0, 2 * np.pi, 3000)
+    # paint papyrus turn by turn on the crushed ellipses -- as FINITE-THICKNESS
+    # annuli, not curve traces.
+    #
+    # THE BUG THIS REPLACES (found by Jinhojeong, confirmed by aviad12g,
+    # issue #1): half_t was computed and never used, so every turn was painted
+    # as a one-voxel curve trace at any voxel size. The declared sheet_um did
+    # nothing -- sweeping it 60 -> 400 um left the material fraction at 10.7 %
+    # unchanged -- so the phantoms were wireframes, gt_surface inherited that,
+    # and a "gap closing 150 -> 10 um" was a spacing change between curves,
+    # not an approach to contact.
+    #
+    # The fix paints each turn as a stack of ellipse traces offset along the
+    # LOCAL NORMAL by -half_t..+half_t, which keeps the physical thickness
+    # uniform around the section (a homothetic rescale would not: it thins the
+    # sheet at the flat sides by b/r and fattens it at the folds by a/r).
+    # Angular sampling scales with perimeter/voxel so no gaps open at fine
+    # voxels, and turn identity is recorded per voxel for fusion readouts.
+    tid = np.zeros((ny, nx), np.int16)          # 0 = air; turn t -> t+1
+    n_lay = max(2, int(np.ceil(g['sheet_um'] / (0.5 * voxel_um))) + 1)
+    offs_mm = np.linspace(-half_t, half_t, n_lay)
     for t in range(n_turns):
         r_t = g['r0_mm'] + (t + 0.5) * p
         a, b = ellipse_axes_for_perimeter(2 * np.pi * r_t, g['ratio'])
+        n_hi = max(3000, int(2 * np.pi * r_t * 1000 / (0.4 * voxel_um)))
+        t_hi = np.linspace(0, 2 * np.pi, n_hi)
         xs, ys = a * np.cos(t_hi), b * np.sin(t_hi)
+        ae, be = np.full(n_hi, a), np.full(n_hi, b)
         if t in fuse_set and t != int(fuse[1]):
             # true fusion: collapse this turn's sector ONTO the target
             # turn's ellipse (turn tj) -- the crossings become one
@@ -501,22 +528,30 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
                 g['ratio'])
             xs = np.where(sel, a2 * np.cos(t_hi), xs)
             ys = np.where(sel, b2 * np.sin(t_hi), ys)
-        ix = ((xs + a_out + pad) * 1000 / voxel_um).astype(int)
-        iy = ((ys + b_out + pad) * 1000 / voxel_um).astype(int)
-        ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
+            ae = np.where(sel, a2, ae)
+            be = np.where(sel, b2, be)
+        # outward unit normal of the (possibly per-point) ellipse at t_hi
+        nx_, ny_ = be * np.cos(t_hi), ae * np.sin(t_hi)
+        nn = np.hypot(nx_, ny_); nx_, ny_ = nx_ / nn, ny_ / nn
         base = papyrus
         if fibers:
             # verso striation along winding direction: modulate along t
             base = papyrus + (15 * np.sign(np.sin(t_hi * 40))).astype(int)
-        for zz in range(nz):
-            v = base if not fibers else \
-                np.clip(base + 15 * np.sign(np.sin(zz * 0.9)), 0, 255)
-            if np.isscalar(v):
-                vol[zz, iy[ok], ix[ok]] = np.maximum(vol[zz, iy[ok], ix[ok]], v)
+        for dr in offs_mm:
+            ix = ((xs + dr * nx_ + a_out + pad) * 1000 / voxel_um).astype(int)
+            iy = ((ys + dr * ny_ + b_out + pad) * 1000 / voxel_um).astype(int)
+            ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny)
+            if not fibers:
+                vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]],
+                                                    np.uint8(base))
             else:
-                vv = np.asarray(v)[ok] if not np.isscalar(v) else v
-                vol[zz, iy[ok], ix[ok]] = np.maximum(vol[zz, iy[ok], ix[ok]],
-                                                     vv.astype(np.uint8))
+                bb = np.asarray(base)[ok]
+                for zz in range(nz):
+                    v = np.clip(bb + 15 * np.sign(np.sin(zz * 0.9)), 0, 255)
+                    vol[zz, iy[ok], ix[ok]] = np.maximum(
+                        vol[zz, iy[ok], ix[ok]], v.astype(np.uint8))
+            free = tid[iy[ok], ix[ok]] == 0
+            tid[iy[ok][free], ix[ok][free]] = t + 1
     # kollesis: double-thickness bands where sheets are glued (Egyptian
     # manufacture). Painted as an extra papyrus layer just inside the turn.
     ko = meta.get('kollesis')
@@ -535,17 +570,36 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
                 vol[:, iy[ok], ix[ok]] = np.maximum(vol[:, iy[ok], ix[ok]],
                                                     min(255, int(papyrus * 130 / 90)))
 
+    # (An earlier hotfix thickened the traces here by in-plane grey dilation.
+    # It is removed: with the annulus painting above it double-counted the
+    # thickness -- a 120 um sheet came out at 270 -- and isotropic dilation
+    # is the wrong shape anyway, fattening along the sheet as much as across
+    # it. Thickness now comes from the normal-offset painting alone, which
+    # also paints turn_id at full thickness rather than as a wireframe.)
+
     # ink from the truth table, inside the z window
     inz = (truth['z_mm'] >= z0) & (truth['z_mm'] < z0 + z_window_mm)
     ix = ((truth['x_crushed'][inz] + a_out + pad) * 1000 / voxel_um).astype(int)
     iy = ((truth['y_crushed'][inz] + b_out + pad) * 1000 / voxel_um).astype(int)
     iz = ((truth['z_mm'][inz] - z0) * 1000 / voxel_um).astype(int)
     ok = (ix >= 0) & (ix < nx) & (iy >= 0) & (iy < ny) & (iz >= 0) & (iz < nz)
-    vol[iz[ok], iy[ok], ix[ok]] = ink
+    # Ink as a patch rather than a point: one voxel per letter made gt_ink
+    # near-empty (70 voxels against ~3M of sheet). Letters get in-plane extent
+    # of roughly a stroke width; glyph shapes are out of scope.
+    inkm = np.zeros_like(vol, dtype=bool)
+    inkm[iz[ok], iy[ok], ix[ok]] = True
+    r_i = max(1, int(round(0.15 * g['letter_mm'] * 1000.0 / voxel_um)))
+    if r_i >= 1:
+        from scipy.ndimage import binary_dilation
+        yy3, xx3 = np.mgrid[-r_i:r_i + 1, -r_i:r_i + 1]
+        disk_i = (yy3 * yy3 + xx3 * xx3 <= r_i * r_i)
+        inkm = binary_dilation(inkm, structure=disk_i[None, :, :])
+    vol[inkm & (vol > 0)] = ink          # ink sits on papyrus, not in air
     if noise > 0:
         v = vol.astype(np.float32) + rng.normal(0.0, noise, vol.shape)
         vol = np.clip(v, 0, 255).astype(np.uint8)
-    return vol, dict(z0_mm=z0, voxel_um=voxel_um, shape=vol.shape)
+    return vol, dict(z0_mm=z0, voxel_um=voxel_um, shape=vol.shape,
+                     turn_id=tid)
 
 
 # ---------------------------------------------------------------------------

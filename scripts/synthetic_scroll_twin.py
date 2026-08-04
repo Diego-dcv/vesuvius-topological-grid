@@ -612,7 +612,14 @@ def make_volume(truth, meta, g=G, z0=None, z_window_mm=8.0, voxel_um=60.0,
         v = vol.astype(np.float32) + rng.normal(0.0, noise, vol.shape)
         vol = np.clip(v, 0, 255).astype(np.uint8)
     return vol, dict(z0_mm=z0, voxel_um=voxel_um, shape=vol.shape,
-                     turn_id=tid, kollesis_mask=kmask)
+                     turn_id=tid, kollesis_mask=kmask,
+                     # pixel (row, col) of the physical origin the ellipses
+                     # are painted around. Any mapping from detector output
+                     # to winding/arc coordinates must use THIS centre, not
+                     # the material centroid: on an asymmetric section the
+                     # two differ by > 1 mm, which mis-assigns windings.
+                     origin_px=((b_out + pad) * 1000 / voxel_um,
+                                (a_out + pad) * 1000 / voxel_um))
 
 
 # ---------------------------------------------------------------------------

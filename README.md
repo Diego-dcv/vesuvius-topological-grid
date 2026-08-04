@@ -1640,6 +1640,34 @@ above use it as a unit test with ground truth, never as evidence about a real sc
 
 ---
 
+## 13 — Kollesis detector: finding the sheet joins
+
+A kollesis join is double papyrus — two sheets glued with a ~15 mm overlap —
+and double thickness is pure geometry: no ink, no model, no labels. Counting
+joins counts sheets, and sheets × the kollema width give a roll length
+measured independently of the spiral.
+
+The detector casts rays through a section, cuts them into material runs, and
+flags a run as join-like when it is doubled against the per-ray median
+(1.6–2.6×), isolated (both ray-neighbours single), and persistent across
+neighbouring rays at the same radius. It reads geometry only — intensity is
+deliberately not used, because in the twin the joins' brightness is painted
+by us, and a detector graded on it would be grading its own assumptions.
+The twin's exported `kollesis_mask` provides exact ground truth to score
+against:
+
+    python scripts/kollesis_detector.py test
+
+**Status: all three acceptance exams pass.** Against ground truth the
+detector finds all joins at 0.95 precision after the lattice fence, which
+is fitted blind on the detected flags and recovers a kollema width of
+165 mm against the twin's true 160. The joins-free control drops from 47
+false flags to 17, inside the criterion's ceiling of 18 — with little
+margin, and stated so. The script's docstring carries the diagnostic
+record.
+
+---
+
 ## Lessons (kept on purpose)
 
 **The recurring failure has a shape.** Most errors recorded in this repository

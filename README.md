@@ -1282,6 +1282,21 @@ This separation matters because future ink models need not solve the geometry ag
 
 ---
 
+**The transfer law holds through the roll, not just at the surface.** Reading
+all rings of the published crossing table (0–38, step 2, medians over 313
+heights), every winding follows the same displacement curve: correlation with
+the outer ring runs 1.000 → 0.952 with no break, and the median residual grows
+smoothly from 0.5° to 3.7° — sub-millimetre of arc throughout. Together with
+the analytic match of the outer ring (+0.936 against the equal-perimeter
+ellipse), this makes the crush a parallel, flexural-slip fold in the
+structural-geology sense: one law, every winding. Practical consequence: given
+the local aspect ratio, the law predicts point positions on any winding to
+~1–2°, so the unrolling gains an interpolation term where segmentation drops
+windings. Medians over height smooth the per-height figure; the per-height
+residual will be somewhat larger.
+
+---
+
 ### Future extensions
 
 The following extensions are direct consequences of the present representation rather than claims of completed work.

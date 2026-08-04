@@ -283,10 +283,12 @@ tests, in [Quick start](#quick-start) steps 10-16.
 
 ### The twin: self-adjusting to the work
 
-Give it a work and it builds the scroll around it. The obra fixes the sheet
+Give it a work and it builds the scroll around it. The work fixes the sheet
 length; the sheet fixes the turns and the outer radius (spiral from a fixed
-~4 mm umbilicus); ink lands with the **measured** grid (letter 4.16 mm, lines
-2.79 mm, columns 43 mm, page 200 mm); then the whole thing is **crushed to the
+~4 mm umbilicus); ink lands on the grid the code carries (letter 4.16 mm, lines
+2.79 mm, columns 43 mm, page 200 mm — the first two are the historical pair,
+contradicted by the render check below and flagged by `grid_warnings()` at
+runtime; pass `--letter-mm 1.83 --line-mm 3.69` for any production figure); then the whole thing is **crushed to the
 measured deformation** — every turn mapped, arc-length preserving, onto a 2:1
 ellipse of equal perimeter, folds at 0°/180° as measured on PHerc1218. Every
 letter's position before and after crushing is known because we put it there:
@@ -416,7 +418,7 @@ philosophical library with a Latin appendix. But the **support** is Egyptian
 by definition, and that leaves a structure the twin now models. The roll is
 not one sheet: it is kollemata glued with an overlap. Pliny (NH XIII) has the
 scapus at no more than twenty sheets, about 11–12 feet — sheets of ~17–19 cm.
-Each join is a band of **double thickness every ~180 mm of arc**.
+Each join is a band of **double thickness every ~160 mm of arc**.
 
 This matters because it is **detectable by thickness alone, with no ink
 model** — the natural registration landmark for unwrapping. And its signature
@@ -427,19 +429,20 @@ A slicing artefact is constant in index; a manufacturing periodicity chirps.
 
 ![Sheet joins in the crushed section and the angular chirp](figures/twin_kollesis.png)
 
-*Left: the 24 joins of a 95-column twin placed in the crushed section —
+*Left: the sheet joins of a 95-column twin placed in the crushed section —
 thickness landmarks, no ink needed. Right: the chirp. Fixed arc, growing
-circumference, so the angular step to the next join falls monotonically from
-1953° at the umbilicus to 657° at the outside.*
+circumference, so the angular step to the next join falls monotonically
+outward. (Figure rendered with the earlier 180 mm sheet default; at the
+measured 160 mm the join count is ~12 % higher.)*
 
 **The arithmetic that followed has since been answered, and the answer was
 the dull one.** A 4.43 m roll exceeds Pliny's scapus of twenty sheets, which
 looked like it needed explaining. It does not: Philodemus' *On Poems* II "was
 at first a roll of 70 sheets; a further 30 were glued on when the work proved
 to be long". Gluing scapi together was ordinary practice. That roll also
-supplies a **measured** sheet width — 16 m over 100 kollemata, i.e. **160 mm**
-— against the 180 mm assumed here, so the default is 12 % high and the 4.43 m
-roll is 27.7 sheets rather than 24.6.
+supplies the **measured** sheet width — 16 m over 100 kollemata, i.e.
+**160 mm** — which the twin now carries as its default; at 160 mm the 4.43 m
+roll is 27.7 sheets.
 
 ### The predictor: the map, with the uncertainty attached
 
@@ -512,15 +515,15 @@ assumed. The layout regime sets the column period, so the same section means
 
 Acceptance tests ship inside each script, criteria pre-registered.
 
-**Twin** (`test`, run on a 72-column twin — the 95-column figures above give
-24 joins rather than 19 for the same reason: the obra sizes the roll):
+**Twin** (`test`, run on a 72-column twin — the 95-column figures above give more
+joins for the same reason: the work sizes the roll):
 
 | exam | criterion | result |
 |---|---|---|
 | A — inextensibility | crushed perimeter = wound circumference per turn, rel. err < 0.1 % | **4.6e-10, PASS** |
 | B — ground-truth round trip | analytic un-crush recovers every letter's s to < 10 µm | **0.00 µm, PASS** |
 | C — umbilicus inversion | the inversion round-trips to < 0.1 turns, **and** r₀ is shown to be a free parameter (3–6 mm spans > 10 turns) | **0.000 turns, 18-turn spread, PASS** |
-| D — kollesis chirp | join count = L/W; angular step monotone > 98 % | **19 joins, 745°→2154°, 100 %, PASS** |
+| D — kollesis chirp | join count = L/W; angular step monotone > 98 % | **21 joins (21.5 sheets), 659°→1806°, 100 %, PASS** |
 
 **Predictor** (`test`):
 
@@ -575,9 +578,10 @@ regime exists to invert.
 5. **The map says where geometry puts text, not whether ink survived.** Absence
    at a predicted site is not a miss; presence far from every predicted site
    is.
-6. The measured 2.79 mm line spacing on a 200 mm page yields ~53 lines per
-   column, taller than the 25–45 typical of opened rolls. The measured grid
-   wins by policy; `--line-mm` overrides.
+6. Line spacing: the code default (2.79 mm) yields ~53 lines per column,
+   taller than the 25–45 typical of opened rolls; the render-corrected
+   3.69 mm yields ~41, inside it. `--line-mm` overrides, and production
+   figures should use the corrected value.
 
 ---
 
@@ -1282,6 +1286,8 @@ This separation matters because future ink models need not solve the geometry ag
 
 ---
 
+#### The displacement law, read through the full ring stack
+
 **The transfer law holds through the roll, not just at the surface.** Reading
 all rings of the published crossing table (0–38, step 2, medians over 313
 heights), every winding follows the same displacement curve: correlation with
@@ -1433,7 +1439,8 @@ angular step, not a new method.
 
 Everything above is built on published per-ray crossing positions, which are
 themselves derived from surface predictions. This section goes to the **raw CT
-volume** — 8.64 µm masked scan, read directly from the open bucket — and asks
+volume** — the masked scan (8.64 µm native, read at pyramid level 1 =
+17.28 µm) directly from the open bucket — and asks
 whether the reconstruction lands on papyrus. Some of it does. Some of what was
 claimed earlier does not, and that is recorded here rather than quietly fixed.
 
@@ -1543,9 +1550,22 @@ reality and independent here:
 
 ```bash
 python scripts/contrast_phantom.py grid --out phantoms/
-python scripts/contrast_phantom.py grid --out phantoms/ --papyrus 35,50,65,90 --pitch 260,180,120
+python scripts/contrast_phantom.py grid --arm physical    --out p/
+python scripts/contrast_phantom.py grid --arm attribution --out a/
+python scripts/contrast_phantom.py grid --arm physical --no-kollesis --out control/
 python scripts/contrast_phantom.py test
 ```
+
+The grid ships in **two arms**, because staying faithful to the physics and
+isolating one variable are different goals. `--arm physical` holds the sheet
+at its real 150 µm, so the gap closes as the pitch drops — which is what a
+crushed scroll actually does (measured pitch ~147 µm against ~150 µm sheets on
+PHerc1218's flattened axis). `--arm attribution` holds the gap at a fixed 42 %
+of the pitch so a failure can be attributed to tightness alone, at the
+declared price of a sheet that thins with pitch, which papyrus does not do.
+`--no-kollesis` omits the double-thickness joins; single-sheet **control**
+cells need it, because with joins on ~9 % of sites carry own-turn material at
+~150 µm — inside a 360 µm reader span.
 
 Geometry is bit-identical along a contrast row; intensity statistics are
 identical down a geometry column. Every cell carries **per-voxel ground truth**
@@ -1555,7 +1575,7 @@ turn t → t+1) and `kollesis_mask` (bool, the footprint of the double-thickness
 sheet joins) — both 2-D (ny, nx) and z-invariant by construction, so broadcast
 over z if a reader wants three dimensions. The first feeds fusion readouts; the
 second lets a join detector be validated against known joins, which no real
-scroll can provide.Run a surface model over the grid and the
+scroll can provide. Run a surface model over the grid and the
 confound resolves by inspection:
 
 | recall falls… | reading |
@@ -1586,10 +1606,13 @@ dark anyway", because one row cannot say what geometry costs.
 
 | exam | criterion | result |
 |---|---|---|
-| A — axes independent | geometry bit-identical across a contrast row; papyrus mean within 1 grey level down a geometry column | **identical; 66.85 vs 66.91, PASS** |
-| B — geometry bites | layer gap falls monotonically with pitch | **9.9 > 7.8 > 6.1 vox, PASS** |
+| A — axes independent | geometry bit-identical across a contrast row; papyrus mean within 1 grey level down a geometry column | **identical; 65.31 vs 65.63, PASS** |
+| B — geometry bites | layer gap falls monotonically with pitch | **12.3 > 10.0 > 8.8 vox, PASS** |
 | C — truth exact, not annotated | every labelled surface voxel non-zero in the noiseless volume and vice versa | **0 mismatched, PASS** |
-| D — faint level still detectable | papyrus/air separation above 2σ of the added noise at the faintest level | **33.4 against σ = 6, PASS** |
+| D — faint level still detectable | papyrus/air separation above 2σ of the added noise at the faintest level | **32.6 against σ = 6, PASS** |
+| E — the geometry axis is valid | attribution: gap fraction constant across the sweep, > 2.5 vox/pitch; physical: minimum gap > 0 and > 2.5 vox/pitch | **0.420 flat, 2.75; gap 10 µm, 5.33, PASS** |
+| F — sheet thickness is painted | material fraction grows with declared thickness; measured crossing width tracks the declaration within discretisation | **ratio 1.64; 90 µm at 60, 150 at 120, PASS** |
+| G — kollesis painted and labelled | median join/non-join thickness ratio in [1.5, 3.2] over measurable joins; empty mask with joins off | **5 joins, 2.43, PASS** |
 
 These check that the phantom is a valid *instrument*, not that any detector
 performs well on it. **Absolute recall on these volumes means nothing** — the
@@ -1597,61 +1620,13 @@ twin is a prism, identical top to bottom, with two analytic folds and no
 tearing. The shape of the recall surface across the grid is the whole result.
 
 Producing the phantoms and running a surface model on them are naturally
-different hands: a 4 × 4 grid at 25 columns is ~105 MB and runs on a laptop in
-minutes; scoring it needs the model and a GPU.
+different hands: the attribution arm stays laptop-sized; the physical arm at a
+30 µm voxel runs ~380 MB per 8 cells and is meant to be generated locally
+rather than downloaded. Scoring needs the model and a GPU.
 
----
-
-## What the twin could do next
-
-The synthetic twin (Mode 7) is the only tool here that produces data rather than
-consuming it, and that makes it good for exactly one class of problem: **breaking a
-confound that real data cannot break.** Two of those are on the table, both asked for
-rather than invented.
-
-**Separating faint from compressed.** A contributor measured that the published
-surface model misses *faint* sheet rather than thin sheet — missed voxels run 10.3 %
-darker than found voxels inside the same volume, while local thickness and component
-size show no difference at all. But in real papyrus brightness and compression travel
-together, so "the model cannot learn faint sheet" and "faint regions are
-geometrically harder" both fit those numbers, and no measurement on real data
-separates them. A phantom can: **hold the geometry fixed and sweep the contrast
-alone.** The twin already emits a voxel volume with independently controllable
-papyrus and ink intensity and per-voxel ground truth, so the sweep is a parameter
-range rather than a new capability. Producing the phantoms and running a surface
-model on them are naturally different hands.
-
-**Calibrating a fusion detector.** The twin can weld chosen turns over chosen angles
-and label the affected letters, which makes it a source of *known* merge sites with
-ground truth — the thing a merge detector needs to quote a detection floor rather
-than a plausibility argument. The same trick already calibrated the winding-count
-invariant to a floor of ≳7 % of a slab's windings.
-
-What the twin cannot do, and should not be asked to: it is a prism, identical top to
-bottom, with two analytic folds and no tearing. **That prism assumption now has a
-price tag**: a single section profile fits a given CT slice to 1.1–2.8 mm, while
-that slice's own measured profile fits to 0.66–0.83 mm (see Mode 11B). So
-`--section-profile` taking one shape for the whole roll is itself an
-approximation worth about 2 mm of section error, and the natural next step is to
-let it take a profile per height, which the data already contains. It does not reproduce the complexity
-of real deformation and comparing its slices with real CT by eye would be pointless.
-Its value is that the answer is known, not that it looks convincing — and the modes
-above use it as a unit test with ground truth, never as evidence about a real scroll.
-
----
-
-## Supporting analyses
-- `scripts/experiment_A_degradation.py` — controlled-degradation validation of the
-  metric (rotation, shear, warp, noise, erasure): the score falls monotonically, which
-  is the calibration a ranking metric needs.
-- `scripts/delta_beta_ink.py` — δ/β contrast of lead-bearing ink vs papyrus from
-  tabulated scattering data. Key result: the exploitable channel is **K-edge
-  subtraction (~88 keV)**, not differential phase — with the caveat that
-  phase-retrieved public volumes may suppress exactly that absorption signal.
-- `scripts/make_rank_candidates.py` and `scripts/orient_acceptance_test.py` —
-  the acceptance tests for the `rank` and `orient` modes. They ship with the
-  code deliberately: every mode in this repository carries the test that
-  gates it, including the ones that failed before they passed.
+**In production.** The grid has been run end-to-end by aviad12g (frozen
+checkpoint, five generation seeds) and read by Jinhojeong's fusion instrument;
+the fixed-geometry contrast follow-up is preregistered in villa#191.
 
 ---
 
@@ -1682,6 +1657,57 @@ margin, and stated so. The script's docstring carries the diagnostic
 record.
 
 ---
+
+## What the twin was asked to do — and what came back
+
+The synthetic twin (Mode 7) is the only tool here that produces data rather than
+consuming it, and that makes it good for exactly one class of problem: **breaking a
+confound that real data cannot break.** Two such problems were put to it, both asked
+for rather than invented — and both have now been run, by other hands.
+
+**Separating faint from compressed** became Mode 12. Run end-to-end by aviad12g over
+a frozen production checkpoint (five generation seeds, controlled-FPR readouts), it
+returned the third outcome — the one invisible in real data: the response moves on
+**both** axes, contrast and geometry, with a modest interaction (~0.05).
+
+**Calibrating a fusion detector** became the three-handed fusion readout: this
+repository's geometry supplied exact gaps, aviad12g's frozen runs supplied the
+probabilities, and Jinhojeong's ray instrument counted — the first measurement of
+fusion rate against exact gap size. The finding: at detected contacts the checkpoint
+bridges neighbouring sheets at a flat 75–78 % across 10–150 µm of true air gap, so
+fusion is **not** a tight-gap phenomenon there, and the PHerc1218 anisotropy question
+moves from gaps to detection-versus-contrast — which the preregistered fixed-geometry
+follow-up is built to answer. (The same welding trick had earlier calibrated the
+winding-count invariant to a floor of ≳7 % of a slab's windings.)
+
+What the twin cannot do, and should not be asked to: it is a prism, identical top to
+bottom, with two analytic folds and no tearing. **That prism assumption now has a
+price tag**: a single section profile fits a given CT slice to 1.1–2.8 mm, while
+that slice's own measured profile fits to 0.66–0.83 mm (see Mode 11B). So
+`--section-profile` taking one shape for the whole roll is itself an
+approximation worth about 2 mm of section error, and the natural next step is to
+let it take a profile per height, which the data already contains. It does not reproduce the complexity
+of real deformation and comparing its slices with real CT by eye would be pointless.
+Its value is that the answer is known, not that it looks convincing — and the modes
+above use it as a unit test with ground truth, never as evidence about a real scroll.
+
+---
+
+## Supporting analyses
+- `scripts/experiment_A_degradation.py` — controlled-degradation validation of the
+  metric (rotation, shear, warp, noise, erasure): the score falls monotonically, which
+  is the calibration a ranking metric needs.
+- `scripts/delta_beta_ink.py` — δ/β contrast of lead-bearing ink vs papyrus from
+  tabulated scattering data. Key result: the exploitable channel is **K-edge
+  subtraction (~88 keV)**, not differential phase — with the caveat that
+  phase-retrieved public volumes may suppress exactly that absorption signal.
+- `scripts/make_rank_candidates.py` and `scripts/orient_acceptance_test.py` —
+  the acceptance tests for the `rank` and `orient` modes. They ship with the
+  code deliberately: every mode in this repository carries the test that
+  gates it, including the ones that failed before they passed.
+
+---
+
 
 ## Lessons (kept on purpose)
 
@@ -1715,6 +1741,8 @@ vesuvius-topological-grid/
 │   ├── text_layout_predictor.py       ← the falsifiable column map
 │   ├── fibre_strain.py                ← where the crush cracks the sheet
 │   ├── contrast_phantom.py            ← faint vs compressed (mode 12)
+│   ├── kollesis_detector.py           ← sheet joins by double thickness (mode 13)
+│   ├── band_sensitivity.py            ← is a period image or band-artefact?
 │   ├── displacement_field.py          ← unroll and diagnose (mode 11)
 │   ├── work_size.py                   ← work ↔ roll size, and the
 │   │                                     unknown-work discriminator
@@ -1802,6 +1830,9 @@ python scripts/text_layout_predictor.py test
 python scripts/fibre_strain.py test
 python scripts/work_size.py test
 python scripts/phase_tracking.py test
+python scripts/displacement_field.py test
+python scripts/contrast_phantom.py test
+python scripts/kollesis_detector.py test
 ```
 
 Steps 10-18 need no input images: everything from mode 7 onward runs on

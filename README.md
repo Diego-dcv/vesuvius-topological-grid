@@ -1670,7 +1670,7 @@ separates physics from artifact.
 
     python scripts/sovrapposto_echo.py test
     
-(figures/sovrapposto_test.png)
+![sovrapposto_test](figures/sovrapposto_test.png)
 
 **Phase 1 — manufactured in the twin, all four exams pass.** The echo is
 painted with exact ground truth at the real 1218 pitch (at 173 µm the

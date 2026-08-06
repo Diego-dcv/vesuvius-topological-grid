@@ -1669,8 +1669,6 @@ ink readings), and a model artifact copies text UN-mirrored, so the mirror
 separates physics from artifact.
 
     python scripts/sovrapposto_echo.py test
-    
-![sovrapposto_test](figures/sovrapposto_test.png)
 
 **Phase 1 — manufactured in the twin, all four exams pass.** The echo is
 painted with exact ground truth at the real 1218 pitch (at 173 µm the
@@ -1693,6 +1691,9 @@ surface-bleed. The small uniform negative matches radially organised
 damage (cracks crossing windings at fixed angle) rather than either
 hypothesis. A finer imprint stays open; the 1.129 µm mesh of the same
 segment is the next rung.
+
+    
+![sovrapposto_test](figures/sovrapposto_test.png)
 
 Two artifacts were caught by the in-cell sanity checks before any margin
 was read: the GP mesh self-overlaps with a ~86 µm offset (the same papyrus

@@ -1701,6 +1701,11 @@ appears twice), and its tail survived a naive distance filter — the
 final pairing defines the neighbour physically (same angle, same height,
 different radius) so mis-identification is excluded by construction.
 
+A fifth exam was added after the real-scroll campaign: the shuffled-pairing placebo, 
+which the field run proved decisive — and which, run on the twin, reproduces the 
+real scroll's shuffled offset (+0.10 clean vs +0.008 noisy, same sign): the estimator's 
+intrinsic mirrored bias with lettered profiles, now characterized.
+
 ---
 
 ## What the twin was asked to do — and what came back

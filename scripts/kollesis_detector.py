@@ -50,7 +50,7 @@ flags to 17 against a ceiling of 18 -- inside the criterion, with little
 margin, and stated so. The fence is fitted BLIND on the detected flags
 (no ground truth) and recovers a kollema width of 165 mm against the
 twin's true 160 (3 %). Radii are measured from the geometry's own origin
-(the twin exports centre_px); an earlier version measured them from the
+(the twin exports origin_px); an earlier version measured them from the
 material centroid and mis-assigned windings on an asymmetric section --
 the full diagnostic record is in the repository's Lessons.
 """

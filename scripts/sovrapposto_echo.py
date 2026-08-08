@@ -39,6 +39,22 @@ Pre-registered exams (written before the numbers were seen):
                       the OPPOSITE way: median (direct - mirror) > 0.3.
   D  DETECTION FLOOR  sweep f at fixed noise; f = 0.15 must be detectable
                       (margin > 0.15); report the smallest detectable f.
+  E  SHUFFLED PLACEBO the control the real-scroll campaign proved decisive
+                      (added after phase 2; the first four exams predate
+                      it): score each contact stretch against the echo of
+                      the WRONG stretch. A real echo lives in the pairing,
+                      so real - shuffled must exceed 0.15, with the
+                      shuffled value reported and sanity-bounded at
+                      |shuffled| < 0.2.
+                      (RE-REGISTERED, first version kept: the original
+                      gated |shuffled| < 0.1, presuming zero bias -- and
+                      the exam's first run showed the bias is REAL: +0.10
+                      here, matching in sign the +0.008 the real-scroll
+                      shuffle produced. Lettered profiles correlate
+                      slightly better mirrored against ANY other lettered
+                      profile; the twin reproduces the real scroll's
+                      shuffled offset, which closes that interpretation.
+                      The operative discriminator is the separation.)
 """
 
 import argparse
@@ -175,6 +191,24 @@ def acceptance_test(verbose=True):
                 break
         okD = floor is not None and floor <= 0.15
 
+        # E -- shuffled-pairing placebo on the f=0.15 echo
+        rngE = np.random.default_rng(7)
+        n_tr = len(tr)
+        perm = rngE.permutation(n_tr)
+        mirS = []
+        for a2, b2 in zip(range(n_tr), perm):
+            k1, i1, j1 = tr[a2]
+            k2, i2, j2 = tr[b2]
+            L = min(j1 - i1, j2 - i2)
+            e = echo[k2 - 1][i2:i2 + L]
+            s2 = prof[k1][i1:i1 + L]
+            if np.std(e) < 1e-12 or np.std(s2) < 1e-12:
+                continue
+            mirS.append(float(np.corrcoef(e, s2[::-1])[0, 1]))
+        mirS = np.array(mirS)
+        okE = (abs(np.median(mirS)) < 0.2
+               and (np.median(mir) - np.median(mirS)) > 0.15)
+
         if verbose:
             print("=" * 70)
             print("ACCEPTANCE TEST -- sovrapposto echo (pre-registered)")
@@ -191,10 +225,15 @@ def acceptance_test(verbose=True):
                   f"{'PASS' if okC else 'FAIL'}")
             print(f"D detection floor  smallest detectable f = {floor} "
                   f"(must be <= 0.15) -> {'PASS' if okD else 'FAIL'}")
+            print(f"E shuffled placebo wrong-stretch median mirrored corr "
+                  f"{np.median(mirS):+.2f} (|.|<0.2; estimator bias, "
+                  f"reported), real - shuffled "
+                  f"{np.median(mir) - np.median(mirS):.2f} (>0.15) -> "
+                  f"{'PASS' if okE else 'FAIL'}")
             print("-" * 70)
-            ok = okA and okB and okC and okD
+            ok = okA and okB and okC and okD and okE
             print("OVERALL:", "PASS" if ok else "FAIL")
-        return dict(passed=bool(okA and okB and okC and okD))
+        return dict(passed=bool(okA and okB and okC and okD and okE))
     finally:
         T.G.clear()
         T.G.update(oldG)

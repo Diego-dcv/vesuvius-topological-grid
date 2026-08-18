@@ -1708,6 +1708,52 @@ intrinsic mirrored bias with lettered profiles, now characterized.
 
 ---
 
+## Mode 15 — Fiber striations inside the closed scroll
+
+**Context.** Papyrus sheets are made of plant strips whose individual
+fibers leave a fine parallel striation — a few millimeters in pitch,
+unique to each sheet, like a fingerprint. Papyrologists have used this
+striation for over a century to match fragments ("fiber matching"): if
+the pattern continues, two pieces belong to the same sheet. Until now
+this required holding the fragment under raking light. The question
+here: is that fingerprint measurable in the CT of a scroll that has
+never been opened?
+
+**Result.** Yes. On the Scroll 1 GP segment (2.4 um surface volume),
+aggregate spectra show a periodic intensity pattern with fundamental
+period ~4.2–4.7 mm (first harmonic 8.3–9.3 mm), on both faces and in
+crossed orientations — height-wise on the recto, arc-wise on the verso,
+matching the two crossed strip layers of papyrus manufacture.
+
+**Controls.** Three alternative explanations were tested and excluded:
+- *Ink/text*: the pattern strengthens away from the inked surface
+  (core ~155x background), and is stronger between text columns
+  (~1162x) than under text (~731x).
+- *Render tiling*: the dominant peak sits at ~65 px, not at the 128 px
+  tile stride.
+- *Crumpling*: the surface geometry undulates at other periods
+  (~20 mm along arc, ~10 mm in height — itself a first measurement of
+  the crush corrugation of the near-core windings); at 2–5 mm the
+  geometry is smooth while the intensity is not.
+
+**Stated limit.** At the 67 um/px render the striation is visible in
+aggregate but not traceable block-to-block (baseline continuity
+0.27–0.33 across three estimators; synthetic benches with noise, drift
+and shear keep >=0.85, so the limit is sampling, not method). Tracing
+fibers individually — and detecting sheet joins (kolleseis) as breaks
+in the striation, including joins crushed below any thickness ratio —
+needs the 1.129 um data. That run is next.
+
+**Reproduce.** `scripts/fiber_striations.py` (Colab-ready, anonymous
+S3); outputs `archives/results/fiber/fiber_striations_results.json` and the
+figure below.
+
+![Fiber striations and controls](archives/results/fiber/fiber_striations.png)
+
+
+
+---
+
 ## What the twin was asked to do — and what came back
 
 The synthetic twin (Mode 7) is the only tool here that produces data rather than

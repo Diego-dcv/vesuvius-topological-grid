@@ -1708,7 +1708,7 @@ intrinsic mirrored bias with lettered profiles, now characterized.
 
 ---
 
-## Mode 15 — Fiber striations inside the closed scroll
+## 15 — Fiber striations inside the closed scroll
 
 **Context.** Papyrus sheets are made of plant strips whose individual
 fibers leave a fine parallel striation — a few millimeters in pitch,

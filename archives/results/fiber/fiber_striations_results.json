@@ -1,0 +1,73 @@
+{
+ "segment": "PHercParis4/segments/20230702185753",
+ "grid": [
+  2530,
+  1820
+ ],
+ "scale_mm_per_px": [
+  0.067,
+  0.0656
+ ],
+ "depth_profile_height": {
+  "recto_surface": [
+   5.91,
+   431.9
+  ],
+  "quarter": [
+   4.47,
+   485.7
+  ],
+  "core": [
+   4.24,
+   755.0
+  ],
+  "three_quarter": [
+   5.7,
+   344.0
+  ],
+  "verso_surface": [
+   4.35,
+   1204.2
+  ]
+ },
+ "arc_verso": {
+  "verso_surface": [
+   9.33,
+   25.5
+  ],
+  "core": [
+   6.39,
+   26.0
+  ]
+ },
+ "text_strata": {
+  "under_text": [
+   2.24,
+   730.8,
+   724
+  ],
+  "between_columns": [
+   3.82,
+   1162.2,
+   453
+  ]
+ },
+ "geometry": {
+  "geometry_arc": [
+   20.22,
+   70.9
+  ],
+  "geometry_height": [
+   10.34,
+   17.1
+  ],
+  "intensity_arc": [
+   6.39,
+   26.0
+  ],
+  "intensity_height": [
+   4.24,
+   755.0
+  ]
+ }
+}

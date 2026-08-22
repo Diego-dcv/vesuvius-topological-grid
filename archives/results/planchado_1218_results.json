@@ -1,0 +1,40 @@
+{
+  "instrumento": "campo de planchado separable Δr(k,θ,z) ≈ A(k)·F(θ,z)",
+  "fuente": "tabla de cruces por rayo del PHerc. 1218 (60 rayos × 313 rebanadas)",
+  "criterios_prefijados": {
+    "autoexamen": "corr(F̂,F_verdad) ≥ 0,90 y ratio de cuña ≤ 0,60",
+    "examen_real": "ratio RMSE/σ en celdas ocultas: ≤0,70 palanca; 0,70-0,90 débil; >0,90 sin ley"
+  },
+  "autoexamen": {
+    "corr_F": 0.99,
+    "ratio": 0.52,
+    "resultado": "PASS"
+  },
+  "banco_negativo": {
+    "ratio": 0.98,
+    "nota": "fase aleatoria por vuelta → sin ley: el instrumento no fabrica palanca"
+  },
+  "examen_real": {
+    "ratio_mediano": 0.58,
+    "p25": 0.46,
+    "p75": 0.69,
+    "vueltas_examinadas": 35,
+    "mitad_interior": 0.46,
+    "mitad_exterior": 0.62,
+    "veredicto": "LEY CON PALANCA",
+    "esquema": "F sin la vuelta examinada; A solo con sus cantos; predicción evaluada en las cuñas reales del censo"
+  },
+  "ajuste_completo": {
+    "R2_mediano": 0.68,
+    "R2_p25": 0.52,
+    "R2_p75": 0.8,
+    "A_mm": "campana: 0,2 (núcleo) → ~1,17 (k≈42-45) → 0,43 (k79)",
+    "planchado_global_in_sample": "±1,26 → ±0,72 mm (42%)"
+  },
+  "limitaciones": [
+    "coloca geometría, no fabrica tinta",
+    "resolución angular 6° (mediana): guía, no letra a letra",
+    "el residuo crece hacia fuera (R² 0,85 en el cuerpo → ~0,3 en k79)",
+    "ley separable de primer orden: la deriva de fase entre vueltas es el primer candidato del residuo (peldaño declarado)"
+  ]
+}

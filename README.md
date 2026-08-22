@@ -1738,7 +1738,7 @@ matching the two crossed strip layers of papyrus manufacture.
 
 **Stated limit.** At the 67 um/px render the striation is visible in
 aggregate but not traceable block-to-block (baseline continuity
-0.27–0.33 across three estimators; synthetic benches with noise, drift
+0.27–0.33 across four estimators (including phase tracking of the fundamental); synthetic benches with noise, drift
 and shear keep >=0.85, so the limit is sampling, not method). Tracing
 fibers individually — and detecting sheet joins (kolleseis) as breaks
 in the striation, including joins crushed below any thickness ratio —

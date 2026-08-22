@@ -1841,6 +1841,7 @@ estimation) and reporting it is part of the method. Earlier script versions live
 vesuvius-topological-grid/
 ├── README.md
 ├── LICENSE.md
+├── LOGBOOK.md
 ├── requirements.txt
 ├── docs/
 │   ├── technical_note_revised.pdf     ← the technical note (start here)

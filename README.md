@@ -1750,7 +1750,20 @@ figure below.
 
 ![Fiber striations and controls](archives/results/fiber/fiber_striations.png)
 
-
+**Cross-scroll check (PHerc. 1218).** The same instruments ran on the
+1218 raw volume (17 µm voxels, ray/ring geometry from the census
+inputs). The crush corrugation is measured there too: 19.8 mm vertical
+period, 10.2× background, over 3,363 sheet columns — against ~10 mm on
+the Paris 4 near-core segment. Two scrolls, one instrument; the more
+brutally crushed roll corrugates at twice the wavelength. The fiber
+striation is *not* detectable in 1218, and the check was run both ways:
+straight dense columns (4,025 at 17 µm steps — nothing over background)
+and crest-following tracking that rides the sheet's local maximum
+through its undulation (1,389 columns, matched shuffled null — still
+nothing). So the absence is a property of the material, not of
+sectioning a corrugated sheet. Read against Paris 4 — better preserved,
+striation strong — the natural reading is that 1218's fine texture did
+not survive its collapse, though one window is not the whole scroll.
 
 ---
 

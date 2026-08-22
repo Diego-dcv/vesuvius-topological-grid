@@ -1,0 +1,30 @@
+{
+  "scroll": "PHerc1218",
+  "volume": "20250521120456-8.640um-1.2m-116keV-masked.zarr level 1 (17.28 um/vox)",
+  "geometry": "Jinhojeong/vesuvius-surface-geometry-diagnostic results/kollesis (origins_merged.csv, positions_merged.csv.gz)",
+  "heights": 323,
+  "z_step_mm": 0.55,
+  "sanity_material_fraction": 0.88,
+  "coarse_band_2_6mm": {
+    "profiles": 2918,
+    "peak_mm": 4.96,
+    "z_vs_shuffled_null": -12.5,
+    "verdict": "band anomalously empty; slow undulation dominates"
+  },
+  "crush_corrugation": {
+    "sheets": 3363,
+    "period_mm": 19.8,
+    "snr_vs_background": 10.2,
+    "verdict": "MEASURED",
+    "paris4_near_core_vertical_mm": 10.3,
+    "note": "two scrolls, one instrument; the more crushed roll corrugates at twice the wavelength"
+  },
+  "fine_band_0p1_1p2mm": {
+    "subvolume": "2000 x 256 x 256 @ L1, one 4.4x4.4 mm window, 35 mm tall",
+    "straight_columns": {"n": 4025, "snr": 0.7, "verdict": "nothing over background"},
+    "crest_following": {"n": 1389, "snr": 0.7, "matched_null_snr": 1.0, "verdict": "nothing, riding the sheet"},
+    "conclusion": "absence is a property of the material, not of sectioning a corrugated sheet"
+  },
+  "dates": "2026-08-18/19",
+  "script": "scripts/cross_scroll_1218.py"
+}

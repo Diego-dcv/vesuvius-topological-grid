@@ -1770,7 +1770,7 @@ segmentation survives) is mapped in mode 16.
 
 ---
 
-## Mode 16 — PHerc. 1218 unrolled: the ribbon and the segmentation census
+## 16 — PHerc. 1218 unrolled: the ribbon and the segmentation census
 
 **What it does.** Rebuilds the scroll as a single continuous ribbon from the
 per-ray crossing table (60 rays × 313 slices; same source table as the
@@ -1821,6 +1821,65 @@ law to interpolate across the dead wedges the census maps here.
 
 **Script.** `scripts/unroll_1218.py` (Colab cell; expects the crossing
 table loaded as `rows`). Figures in `figures/`.
+
+---
+
+## 17 — The ironing field: one folding law for all of PHerc. 1218
+
+**What it does.** Tests whether the crush relief of the whole scroll is
+separable — Δr(winding, θ, z) ≈ A(winding) · F(θ, z) — i.e. whether all
+windings share ONE master fold pattern, each with its own amplitude. If
+they do, the folding law becomes a predictor: in the wedges where
+segmentation dies (mode 16 census), the sheet's radial position can be
+predicted from the pattern, calibrated on the surviving rims of that same
+winding.
+
+**Method.** F = median across windings of the per-winding normalized
+relief; A per winding by least squares. Exams, criteria fixed before
+running: (1) a synthetic self-test inside the cell (fitter must recover a
+planted law: corr ≥ 0.90, wedge ratio ≤ 0.60 — PASS at 0.990 / 0.52; a
+negative bench with per-winding random phase yields 0.98 = the instrument
+does not manufacture leverage); (2) the wedge exam on real data: for each
+tested winding, F is fit *without* it, its A from its rim cells only, and
+the prediction is scored on the census wedges (RMSE/σ; ≤0.70 = leverage,
+0.70–0.90 = weak, >0.90 = no law).
+
+**Result.** Leverage, by the prefixed criterion: wedge ratio 0.58
+[p25 0.46, p75 0.69] over 35 windings — inner half 0.46, outer half 0.62
+(the use case: still below 0.70). Full fit: median R² = 0.68 per winding
+(~0.85 in the body, declining outward). The shared pattern removes 42% of
+the global relief in-sample (±1.26 → ±0.72 mm). Amplitude A(k) is a
+bell: ~0.2 mm at the core, peaking at ~1.17 mm around winding 42–45,
+falling to ~0.43 mm at winding 79 — the crush wrinkles hardest at
+mid-depth. In practice: where segmentation sees nothing, the field cuts
+the radial uncertainty roughly in half (~±1.3 → ~±0.8 mm).
+
+**Figures.**
+
+![Master fold pattern](figures/campo_pliegues_1218.png)
+
+*The master fold pattern F(θ, z): the wrinkle all windings share. The
+coherent vertical structure at θ≈180° is the fold crease — the same
+meridian the coverage census (mode 16) shows as a dead line.*
+
+![Fold amplitude per winding](figures/amplitud_planchado_1218.png)
+
+*Fold amplitude A(k) (red) and variance explained R² (blue) per winding.*
+
+![Before / after ironing](figures/planchado_antes_despues_1218.png)
+
+*The unrolled ribbon before and after removing A(k)·F(θ, z): what the
+iron does not explain is local damage plus the second-order term.*
+
+**Limitations.** Places geometry, does not produce ink. Angular resolution
+is the table's 6° binning — a guide, not letter-level. The residual grows
+outward (R² ~0.85 in the body → ~0.3 at winding 79); the first candidate
+for that residual is phase drift between windings, a declared next step,
+not part of this fit.
+
+**Artifacts.** `planchado_1218.npz` (the full field Δr̂ plus geometry and
+per-winding quality) and `planchado_1218_results.json` (exam numbers) —
+produced by the export cell in `scripts/planchado_1218.py`.
 
 ---
 

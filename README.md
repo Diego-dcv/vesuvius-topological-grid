@@ -1765,6 +1765,63 @@ sectioning a corrugated sheet. Read against Paris 4 — better preserved,
 striation strong — the natural reading is that 1218's fine texture did
 not survive its collapse, though one window is not the whole scroll.
 
+The crush geometry of PHerc. 1218 (corrugation, unrolled ribbon, and where
+segmentation survives) is mapped in mode 16.
+
+---
+
+## Mode 16 — PHerc. 1218 unrolled: the ribbon and the segmentation census
+
+**What it does.** Rebuilds the scroll as a single continuous ribbon from the
+per-ray crossing table (60 rays × 313 slices; same source table as the
+census/fence work): median radius per (winding, θ) → developed length →
+radial crush relief per (length, height). A second map counts, for every
+(winding, θ) cell, how much of the height column the segmentation actually
+traced — the coverage census.
+
+**Figures.**
+
+![PHerc. 1218 unrolled ribbon](figures/pergamino_desplegado_1218.png)
+
+*PHerc. 1218 unrolled: 5.13 m of continuous ribbon across 78 traced
+windings (winding pitch ~0.20 mm/turn; at least ~95 windings present, the
+outer ~16 only as fragments). Color: radial crush relief, ±2.6 mm typical.
+Coverage is sustained ≥50% out to L = 4.10 m; beyond that, only the
+high-curvature rims of the flattened section survive segmentation. Lengths
+from median geometry; per-height variation of a few percent. The ribbon is
+~25% longer than a circular spiral of the same median radius — a geometric
+signature of the crush.*
+
+![PHerc. 1218 segmentation census](figures/cobertura_1218.png)
+
+*Segmentation census by (winding, θ). Coverage decays smoothly from winding
+~45 along two growing wedges — the flattened faces, where layers are
+pressed together — while two nearly opposite meridians (the rims) survive
+to the outermost windings. The thin dead line at θ≈180° is the fold crease
+itself, matching the vertical fold stripe seen in the relief maps.*
+
+**Numbers.** Ribbon 5.13 m; windings 2..79 usable (table reaches k=108;
+k≥96 empty, k=80..95 at 1–10% coverage); pitch 0.20 mm/turn (median radius
+0.58 → 16.04 mm); typical relief ±2.6 mm; sustained ≥50% coverage to
+L = 4.10 m (~winding 70); perimeter excess +25% over the circular
+equivalent. Horizontal relief bands repeat at fixed heights across dozens
+of windings — the folding law seen along the whole ribbon.
+
+**Limitations.** Geometry only — this places material, it does not produce
+ink. Angular resolution is the table's 6° binning: a guide, not
+letter-level. Median-geometry lengths; small z-gaps (≤2 mm) are
+interpolated for display only, larger gaps are left blank. Windings below
+10% coverage are excluded, not extrapolated.
+
+**Status.** Instrument verified on a synthetic bench (phantom rings cut,
+no edge artifacts, flank-shaped coverage recovered). Next step: the
+ironing field — combining the in-plane de-crushing (mode 10/11) with this
+radial relief matrix into a single 3D correction field, using the folding
+law to interpolate across the dead wedges the census maps here.
+
+**Script.** `scripts/unroll_1218.py` (Colab cell; expects the crossing
+table loaded as `rows`). Figures in `figures/`.
+
 ---
 
 ## What the twin was asked to do — and what came back

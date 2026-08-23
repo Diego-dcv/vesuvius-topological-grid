@@ -1881,6 +1881,75 @@ not part of this fit.
 per-winding quality) and `planchado_1218_results.json` (exam numbers) —
 produced by the export cell in `scripts/planchado_1218.py`.
 
+The full displacement field this iron corrects is measured point by
+point — and the sheet rebuilt label by label — in mode 18.
+
+---
+
+## 18 — The unwrap, v0: every label back to its origin
+
+**What it does.** Maps every crossing in the ray-crossing table (1.35M
+points, windings 2–79) to its intrinsic position on the flat sheet
+(developed length × height) and back onto an ideal pre-collapse spiral
+fitted to the median radii (pitch 0.197 mm/turn, r0 0.97 mm). Nothing is
+predicted or interpolated: where the table has no data, the sheet has a
+hole, and the hole is information.
+
+**Frame.** The table-to-volume frame is iyando's convention
+(pitch_qa.py `ray_metrics()`), with per-slice origins from
+origins_merged.csv (duplicates deduplicated by averaging; global
+CT↔labels offset (−3,−1) voxels). Cross-validated two ways: our blind
+self-registration recovered the mid-slice origin to ~10 voxels before
+knowing it, and the duplicate statistics reproduce the published ones
+exactly.
+
+**Figures.**
+
+![Flat sheet](figures/hoja_plana_1218.png)
+
+*The flat sheet: label presence (top; holes = wedges, damage, lost
+segmentation, drawn by absence) and per-point radial displacement vs the
+ideal spiral (bottom) — the collapse of PHerc. 1218 measured point by
+point: median 1.2 mm, 95th percentile 5.9 mm.*
+
+![Restored scroll](figures/rollo_restaurado_1218.png)
+
+*The scroll rewound to its ideal spiral, color = how far each point
+travelled in the collapse. The bright horizontal rays and dark vertical
+ones are the vertical crush seen from the original state: the long axis
+moved out, the short axis moved in.*
+
+![Textured flat sheet](figures/hoja_plana_texturizada_1218.png)
+
+*CT intensity carried onto the unwrap. This shows density and damage
+mapped on the sheet — not ink: at 17 µm the layers are in full contact
+and single-ray brightness carries no layer-locked signal (flat
+anchor-stacked profile; radial decorrelation length ~50–70 µm, not
+anchored to the crossings). The per-winding vertical patterning growing
+outward is the rim/face alternation of the census (mode 16).*
+
+**Numbers.** 1,348,078 crossings mapped; displacement |d| median
+1.21 mm, p95 5.85 mm; ideal spiral pitch 0.197 mm/turn. The reliable
+domain converges with the coverage census (mode 16): windings 2–66,
+L ≈ 4.1 m — two independent instruments agreeing on where the data ends.
+
+**Limitations.** Angular resolution is the table's 6° binning; developed
+lengths from median geometry; the wedges are holes, not predictions (the
+ironing field of mode 17 predicts them separately, with its own measured
+error). Texture is density/damage, not letters — the brightness null is
+documented above and in the exam chain.
+
+**Next.** With per-voxel labels the same mapping yields the
+full-resolution unwrap, a per-point sheet-thickness map in flat
+coordinates, and a geometric QA of the labels themselves (self-overlaps
+and sheet-switches become visible artifacts in flat space) —
+conversation opened with the labels' author.
+
+**Scripts.** `scripts/unwrap_labels_1218.py` (presence + displacement +
+restored scroll), `scripts/unwrap_texture_1218.py` (CT intensity on the
+unwrap). Both need only the crossing table; the texture script also
+reads the L1 volume.
+
 ---
 
 ## What the twin was asked to do — and what came back

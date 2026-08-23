@@ -1,29 +1,119 @@
+<!-- Sustituye TODO lo que hay antes del modo 1 por este bloque. -->
+
 # vesuvius-topological-grid
 
-**An ML-independent structural metric for Herculaneum scroll surfaces — measure, arbitrate, detect, track, screen, orient, reconcile, unroll.**
+**An ML-independent structural metric for Herculaneum scroll surfaces —
+measure, arbitrate, detect, track, screen, orient, reconcile, unroll.**
 
-Ancient writing has a grid: equally spaced lines, regular letter pitch, columns on a
-module — like the structural grid of a building. If a virtual unwrapping is correct,
-that grid survives; if it fails, the grid breaks. This repository turns that
-observation into a few small, reproducible tools. None of them reads text; all of
-them run in seconds on a laptop.
+Ancient writing has a grid: equally spaced lines, regular letter pitch,
+columns on a module — like the structural grid of a building. If a
+virtual unwrapping is correct, that grid survives; if it fails, the
+grid breaks. This repository began as a few small tools built on that
+observation, and has grown into a set of geometry instruments for the
+same mission: none of them reads text, and there is no ML anywhere in
+the chain.
 
-**What this is, and what it is not.** This repository does not trace surfaces, does
-not flatten better than [flatboi](https://github.com/ScrollPrize/villa/blob/main/volume-cartographer/libs/flatboi/flatboi.cpp),
+**What is input and what is produced here.** The PHerc1218 per-ray
+crossing table and per-slice origins are an **external input**
+(iyando's convention and script, Jinhojeong's run — credit and
+provenance in mode 16). This repository does **not** detect windings
+from raw CT; it reconstructs and analyses geometry from those published
+crossings, and validates the results against the raw CT volume where
+that is possible.
+
+**Evidence levels used throughout:**
+`SYNTHETIC` (twin/bench with planted truth) · `REAL-DERIVED` (built
+from published real-scroll data) · `RAW CT` (checked directly against
+the CT volume) · `THIRD-PARTY` (validated against another
+contributor's ground truth).
+
+## Results on real scroll data
+
+- **PHerc1218 unrolled**: 5.13 m of continuous ribbon, 78 usable
+  windings (≥95 traced), pitch 0.20 mm/turn, with a coverage census
+  showing exactly where segmentation survives (mode 16). `REAL-DERIVED`
+- **One folding law for the whole scroll**: the crush relief is
+  separable; in a held-out exam it predicts hidden geometry at
+  RMSE/σ = 0.58 (mode 17). `REAL-DERIVED`, negative bench included.
+- **The collapse measured point by point**: 1.35M crossings mapped to
+  the flat sheet and an ideal spiral; displacement median 1.2 mm,
+  p95 5.9 mm (mode 18). `REAL-DERIVED`
+- **Frame cross-validated**: blind self-registration recovered the
+  official per-slice origin to ~10 voxels; convention confirmed by its
+  operator, with an offered back-projection (mode 18). `THIRD-PARTY`
+- **Fiber striations seen inside a closed scroll** (Paris 4), with a
+  full impostor-control chain — and their absence in PHerc1218,
+  double-controlled (mode 15). `RAW CT`, positive and null.
+- **Two placebo-controlled nulls that save others the attempt**:
+  no mirrored ink transfer at ~19 µm/px (mode 14); no layer-locked
+  brightness signal in PHerc1218's crushed interior at 17 µm
+  (mode 18). `RAW CT`
+
+## What has actually been tested
+
+| Mode | Question | Data | Evidence | Status |
+|---|---|---|---|---|
+|  1| Measure | | | |
+|  2| Arbitrate | | | |
+|  3| Detect | | | |
+| 3B| Search & Track | | | | 
+|  4| Screen | | | |
+|  5| Orient | | | |
+|  6| Reconcile | | | |
+|  7| Twin & Predict | | | |
+|  8| Fibre strain | | | |
+|  9| Work size | | | |
+| 10 | Can the in-plane flattening be undone? | 1218 crossings | REAL-DERIVED (residual 0.2–0.33 mm, transfers across windings) | supported |
+| 11 / 11B | Do nested windings deform under one law? | 1218 crossings + raw CT | REAL-DERIVED + RAW CT (multiwinding collapse 1.000→0.952; raw-CT reconstruction check) | supported |
+| 12 | Digital twin with planted ground truth | synthetic | SYNTHETIC (exam suite A–G) | instrument |
+| 13 | Can double-thickness (kollesis) be detected? | twin; real pre-flight | SYNTHETIC (3 exams pass); real run **not attempted**: the crossing table carries no thickness (declared stop) | validated on twin only |
+| 14 | Is there mirrored ink transfer (sovrapposti)? | twin + Paris 4 GP 2.4 µm | SYNTHETIC pass + REAL placebo-controlled null | **null** at ~19 µm/px |
+| 15 | Are papyrus fiber striations visible in CT? | Paris 4 render + 1218 raw CT | RAW CT | Paris 4 **yes** (control chain); 1218 **no** (double-controlled) |
+| 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |
+| 17 | Is the crush relief one shared law (ironing field)? | 1218 crossings | REAL-DERIVED, held-out wedge exam 0.58; negative bench 0.98 | supported |
+| 18 | Can every label go back to its origin? | 1218 crossings + raw CT | REAL-DERIVED + RAW CT texture + THIRD-PARTY frame | supported; brightness null documented |
+
+## Map of the repository
+
+- **A. Measurement & QA on real data** — modes 11B, 16, 18
+- **B. Synthetic instruments & benches** — modes 12, 13 (+ the benches
+  inside 14, 17, 18)
+- **C. PHerc1218 geometry** — modes 10, 11, 16, 17, 18
+- **D. Real-scroll experiments, positives and nulls** — modes 14, 15,
+  and the texture chain in 18
+- **E. Open threads** — the 1.129 µm Paris 4 mesh; the per-voxel unwrap
+  (proposed to the labels' author); the thermal-tempering hypothesis
+
+Mode numbers are stable identifiers and keep their original
+(chronological) order below; this index is the thematic map.
+
+---
+
+## Scope and method
+
+This repository does not trace surfaces, does not flatten better than
+[flatboi](https://github.com/ScrollPrize/villa/blob/main/volume-cartographer/libs/flatboi/flatboi.cpp),
 does not fit spirals better than
 [fit_spiral](https://github.com/ScrollPrize/villa/blob/main/volume-cartographer/scripts/spiral/fit_spiral.py),
-and does not detect ink at all. Those problems have teams and tooling. What it does
-is **measure** — properties of the roll itself and of the segmentation that produced
-its geometry, without labels, without ground truth and without ML anywhere in the
-chain. Winding pitch, fusion rate, crush ratio, where the segmentation stops being
-trustworthy, whether a period is real or an artefact of the band it was searched in.
+and does not detect ink at all. Those problems have teams and tooling.
+What it does is **measure** — properties of the roll itself and of the
+segmentation that produced its geometry: winding pitch, fusion rate,
+crush ratio, unrolled length, per-point collapse displacement, where
+the segmentation stops being trustworthy, whether a period is real or
+an artefact of the band it was searched in. Its inputs are declared
+above; its instruments are built and examined on a synthetic twin with
+planted ground truth before touching real data, and validated against
+raw CT and third-party ground truth where possible — with no ML
+anywhere in the chain.
 
 That is a narrow niche, and it is a stated one: the project's own
-[open-problems page](https://scrollprize.org/2026_open_problems) says twice that "we
-do not always know which part of the pipeline is limiting us" and that "better
-diagnostics matter just as much as better models". Everything here is aimed at that
-sentence. Every mode ships an acceptance test written before the answer was known,
-and several of those tests have failed and are documented where they failed.
+[open-problems page](https://scrollprize.org/2026_open_problems) says
+twice that "we do not always know which part of the pipeline is
+limiting us" and that "better diagnostics matter just as much as better
+models". Everything here is aimed at that sentence. Every mode ships an
+acceptance test written before the answer was known, and several of
+those tests have failed and are documented where they failed (see
+`LOGBOOK.md`).
 
 ## 1 — Measure (`scripts/grid_metric.py analyze`)
 Detects the scribe's spatial signature on a rendered surface via windowed spectral

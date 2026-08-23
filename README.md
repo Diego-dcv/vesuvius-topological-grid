@@ -1,5 +1,3 @@
-<!-- Sustituye TODO lo que hay antes del modo 1 por este bloque. -->
-
 # vesuvius-topological-grid
 
 **An ML-independent structural metric for Herculaneum scroll surfaces —
@@ -53,16 +51,16 @@ contributor's ground truth).
 
 | Mode | Question | Data | Evidence | Status |
 |---|---|---|---|---|
-|  1| Measure | | | |
-|  2| Arbitrate | | | |
-|  3| Detect | | | |
-| 3B| Search & Track | | | | 
-|  4| Screen | | | |
-|  5| Orient | | | |
-|  6| Reconcile | | | |
-|  7| Twin & Predict | | | |
-|  8| Fibre strain | | | |
-|  9| Work size | | | |
+| 1 | Does the scribe's spatial grid survive on a rendered surface? | Paris 4 renders | REAL-DERIVED (two independent implementations replicate: pitch 4.16 mm, column period 43.0 mm) | supported (pitch later refined, see mode 7) |
+| 2 | Where do two ink models disagree on the same region? | multiple renders | REAL-DERIVED (consensus + divergence maps) | instrument |
+| 3 | Can buried ink emerge by stacking lines at the detected period? | synthetic + clean model output | SYNTHETIC (gain ×2 at 4× noise with ~20 lines) | prototype, limits stated |
+| 3B | Can period and phase be tracked on raw intensity (epoch folding)? | raw surface intensity | REAL-DERIVED (4 exams PASS; period to 0.1% at SNR 0.3) | supported |
+| 4 | Which segmentation candidate preserves the grid best? | candidate renders | REAL-DERIVED (wobble punished −24%; rotation margins ~3%, declared thin) | supported, inconclusive on close scores |
+| 5 | What is the local baseline tilt? | Paris 4 renders | REAL-DERIVED (median error 0.00°, max 1.37° vs imposed rotations) | supported (saturates beyond ±45°) |
+| 6 | How many windings should a ray cross, voids included? | synthetic pathology + full 1218 (1.46M crossings) | SYNTHETIC + REAL-DERIVED (void-aware ratio 1.00 where naive drops to 0.70); adopted unchanged by an independent contributor | supported, THIRD-PARTY use |
+| 7 | What does geometry imply for work size and text placement? | twin + real scroll | SYNTHETIC + REAL-DERIVED (8 acceptance tests PASS; two failed designs documented) | supported with caveats |
+| 8 | Where does papyrus crack under the measured crush? | measured 2:1 section, plate theory | REAL-DERIVED (neutral angle 37.64°, strain ratio 3.39×) | **claim tested and withdrawn** on real labels — kept as documented failure |
+| 9 | What work size does a measured section imply? | measured sections + catalogue | REAL-DERIVED (forward→inverse roundtrip exact; column period vindicated on the Grand Prize render) | supported (Greek prose band 47–98 columns) |
 | 10 | Can the in-plane flattening be undone? | 1218 crossings | REAL-DERIVED (residual 0.2–0.33 mm, transfers across windings) | supported |
 | 11 / 11B | Do nested windings deform under one law? | 1218 crossings + raw CT | REAL-DERIVED + RAW CT (multiwinding collapse 1.000→0.952; raw-CT reconstruction check) | supported |
 | 12 | Digital twin with planted ground truth | synthetic | SYNTHETIC (exam suite A–G) | instrument |
@@ -114,6 +112,8 @@ models". Everything here is aimed at that sentence. Every mode ships an
 acceptance test written before the answer was known, and several of
 those tests have failed and are documented where they failed (see
 `LOGBOOK.md`).
+
+---
 
 ## 1 — Measure (`scripts/grid_metric.py analyze`)
 Detects the scribe's spatial signature on a rendered surface via windowed spectral

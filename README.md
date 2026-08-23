@@ -1928,6 +1928,23 @@ anchor-stacked profile; radial decorrelation length ~50–70 µm, not
 anchored to the crossings). The per-winding vertical patterning growing
 outward is the rim/face alternation of the census (mode 16).*
 
+![Band render vs half-pitch control](figures/tex3_render_banda.png)
+
+*The receipt for the brightness null: a band of winding 35 rendered on
+the anchored surface (top), the same render displaced half a layer
+pitch — where the neighbouring sheet would be (middle), and their
+difference (bottom). The two renders share all large-scale structure
+(density, damage — note the dark streak, a candidate radial crack) and
+differ only in fine-scale noise: brightness does not know which sheet
+it is on.*
+
+![Radial decorrelation](figures/tex3b_descorrelacion.png)
+
+*Radial decorrelation of the render: correlation decays gradually
+(0.86 at 17 µm, floor at half a pitch), so radial structure with
+~50–70 µm coherence does exist — it is simply not locked to the sheet
+crossings. Documented for future work at finer scales.*
+
 **Numbers.** 1,348,078 crossings mapped; displacement |d| median
 1.21 mm, p95 5.85 mm; ideal spiral pitch 0.197 mm/turn. The reliable
 domain converges with the coverage census (mode 16): windings 2–66,

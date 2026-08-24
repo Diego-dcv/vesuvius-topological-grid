@@ -2059,6 +2059,63 @@ reads the L1 volume.
 
 ---
 
+### Mode 18, v0.5 — the per-voxel unwrap (step-8 subsample)
+
+*Evidence: `REAL-DERIVED` + `THIRD-PARTY` data (Jinhojeong's labelled 
+points, Kaggle) — supported; one design correction documented below.*
+
+**What it does.** Assigns a winding number to every labelled voxel of
+Jinhojeong's step-8 subsample
+([pherc1218-label-points](https://www.kaggle.com/datasets/jhjeong0815/pherc1218-label-points),
+14.8M points, pre-repair stitch — the same volume the crossing table was
+cast from) by bracketing each point between the crossing-table radii on
+its own ray (θ, z). Two prefixed acceptance criteria, both passed:
+85.8% of points assigned without ambiguity (criterion ≥60%), and a
+median |Δr| to the assigned crossing of 2.61 voxels = 45 µm (criterion
+≤3 voxels; sheet thickness is 6–12 voxels). Registration checks came
+out clean: lattices aligned (|Δz| = 0), and the best in-plane offset is
+(0,0), confirming the labels and the table share one frame.
+
+![Per-voxel flat sheet](figures/vote2_hoja_subsample.png)
+
+*2,828,221 labelled voxels, each at its own place on the flat sheet.
+No point is predicted or interpolated. The map independently reproduces
+the anatomy the coverage census (mode 16) drew from the ribbon: solid
+interior to L ≈ 2.5 m, growing wedge combing beyond it, and the die-off
+toward L ≈ 4–5 m.*
+
+**Label QA, two-way.** Instances were the wrong unit for winding
+assignment — see the correction below — but they are the right unit for
+QA: a legitimate instance is a piece of the spiral, so its assigned
+windings must form a consecutive run. 20,494 of 73,899 instances
+(27.7%) show a winding gap ≥2 with ≥3 points on each side — the same
+order as the ~17% seam merge-fault rate the labels' author measured on
+his side. Per the protocol agreed with him, these are **candidates for
+either side being wrong until checked against the CT** — some will be
+his seams, some our assignment errors, possibly some real extreme
+folds. The list ships as `qa_instancias_1218.csv`. Declared limit: a
+switch to the *adjacent* winding (gap = 1) is indistinguishable from
+legitimate continuation at this subsampling.
+
+**Documented design correction.** The first version (VOTE-1) assigned
+windings by majority vote per instance. Its prefixed purity exam
+returned REVIEW (median purity 0.15; one instance drew 176,859 votes)
+and stopped the result: the scroll is one spiral sheet, so a
+well-stitched instance *must* span many windings — purity measured
+topology, not error. The unit was wrong, not the data. The per-point
+version above replaced it; VOTE-1 is kept in `scripts/` as the recorded
+correction.
+
+**Scripts.** `scripts/winding_per_point_1218.py` (per-point assignment,
+QA, per-voxel flat sheet); `scripts/vote_instance_winding_1218.py`
+(superseded, kept as documented correction). Both need only the
+crossing table plus the public Kaggle subsample. Next: the same
+assignment over the full-resolution labels (script offered to their
+author), which adds the per-point sheet-thickness map.
+
+
+---
+
 ## What the twin was asked to do — and what came back
 
 The synthetic twin (Mode 7) is the only tool here that produces data rather than

@@ -51,5 +51,7 @@ Failures are listed on purpose: they are part of the method.
 - ✘ First 1218 pass at 69 µm voxels: my error (voxel larger than the sheet); redone at 17 µm with 88% material hits
 - ✔ Striation not detectable in 1218, checked both ways after the "sponge objection": straight dense columns AND crest-following tracking with matched null — the absence is the material's, not the sectioning's
 - ✔ 22-08 Ironing field (mode 17): one separable folding law fits all 78 windings of PHerc. 1218 — wedge exam 0.58 (outer half 0.62, criterion ≤0.70), R² 0.68, field exported. Two plumbing bugs found and fixed en route (empty wedge mask read as a verdict; edge-padded smoothing).
-- ⏳ Progress-prize submission (deadline Aug 31)
+- ✘ 24-08 VOTE-1 (instance majority vote): prefixed purity exam returned REVIEW and blocked the result — instances legitimately span windings (the scroll is one sheet); unit of analysis wrong, not the data. Corrected to per-point assignment.
+- ✔ 24-08 VOTE-2 (per-point winding by ray-profile bracketing): 85.8% assigned (exam ≥60% PASS), median |Δr| 2.61 vox = 45 µm (exam ≤3 vox PASS); first per-voxel flat sheet of PHerc. 1218 (subsample); 20,494 winding-gap instances shipped as two-way label-QA candidates.
+
 - ⏳ Optional next steps (not debts): 1.129 µm mesh of the GP segment; more 1218 boxes; twin corrugation parameter

@@ -1746,6 +1746,79 @@ false flags to 17, inside the criterion's ceiling of 18 — with little
 margin, and stated so. The script's docstring carries the diagnostic
 record.
 
+
+---
+
+### Mode 13, addendum — the real run, at last: three nulls
+
+*Evidence: `REAL-DERIVED` (label-thickness field, third-party full-res
+run) + `RAW CT` (brightness) — measured nulls, sensitivity floors
+declared.*
+
+**The missing observable arrived.** This mode stopped honestly in its
+day: the crossing table carries no thickness. The full-resolution
+per-point run of the labels (mode 18 v0.5, executed by their author on
+the 5.2 GB pre-repair tree) produced a per-cell radial-extent field —
+anchored before use: at near-zero local slope its median settles at
+93 µm p10–p90 (≈115 µm of sheet, right where physical papyrus sits),
+with a measured, mild slope covariate. A label-thickness field, named
+as such — not material thickness.
+
+**Three searches, prefixed criteria, three nulls.**
+
+1. **Direct bands (KOL-1).** Kollesis candidates = 4–35 mm bands, ≥40%
+   over the local baseline, ≥60% vertical coherence (a join is
+   full-height; damage is patchy). Expected ~20 joins over the reliable
+   4.1 m; found **2**, both narrow — and both sitting at θ ≈ 0°, our
+   own coordinate seam, which makes an instrumental origin the first
+   suspect. Their loci are recorded for a raw-CT check (L = 1.569 m,
+   windings 40–41, r ≈ 789 vox; L = 2.838 m, winding 57, r ≈ 993 vox).
+   The θ-shuffled control found zero. **No lattice.**
+
+2. **Folded thickness (KOL-2/4a).** Weak joins could hide individually
+   and emerge stacked at the factory sheet width W. Epoch folding of
+   the corrected thickness profile, against a 40 mm block-permutation
+   null: first over W = 120–260 mm (p = 0.19) — a window that turned
+   out to be half wrong: the literature puts Herculaneum kollema
+   lengths at **6–19 cm, varying per roll** (PHerc. 163: 12–13 cm), so
+   the scan was re-run over the papyrological window 60–190 mm at
+   0.05 mm steps (at small W, 1 mm of error dephases ~70 periods):
+   best W = 171.5 mm at **p = 0.57**. Null in both windows. Two method
+   errors were caught by the synthetic power bench before any verdict
+   and are part of the record: the W scan was initially too coarse to
+   stay in phase, and the first significance control (circular shifts)
+   was broken — shifting a periodic profile leaves it periodic. Both
+   fixed, verdicts re-run.
+
+3. **Folded brightness (KOL-3/4b).** The construction argument: joins
+   were smoothed for the scribe's face by paring and *burnishing* — and
+   burnishing compresses rather than removes, so a join should be
+   denser even where it is no thicker. Same folding machinery on the CT
+   brightness carried onto the unwrapped sheet (instrumental seam rays
+   excluded by declaration): 120–260 mm gave p = 0.55; the
+   papyrological window 60–190 mm gave best W = 94.9 mm, elevation
+   1.46%, **p = 0.22**. Null in both windows, on a 2.1% rms profile.
+
+**What the nulls mean, exactly.** The bench-measured sensitivity floor
+is ~5% periodic elevation for ~8 mm bands (at 3% profile noise; the
+brightness profile came in at 2.1%). So: PHerc. 1218's pre-repair
+labels and its 17 µm brightness carry **no kollesis signature above a
+few percent** — not that the joins are absent. The remaining routes are
+declared: a raw-CT look at the two flagged loci, the repaired v2
+labels, and fiber-orientation discontinuities at high resolution
+(Paris 4, 1.129 µm) where a join should break the fiber pattern of two
+sheets.
+
+![Thickness profile](figures/kol1_perfil_espesor.png)
+
+*Slope-corrected label thickness along the unwrapped sheet. No join
+lattice; the two surviving candidates sit at the instrument's own
+θ ≈ 0° seam.*
+
+![Brightness fold](figures/kol3_plegado.png)
+
+*Brightness folded at the best sheet width: flat at p = 0.55.*
+
 ---
 
 ## 14 — The mirrored echo (`scripts/sovrapposto_echo.py`)

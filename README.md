@@ -33,11 +33,12 @@ contributor's ground truth).
 - **One folding law for the whole scroll**: the crush relief is
   separable; in a held-out exam it predicts hidden geometry at
   RMSE/σ = 0.58 (mode 17). `REAL-DERIVED`, negative bench included.
-- **The folding law re-measured in microns**: with one winding hidden,
-  its radial position is recovered to **32 µm** against a local sheet
-  separation of ~0.2 mm (60 µm with three hidden) — published against our own
-  field, which lost the comparison to local interpolation (mode 17
-  addendum). `REAL-DERIVED`
+- **Local winding coherence measured in microns**: a held-out winding is
+  recovered to **32 µm by interpolation from its neighbours** (60 µm with
+  three hidden), against a local sheet separation of ~0.2 mm. Our own
+  global folding field does an order of magnitude worse (370 µm) and is
+  kept only for the wedges, where the neighbours are missing too — the
+  comparison was published against us (mode 17 addendum). `REAL-DERIVED`
 - **9,034 coordinates of unlabelled papyrus**: 92.7% of absent-winding
   positions carry material in the raw CT, control-calibrated — shipped
   as falsifiable claims in the labels' author's frame (mode 19).
@@ -78,8 +79,8 @@ contributor's ground truth).
 | 15 | Are papyrus fiber striations visible in CT? | Paris 4 render + 1218 raw CT | RAW CT | Paris 4 **yes** (control chain); 1218 **no** (double-controlled) |
 | 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |
 | 17 | Is the crush relief one shared law (ironing field)? | 1218 crossings | REAL-DERIVED, held-out wedge exam 0.58; negative bench 0.98 | supported |
-| 18 | Can every label go back to its origin? | 1218 crossings + raw CT + full-res label tree | REAL-DERIVED + RAW CT texture + THIRD-PARTY: per-point assignment replicated exactly by the labels' author on the full 5.2 GB tree (85.8%, median 2.6 vox); the same pass corrected his published seam-agreement figure on the full population (82.9% → 88.8%) | supported; brightness null documented; step-8 subsample shown to hide nothing |
-| 19 | Is the missing 40% of the scroll lost, or just unlabelled? | 1218 raw CT + winding maps | RAW CT with control arm: 92.7% of absent-winding positions carry material (control-calibrated threshold); wedge audit with self-calibrated lamina counter (E1, E2 PASS) | thin gaps: **9,034 exact coordinates** shipped as falsifiable claims; wedges: mass 0.85 preserved but only ρ=0.34 still resolvable as laminae at 17 µm; 281 certified new crossings, random control failing at stride 2 declared |
+| 18 | Can every label go back to its origin? | 1218 crossings + raw CT + full-res label tree | REAL-DERIVED + RAW CT texture + THIRD-PARTY: per-point assignment replicated exactly by the labels' author on the full 5.2 GB tree (85.8%, median 2.6 vox); the same pass corrected his published seam-agreement figure on the full population (82.9% → 88.8%). REPRODUCED, not ground-truth validated: both routes share the same label ecosystem | supported; brightness null documented; step-8 subsample shown to hide nothing |
+| 19 | Is the missing 40% of the scroll lost, or just unlabelled? | 1218 raw CT + winding maps | RAW CT with control arm: 92.7% of absent-winding positions carry material (control-calibrated threshold); wedge audit with self-calibrated lamina counter (E1, E2 PASS) | thin gaps: **9,034 predicted positions with raw-CT evidence of material**, shipped as falsifiable claims; wedges: mass 0.85 preserved but only ρ=0.34 still resolvable as laminae at 17 µm; 281 certified new crossings, random control failing at stride 2 declared |
 
 ## Map of the repository
 
@@ -2310,8 +2311,9 @@ shown these are not windings quietly swallowed by a fat neighbour: of
 10,612 gaps in one winding, only 5.4% fall inside a neighbour's label,
 and those neighbours carry no excess thickness.
 
-Combined, that yields **9,034 exact coordinates of papyrus with no
-label** — shipped as `archives/results/recovery/unlabeled_material_1218.csv`
+Combined, that yields **9,034 predicted missing-label positions with
+raw-CT evidence of material** — shipped as
+`archives/results/recovery/unlabeled_material_1218.csv`
 in the labels' author's own frame, as falsifiable claims: his repaired
 v2 labels either cover them (mutual confirmation by independent routes)
 or they do not (our error, and we want to know).
@@ -2400,7 +2402,15 @@ control arm) and `scripts/wedge_audit_1218.py` (mass and lamina audit,
 with E1/E2). Artifacts in `archives/results/recovery/`.
 
 **Declared limits.** Thin gaps only where both neighbours survive; wedges
-are audited, never interpolated. Under full contact the honest wording is
+are audited, never interpolated. And the control answers a narrower
+question than the section's title: sampling present windings shows that
+the predicted position **is not air**, not that *the missing winding is
+there*. In a crushed region almost any nearby radius carries material.
+The control that would separate the two is an **off-layer arm** —
+resample at ±½ pitch and at random comparable offsets, and require the
+predicted position to hold more laminar signal than its own displaced
+copies. That arm has not been run, so the claim here stays at *material
+present*, not *missing winding identified*. Under full contact the honest wording is
 *candidate unsegmented sheet*, not *sheet*. Assigning brightness-coherent
 laminae to specific windings is the declared next step, not a claim made
 here.
@@ -2585,9 +2595,15 @@ python scripts/contrast_phantom.py test
 python scripts/kollesis_detector.py test
 ```
 
-Steps 10-18 need no input images: everything from mode 7 onward runs on
-geometry alone. The twin and the predictor run on geometry
-alone.
+The scripts listed above run on geometry alone — no input images. That is
+no longer true of the repository as a whole, so the modes split three ways:
+
+- **Core tools, standalone** — modes 1–13 and their `test` targets above:
+  synthetic twin, predictor, folding, displacement, detectors.
+- **PHerc. 1218 experiments** — modes 15, 16, 17, 18: require the crossing
+  table and the label tree from the labels' author's repository.
+- **Raw-CT experiments** — modes 11B, 14, 19: require access to the scan
+  volume (and, for mode 14, the Paris 4 fragment).
 
 Scripts write PNG figures (and CSVs) to the working directory. A Paris-4-sized image
 analyses in under a minute on a laptop.

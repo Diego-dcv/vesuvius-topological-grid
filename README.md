@@ -64,7 +64,7 @@ contributor's ground truth).
 | 10 | Can the in-plane flattening be undone? | 1218 crossings | REAL-DERIVED (residual 0.2–0.33 mm, transfers across windings) | supported |
 | 11 / 11B | Do nested windings deform under one law? | 1218 crossings + raw CT | REAL-DERIVED + RAW CT (multiwinding collapse 1.000→0.952; raw-CT reconstruction check) | supported |
 | 12 | Digital twin with planted ground truth | synthetic | SYNTHETIC (exam suite A–G) | instrument |
-| 13 | Can double-thickness (kollesis) be detected? | twin; real pre-flight | SYNTHETIC (3 exams pass); real run **not attempted**: the crossing table carries no thickness (declared stop) | validated on twin only |
+| 13 | Can double-thickness (kollesis) be detected? | twin; 1218 label-thickness field + raw CT | SYNTHETIC (3 exams pass) + REAL-DERIVED + RAW CT: three prefixed searches — direct bands, folded thickness, folded brightness — all **null** across the full papyrological window (60–260 mm); floor ~5%; detector calibrated against 63 third-party fusion loci (+20% response) | **null**, calibrated: folded nulls hold; direct band search declared insensitive at solder scale; two θ≈0° loci recorded as instrument-suspect |
 | 14 | Is there mirrored ink transfer (sovrapposti)? | twin + Paris 4 GP 2.4 µm | SYNTHETIC pass + REAL placebo-controlled null | **null** at ~19 µm/px |
 | 15 | Are papyrus fiber striations visible in CT? | Paris 4 render + 1218 raw CT | RAW CT | Paris 4 **yes** (control chain); 1218 **no** (double-controlled) |
 | 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |

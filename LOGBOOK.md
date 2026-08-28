@@ -65,12 +65,4 @@ Failures are listed on purpose: they are part of the method.
 
 
 
-- ⏳ Optional next steps (not debts): 1.129 µm mesh of the GP segment; more 1218 boxes; twin corrugation parameter- ✘ 24-08 VOTE-1 (instance majority vote): prefixed purity exam returned REVIEW and blocked the result — instances legitimately span windings (the scroll is one sheet); unit of analysis wrong, not the data. Corrected to per-point assignment.
-- ✔ 24-08 VOTE-2 (per-point winding by ray-profile bracketing): 85.8% assigned (exam ≥60% PASS), median |Δr| 2.61 vox = 45 µm (exam ≤3 vox PASS); first per-voxel flat sheet of PHerc. 1218 (subsample); 20,494 winding-gap instances shipped as two-way label-QA candidates.
-- ✔ 27-08 Mode 13 finally ran on real data: the thickness observable arrived via the full-resolution label run (mode 18 v0.5). Three prefixed searches — direct bands, folded thickness, folded brightness — all null; sensitivity floor ~5% declared; two θ≈0° candidates recorded as instrument-suspect loci for a raw-CT check.
-- ✘ 27-08 The first fold window (120–260 mm) was half wrong: Herculaneum kollemata run 6–19 cm per roll (literature). Both folds were re-run over 60–190 mm at 0.05 mm steps: thickness p = 0.57, brightness p = 0.22 — null across the full papyrological range.
-- The synthetic power bench caught two method errors before any verdict: a W scan too coarse to hold phase over 20 periods, and a circular-shift null that cannot kill periodic signals (block permutation replaced it). KOL-2 was re-verdicted under the fixed null and held.
-
-
-
 - ⏳ Optional next steps (not debts): 1.129 µm mesh of the GP segment; more 1218 boxes; twin corrugation parameter

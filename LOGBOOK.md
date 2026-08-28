@@ -56,6 +56,20 @@ Failures are listed on purpose: they are part of the method.
 - ✔ 27-08 Mode 13 finally ran on real data: the thickness observable arrived via the full-resolution label run (mode 18 v0.5). Three prefixed searches — direct bands, folded thickness, folded brightness — all null; sensitivity floor ~5% declared; two θ≈0° candidates recorded as instrument-suspect loci for a raw-CT check.
 - ✘ 27-08 The first fold window (120–260 mm) was half wrong: Herculaneum kollemata run 6–19 cm per roll (literature). Both folds were re-run over 60–190 mm at 0.05 mm steps: thickness p = 0.57, brightness p = 0.22 — null across the full papyrological range.
 - The synthetic power bench caught two method errors before any verdict: a W scan too coarse to hold phase over 20 periods, and a circular-shift null that cannot kill periodic signals (block permutation replaced it). KOL-2 was re-verdicted under the fixed null and held.
+- ✔ 27-08 Route A: per-point winding assignment run by the labels' author on the full 5.2 GB tree — exact replication of the step-8 result (85.8%, 2.625 vox) and a correction of his published seam-agreement figure on the full population (82.9% → 88.8%)
+- ✔ 27-08 Mode 17 re-examined in microns (leave-one-winding-out): 32 µm at one winding hidden, 60 µm at three, against ~180 µm sheet separation — and the prefixed comparison went AGAINST our own field: local interpolation wins, the master pattern keeps the wedges
+- ✔ 27-08 Mode 19: 92.7% of absent-winding positions carry material in the raw CT (control-calibrated) → 9,034 coordinates of unlabelled papyrus shipped as falsifiable claims; wedge audit passes E1/E2 — mass 0.85 preserved, only ρ=0.34 still resolvable as laminae at 17 µm; 281 certified new crossings
+- ✘ 27-08 First wedge audit returned zero gaps: k is the ordinal of a ray crossing, not the identity of a winding — interior gaps cannot exist by construction. Caught by its own calibration exam before any verdict; rebuilt around wedges
+- ✘ 27-08 Mode 19 exam E4 failed at z-stride 2 (random control matched the real rate for isolated laminae). Doubling z-sampling lifted certified crossings 2.7×; the 1,697 that never found a neighbour stay candidates, not crossings
+- ✔ 28-08 Kollesis nulls calibrated against 63 third-party fusion loci: the thickness field responds at +20% (1.21 vs 0.98 control) — folded nulls hold above their ~5% floor; the direct band search (≥40%) declared insensitive at solder scale
+
+
+
+- ⏳ Optional next steps (not debts): 1.129 µm mesh of the GP segment; more 1218 boxes; twin corrugation parameter- ✘ 24-08 VOTE-1 (instance majority vote): prefixed purity exam returned REVIEW and blocked the result — instances legitimately span windings (the scroll is one sheet); unit of analysis wrong, not the data. Corrected to per-point assignment.
+- ✔ 24-08 VOTE-2 (per-point winding by ray-profile bracketing): 85.8% assigned (exam ≥60% PASS), median |Δr| 2.61 vox = 45 µm (exam ≤3 vox PASS); first per-voxel flat sheet of PHerc. 1218 (subsample); 20,494 winding-gap instances shipped as two-way label-QA candidates.
+- ✔ 27-08 Mode 13 finally ran on real data: the thickness observable arrived via the full-resolution label run (mode 18 v0.5). Three prefixed searches — direct bands, folded thickness, folded brightness — all null; sensitivity floor ~5% declared; two θ≈0° candidates recorded as instrument-suspect loci for a raw-CT check.
+- ✘ 27-08 The first fold window (120–260 mm) was half wrong: Herculaneum kollemata run 6–19 cm per roll (literature). Both folds were re-run over 60–190 mm at 0.05 mm steps: thickness p = 0.57, brightness p = 0.22 — null across the full papyrological range.
+- The synthetic power bench caught two method errors before any verdict: a W scan too coarse to hold phase over 20 periods, and a circular-shift null that cannot kill periodic signals (block permutation replaced it). KOL-2 was re-verdicted under the fixed null and held.
 
 
 

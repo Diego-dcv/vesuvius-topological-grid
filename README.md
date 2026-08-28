@@ -69,7 +69,7 @@ contributor's ground truth).
 | 15 | Are papyrus fiber striations visible in CT? | Paris 4 render + 1218 raw CT | RAW CT | Paris 4 **yes** (control chain); 1218 **no** (double-controlled) |
 | 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |
 | 17 | Is the crush relief one shared law (ironing field)? | 1218 crossings | REAL-DERIVED, held-out wedge exam 0.58; negative bench 0.98 | supported |
-| 18 | Can every label go back to its origin? | 1218 crossings + raw CT | REAL-DERIVED + RAW CT texture + THIRD-PARTY frame | supported; brightness null documented |
+| 18 | Can every label go back to its origin? | 1218 crossings + raw CT + full-res label tree | REAL-DERIVED + RAW CT texture + THIRD-PARTY: per-point assignment replicated exactly by the labels' author on the full 5.2 GB tree (85.8%, median 2.6 vox); the same pass corrected his published seam-agreement figure on the full population (82.9% → 88.8%) | supported; brightness null documented; step-8 subsample shown to hide nothing |
 
 ## Map of the repository
 

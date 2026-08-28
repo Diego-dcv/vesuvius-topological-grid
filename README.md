@@ -2376,11 +2376,14 @@ census wedge pattern) and as shifts from fusion. The exam meant to
 calibrate the counter caught it before any verdict was published; the
 audit was rebuilt around wedges, which is what it should have been.
 
-![Anomaly map](figures/lam3v3_mapa_anomalias_1218.png)
+![Anomaly map](figures/mapa_anomalias_1218.png)
 
-*Label thickness and collapse aperture over L × z: the loose core, the
-crushed waist, and the open mouths of the roll top and bottom — the best
-candidate for delamination.*
+*Label thickness (top) and winding-to-winding aperture (bottom) over
+developed length and height, median-aggregated per cell. The open core at
+L < 0.15 m, the tight band through the first metre, and the loosening
+toward the top and bottom of the roll. Descriptive only — no exam rides
+on this figure. `scripts/anomaly_map_1218.py`, rebuilt from the public
+winding maps.*
 
 ![Recovery map](figures/mapa_recuperable_1218.png)
 

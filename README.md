@@ -70,6 +70,7 @@ contributor's ground truth).
 | 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |
 | 17 | Is the crush relief one shared law (ironing field)? | 1218 crossings | REAL-DERIVED, held-out wedge exam 0.58; negative bench 0.98 | supported |
 | 18 | Can every label go back to its origin? | 1218 crossings + raw CT + full-res label tree | REAL-DERIVED + RAW CT texture + THIRD-PARTY: per-point assignment replicated exactly by the labels' author on the full 5.2 GB tree (85.8%, median 2.6 vox); the same pass corrected his published seam-agreement figure on the full population (82.9% → 88.8%) | supported; brightness null documented; step-8 subsample shown to hide nothing |
+| 19 | Is the missing 40% of the scroll lost, or just unlabelled? | 1218 raw CT + winding maps | RAW CT with control arm: 92.7% of absent-winding positions carry material (control-calibrated threshold); wedge audit with self-calibrated lamina counter (E1, E2 PASS) | thin gaps: **9,034 exact coordinates** shipped as falsifiable claims; wedges: mass 0.85 preserved but only ρ=0.34 still resolvable as laminae at 17 µm; 281 certified new crossings, random control failing at stride 2 declared |
 
 ## Map of the repository
 

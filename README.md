@@ -2372,7 +2372,7 @@ census wedge pattern) and as shifts from fusion. The exam meant to
 calibrate the counter caught it before any verdict was published; the
 audit was rebuilt around wedges, which is what it should have been.
 
-![Anomaly map](figures/mapa_anomalias_1218.png)
+![Anomaly map](figures/lam3v3_mapa_anomalias_1218.png)
 
 *Label thickness and collapse aperture over L × z: the loose core, the
 crushed waist, and the open mouths of the roll top and bottom — the best
@@ -2382,7 +2382,7 @@ candidate for delamination.*
 
 *Where the absent windings still have material in the CT.*
 
-![Wedge audit](figures/lam3v3_mapa.png)
+![Wedge audit](figures/lam3v3_scatter.png)
 
 *Resolvable-lamina ratio ρ per column.*
 

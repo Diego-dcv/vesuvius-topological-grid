@@ -33,6 +33,15 @@ contributor's ground truth).
 - **One folding law for the whole scroll**: the crush relief is
   separable; in a held-out exam it predicts hidden geometry at
   RMSE/σ = 0.58 (mode 17). `REAL-DERIVED`, negative bench included.
+- **The folding law re-measured in microns**: with one winding hidden,
+  its radial position is recovered to **32 µm** against a ~180 µm sheet
+  separation (60 µm with three hidden) — published against our own
+  field, which lost the comparison to local interpolation (mode 17
+  addendum). `REAL-DERIVED`
+- **9,034 coordinates of unlabelled papyrus**: 92.7% of absent-winding
+  positions carry material in the raw CT, control-calibrated — shipped
+  as falsifiable claims in the labels' author's frame (mode 19).
+  `RAW CT`
 - **The collapse measured point by point**: 1.35M crossings mapped to
   the flat sheet and an ideal spiral; displacement median 1.2 mm,
   p95 5.9 mm (mode 18). `REAL-DERIVED`
@@ -74,14 +83,16 @@ contributor's ground truth).
 
 ## Map of the repository
 
-- **A. Measurement & QA on real data** — modes 11B, 16, 18
+- **A. Measurement & QA on real data** — modes 11B, 16, 18, 19
 - **B. Synthetic instruments & benches** — modes 12, 13 (+ the benches
   inside 14, 17, 18)
 - **C. PHerc1218 geometry** — modes 10, 11, 16, 17, 18
 - **D. Real-scroll experiments, positives and nulls** — modes 14, 15,
   and the texture chain in 18
-- **E. Open threads** — the 1.129 µm Paris 4 mesh; the per-voxel unwrap
-  (proposed to the labels' author); the thermal-tempering hypothesis
+- **F. Recovery and repair** — mode 19 (what is unlabelled, what is fused)
+- **E. Open threads** — the 1.129 µm Paris 4 mesh; a raw-CT look at the two
+  θ≈0° kollesis loci; the repaired v2 labels against our 9,034 claims;
+  the thermal-tempering hypothesis
 
 Mode numbers are stable identifiers and keep their original
 (chronological) order below; this index is the thematic map.
@@ -917,7 +928,12 @@ mode most likely to produce a wrong attribution.
 
 ---
 
-## 11 — Unroll and diagnose (`scripts/displacement_field.py`)
+## 10 / 11 — Unroll and diagnose (`scripts/displacement_field.py`)
+
+*One script, two modes in the table above: **10** is the displacement
+field and its inversion (11.1–11.2); **11** is the folding law that the
+collapsed windings turn out to share, and 11B is its check against the
+raw scan.*
 
 > **The flattening is the vehicle. The map of where to trust it is the result.**
 
@@ -1810,6 +1826,31 @@ labels, and fiber-orientation discontinuities at high resolution
 (Paris 4, 1.129 µm) where a join should break the fiber pattern of two
 sheets.
 
+**A null is only worth its calibration — so the detector was calibrated.**
+The labels' author supplied 63 documented fusion loci (welded sheet
+contacts) from his own repair pass. Against 400 matched control cells,
+the thickness field responds at those loci with a median ratio of
+**1.21 [0.88–1.55]** versus **0.98 [0.73–1.32]** for the controls. So the
+field does see real welds, at roughly **+20%** — not the ×2 a textbook
+double thickness would give, because a locus is a point and a cell
+averages ~350 of them. Three consequences, stated plainly:
+
+- the **folded** searches (KOL-2/3/4) keep their meaning: their measured
+  floor of ~5% sits well below a +20% real response, so the nulls are
+  nulls against a signal the instrument demonstrably detects;
+- the **direct band** search (KOL-1), which demanded ≥40% elevation, is
+  **degraded**: it is insensitive at solder scale and is reported as
+  such, not as evidence of absence;
+- the **brightness** null is untouched — it never used the labels.
+
+One caveat carried openly: those 63 loci cluster toward θ ≈ 0° (9 of 63
+within 10°, against 3.5 expected uniform), the same meridian as our two
+surviving candidates. His pipeline and ours drink from the same labels,
+so this is not two independent witnesses. Either the crease edge really
+does concentrate welding — which is what the physics of maximum pressure
+would predict — or both inherit a frame artefact. Only the raw CT
+settles it, and that check is requested.
+
 ![Thickness profile](figures/kol1_perfil_espesor.png)
 
 *Slope-corrected label thickness along the unwrapped sheet. No join
@@ -2045,6 +2086,54 @@ not part of this fit.
 per-winding quality) and `planchado_1218_results.json` (exam numbers) —
 produced by the export cell in `scripts/planchado_1218.py`.
 
+### Mode 17, addendum — the same law re-examined in microns
+
+*Evidence: `REAL-DERIVED` — leave-one-winding-out, prefixed criteria,
+shuffled control.*
+
+The wedge exam above scores in units of σ. A segmenter asked the fair
+question in his own units: **how many microns?** So the field was
+re-examined by hiding windings and predicting their radial position bin
+by bin, in µm, against a local sheet separation of ~177 µm.
+
+Two arms, criteria fixed before running: hide one winding (arm 1) or
+three (arm 2, neighbours at ±2). Four predictors: P0 the ideal spiral
+(floor), P1 interpolation from the surviving neighbours, P2 the held-out
+ironing field, NEG the same field with its θ-dependence shuffled.
+
+| predictor | arm 1 (1 hidden) | arm 2 (3 hidden) |
+|---|---|---|
+| P1 neighbours | **32 µm**, 88% in the right gap | **60 µm**, 68% |
+| P2 held-out field | 370 µm, 16% | 387 µm |
+| P0 ideal spiral | 1717 µm, 5% | 1719 µm |
+| NEG shuffled | 1954 µm, 4% | 2232 µm |
+
+**Result.** Exam A3 passes (P2 beats the floor in both arms) and the
+control degrades as it should. But exam B3 — published whichever way it
+fell — goes to **P1**: local coherence between adjacent windings is an
+order of magnitude deeper than the global field approximation. Thirty-two
+microns is below the table's own noise (<2 voxels) at one winding out,
+sixty at two. That leaves the master fold pattern exactly one job: the
+**wedges**, where the neighbours are missing too and P1 has nothing to
+interpolate from.
+
+**Fence, declared.** Bin resolution is 6° × 0.55 mm over median radial
+positions, and only where segmentation exists. This is not per-voxel
+tracing and it assigns no voxel to a sheet in contact — that is mode 18.
+
+![Held-out error in microns](figures/pl4_error_um.png)
+
+*Prediction error per predictor and arm, against the ~180 µm local sheet
+separation.*
+
+**Script.** `scripts/planchado_heldout_um_1218.py`; arrays in
+`archives/results/planchado/pl4_resultados_1218.npz`. A synthetic bench
+with a planted law (20 µm noise) recovers the hidden winding at 14 µm —
+the theoretical median of |noise| — against 362 for the floor and 477
+for the shuffled control.
+
+---
+
 The full displacement field this iron corrects is measured point by
 point — and the sheet rebuilt label by label — in mode 18.
 
@@ -2187,6 +2276,125 @@ crossing table plus the public Kaggle subsample. Next: the same
 assignment over the full-resolution labels (script offered to their
 author), which adds the per-point sheet-thickness map.
 
+
+---
+
+## 19 — The recovery map: is the missing scroll lost, or only unlabelled?
+
+*Evidence: `RAW CT` with a control arm — two prefixed exams passed, one
+design error caught and recorded.*
+
+**The question.** Roughly 40% of PHerc. 1218 has no segmentation. The
+coverage census (mode 16) shows where, but not *why*: is the papyrus
+destroyed, or is it sitting there unlabelled? Those two answers ask
+different things of the people doing the segmenting, so the difference
+is worth measuring rather than assuming.
+
+The winding maps make it measurable. Where a winding is absent between
+two present neighbours, mode 17's held-out interpolation places it to
+32–60 µm. Sample the raw CT at exactly that radius and ask whether there
+is material there.
+
+### Thin gaps: the material is there
+
+**Method.** For every absent-winding position with present neighbours
+(dk ≤ 3), sample the raw CT at the interpolated radius. **Control arm:**
+sample present windings the same way; the threshold is the control's 5th
+percentile, printed before it is applied.
+
+**Result.** **92.7%** of sampled positions carry material — median
+brightness 145 against the control's 143, threshold 100, stable across
+dk = 1/2/3 (92.6 / 94.1 / 94.5%). A companion check (LAM-1) had already
+shown these are not windings quietly swallowed by a fat neighbour: of
+10,612 gaps in one winding, only 5.4% fall inside a neighbour's label,
+and those neighbours carry no excess thickness.
+
+Combined, that yields **9,034 exact coordinates of papyrus with no
+label** — shipped as `archives/results/recovery/unlabeled_material_1218.csv`
+in the labels' author's own frame, as falsifiable claims: his repaired
+v2 labels either cover them (mutual confirmation by independent routes)
+or they do not (our error, and we want to know).
+
+The hole is in the drawing, not in the snail.
+
+### Wedges: the mass survives, the structure mostly does not
+
+Thin gaps are the easy case. The census wedges — where a whole run of
+windings is truncated — are the hard one, and interpolating across them
+would be inventing. So they were **audited** instead of filled: count
+mass and count laminae, assign nothing.
+
+**Method.** In each column, a wedge runs from the last crossing to the
+scroll's real edge in the masked CT. Laminae are counted by peak finding
+on the smoothed radial profile — *detected in the CT, never interpolated* —
+with the counter **self-calibrated on the labelled stretch of that same
+column** (η = ridges per known winding).
+
+**Prefixed exams.** E1: median η between 0.3 and 1.2 → **PASS at 1.06**
+(IQR 0.92–1.21) — the counter reproduces what is known. E2: split-half,
+the inner half must predict the outer within 25% → **PASS at 16.4%**.
+
+**Result.** Over 1,672 auditable wedges (≥3 expected windings): material
+fraction **0.85**, but resolvable-lamina ratio **ρ = 0.34 [0.33–0.36]** —
+2,671 laminae resolved of 7,822 expected, distribution p10 0.00 / p50
+0.30 / p90 0.70. The wedges keep the papyrus and lose most of the
+partitions: about **one sheet in three is still resolvable as a lamina at
+17 µm**. The rest is fused mass — not necessarily destroyed, but with no
+testimony at this resolution. The synthetic bench anchors the reading: a
+planted full wedge audits at ρ = 1.02, an amorphous mass with no laminae
+at 0.29. The real scroll sits beside the amorphous bench, not the full one.
+
+### Placing what can be placed
+
+The resolvable laminae in each wedge were then exported as new crossings
+in the table's own format, ordered by the spiral, behind three locks:
+spacing within 0.5–2.5× the local pitch (cut at the first violation),
+brightness ≥60% of that column's known ridge median with a prominence
+floor, and continuity with neighbouring columns. Mass with no ridges is
+exported as a **declared range**, not carved into invented sheets.
+
+**Result:** **281 certified new crossings** at full z-resolution — the
+first material *added* to the table — plus 3,804 mush blocks bounding
+~667 winding-equivalents. Exam E3 passes (median pitch within 25% of the
+labelled one). **Exam E4 failed at stride 2** and is reported as such:
+with isolated laminae, one per column, the random control matched the
+real rate. Doubling the z-sampling gave the isolated ridges neighbours to
+confirm against and lifted the certified count 2.7×; the 1,697 that never
+found a neighbour stay candidates and are **not** exported as crossings.
+
+### A design error, caught by its own exam
+
+The first version of the wedge audit looked for absent windings *between*
+two present ones by index — and returned zero. The index `k` is the
+ordinal of a ray crossing, not the identity of a winding: interior gaps
+in `k` cannot exist by construction. Absences live as **truncation** (the
+census wedge pattern) and as shifts from fusion. The exam meant to
+calibrate the counter caught it before any verdict was published; the
+audit was rebuilt around wedges, which is what it should have been.
+
+![Anomaly map](figures/mapa_anomalias_1218.png)
+
+*Label thickness and collapse aperture over L × z: the loose core, the
+crushed waist, and the open mouths of the roll top and bottom — the best
+candidate for delamination.*
+
+![Recovery map](figures/mapa_recuperable_1218.png)
+
+*Where the absent windings still have material in the CT.*
+
+![Wedge audit](figures/lam3v3_mapa.png)
+
+*Resolvable-lamina ratio ρ per column.*
+
+**Scripts.** `scripts/recovery_probe_1218.py` (thin gaps, with the
+control arm) and `scripts/wedge_audit_1218.py` (mass and lamina audit,
+with E1/E2). Artifacts in `archives/results/recovery/`.
+
+**Declared limits.** Thin gaps only where both neighbours survive; wedges
+are audited, never interpolated. Under full contact the honest wording is
+*candidate unsegmented sheet*, not *sheet*. Assigning brightness-coherent
+laminae to specific windings is the declared next step, not a claim made
+here.
 
 ---
 

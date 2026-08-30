@@ -80,7 +80,7 @@ contributor's ground truth).
 | 16 | Can the scroll be unrolled from the crossings? | 1218 crossings | REAL-DERIVED (ribbon + coverage census) | supported |
 | 17 | Is the crush relief one shared law (ironing field)? | 1218 crossings | REAL-DERIVED, held-out wedge exam 0.58; negative bench 0.98 | supported |
 | 18 | Can every label go back to its origin? | 1218 crossings + raw CT + full-res label tree | REAL-DERIVED + RAW CT texture + THIRD-PARTY: per-point assignment replicated exactly by the labels' author on the full 5.2 GB tree (85.8%, median 2.6 vox); the same pass corrected his published seam-agreement figure on the full population (82.9% → 88.8%). REPRODUCED, not ground-truth validated: both routes share the same label ecosystem | supported; brightness null documented; step-8 subsample shown to hide nothing |
-| 19 | Is the missing 40% of the scroll lost, or just unlabelled? | 1218 raw CT + winding maps | RAW CT with control arm: 92.7% of absent-winding positions carry material (control-calibrated threshold); wedge audit with self-calibrated lamina counter (E1, E2 PASS) | thin gaps: **9,034 predicted positions with raw-CT evidence of material**, shipped as falsifiable claims; wedges: mass 0.85 preserved but only ρ=0.34 still resolvable as laminae at 17 µm; 281 certified new crossings, random control failing at stride 2 declared |
+| 19 | Is the missing 40% of the scroll lost, or just unlabelled? | 1218 raw CT + winding maps | RAW CT with control arm: 92.7% of absent-winding positions carry material (control-calibrated threshold); wedge audit with self-calibrated lamina counter (E1, E2 PASS) | thin gaps: **9,034 predicted positions with raw-CT evidence of material**, shipped as falsifiable claims; wedges: mass 0.85 preserved but only ρ=0.34 still resolvable as laminae at 17 µm; 281 new-crossing candidates (a neighbour-continuity certification was withdrawn 30-08 after a half-pitch audit — see Mode 19), random-control failures declared at each step |
 
 ## Map of the repository
 
@@ -2356,9 +2356,9 @@ brightness ≥60% of that column's known ridge median with a prominence
 floor, and continuity with neighbouring columns. Mass with no ridges is
 exported as a **declared range**, not carved into invented sheets.
 
-**Result:** **281 certified new crossings** at full z-resolution — the
-first material *added* to the table, **0.36 m of ribbon** on top of the
-5.13 m already traced — plus 3,804 mush blocks bounding
+**Result (amended 30-08 — see the audit below):** 281 new crossings
+at full z-resolution, **since downgraded to candidates**; the
+**0.36 m of ribbon is no longer claimed** — plus 3,804 mush blocks bounding
 ~667 winding-equivalents. Exam E3 passes (median pitch within 25% of the
 labelled one). **Exam E4 failed at stride 2** and is reported as such:
 with isolated laminae, one per column, the random control matched the

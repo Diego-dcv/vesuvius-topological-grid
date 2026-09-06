@@ -3,3 +3,6 @@ scipy>=1.7
 matplotlib>=3.4
 pillow>=9.0
 xraydb>=4.5
+# optional, only for the PHerc. 1218 modes:
+#   zarr s3fs      -> raw-CT scripts (wedge_audit, unwrap_texture, kollesis_search)
+#   kagglehub      -> label-point scripts (vote_instance, winding_per_point)

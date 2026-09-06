@@ -68,6 +68,31 @@ def mad(a):
 ESC = np.array([mad(REL[i]) for i in range(len(K))])
 NORM = REL / ESC[:, None, None]
 
+# mode 17's relief: r minus its running mean over z (W = 41 planes) per ray,
+# i.e. the slow crush shape removed, only the fold left. Added 2026-09-06
+# because the sanity R2 did not match: mode 17 fitted THIS, the P2 above
+# fits shape + fold together.
+W17 = 41; ker17 = np.ones(W17, np.float32)
+TREND = np.full_like(Rg, np.nan)
+for k in K:
+    for i in range(60):
+        y = Rg[k, i]; ok = np.isfinite(y)
+        if ok.sum() < 30:
+            continue
+        num = np.convolve(np.pad(np.where(ok, y, 0).astype(np.float32), W17 // 2, mode="reflect"), ker17, "valid")
+        den = np.convolve(np.pad(ok.astype(np.float32), W17 // 2, mode="reflect"), ker17, "valid")
+        TREND[k, i] = np.divide(num, den, out=np.full(nzp, np.nan, np.float32), where=den > 0)
+REL17 = np.stack([Rg[k] - TREND[k] for k in K])
+ESC17 = np.array([mad(REL17[i]) for i in range(len(K))])
+NORM17 = REL17 / ESC17[:, None, None]
+def ajusta_A17(F, idx):
+    A = np.full(len(K), np.nan)
+    for i in idx:
+        m = np.isfinite(REL17[i]) & np.isfinite(F)
+        den = np.nansum(F[m] ** 2)
+        A[i] = np.nansum(F[m] * REL17[i][m]) / den if den > 0 else np.nan
+    return A
+
 def ajusta_A(F, idx):
     """pendiente A_k = <F*rel>/<F^2> por vuelta, solo bins finitos"""
     A = np.full(len(K), np.nan)
@@ -80,20 +105,37 @@ def ajusta_A(F, idx):
 # SANIDAD: reproducir el R2 del modo 17 con todo dentro
 F_full = np.nanmedian(NORM, axis=0)
 A_full = ajusta_A(F_full, range(len(K)))
-sse = sst = 0.0
+sse = sst = 0.0; R2k = []
 for i in range(len(K)):
     m = np.isfinite(REL[i]) & np.isfinite(F_full)
-    sse += np.nansum((REL[i][m] - A_full[i] * F_full[m]) ** 2)
-    sst += np.nansum(REL[i][m] ** 2)
-R2 = 1 - sse / sst
-print(f"SANIDAD R2 global del ajuste A*F: {R2:.2f} "
-      f"({'reproduce el modo 17' if 0.58 <= R2 <= 0.78 else 'AVISO: fuera de 0.68+/-0.10'})")
+    e2 = np.nansum((REL[i][m] - A_full[i] * F_full[m]) ** 2)
+    t2 = np.nansum(REL[i][m] ** 2)
+    sse += e2; sst += t2
+    R2k.append(1 - e2 / t2 if t2 > 0 else np.nan)
+R2 = 1 - sse / sst                       # pooled over all windings
+R2_med = float(np.nanmedian(R2k))        # median per winding = mode 17's figure
+# mode 17 reported the MEDIAN PER-WINDING R2 (0.68); the pooled R2 is higher
+# because the big-relief windings in the body (~0.85) dominate the sums.
+# Until 2026-09-06 this check compared the pooled value with the per-winding
+# band and warned every run; it now compares like with like.
+F17 = np.nanmedian(NORM17, axis=0); A17 = ajusta_A17(F17, range(len(K)))
+R2k17 = []
+for i in range(len(K)):
+    m = np.isfinite(REL17[i]) & np.isfinite(F17)
+    if m.sum() > 500 and np.isfinite(A17[i]):
+        res_ = REL17[i][m] - A17[i] * F17[m]
+        R2k17.append(1 - np.var(res_) / np.var(REL17[i][m]))
+R2_17 = float(np.nanmedian(R2k17))
+print(f"SANIDAD (modo 17: forma lenta quitada, W=41) R2 mediana por vuelta {R2_17:.2f} "
+      f"({'reproduce el modo 17' if 0.58 <= R2_17 <= 0.78 else 'AVISO: fuera de 0.68+/-0.10'})")
+print(f"SANIDAD R2 del ajuste A*F: mediana por vuelta {R2_med:.2f} "
+      f"(forma + pliegue juntos: no es la cifra del modo 17); agrupado {R2:.2f}")
 
 # ---------- el examen: dos brazos ----------
 def examen(paso):
     """paso=1: ocultar k, vecinas k+/-1; paso=2: ocultar k-1..k+1, vecinas k+/-2"""
     res = {m: {"k": [], "med": [], "gap": []} for m in
-           ["P0", "P1", "P2", "NEG"]}
+           ["P0", "P1", "P2", "P2b", "NEG"]}
     kidx = {k: i for i, k in enumerate(K)}
     for k in K:
         if (k - paso) not in kidx or (k + paso) not in kidx:
@@ -106,6 +148,13 @@ def examen(paso):
         Fh = np.nanmedian(NORM[vis], axis=0)
         Ah = ajusta_A(Fh, vis)
         Aint = np.interp(k, K[vis], Ah[vis])
+        # mode-17 flavour, held out: fold field from detrended reliefs of the
+        # visible windings; the hidden winding's slow trend is the mean of its
+        # neighbours' trends (that is all a held-out method may know)
+        Fh17 = np.nanmedian(NORM17[vis], axis=0)
+        Ah17 = ajusta_A17(Fh17, vis)
+        Aint17 = np.interp(k, K[vis], Ah17[vis])
+        trend_nb = (TREND[k - paso] + TREND[k + paso]) / 2
         rint = np.interp(k, K[vis], rbar[vis])
         # bins evaluables comunes
         m = (np.isfinite(Rg[k]) & np.isfinite(Rg[k - paso])
@@ -118,13 +167,21 @@ def examen(paso):
             "P0": np.full(m.sum(), rint),
             "P1": (Rg[k - paso][m] + Rg[k + paso][m]) / 2,
             "P2": rint + Aint * Fh[m],
+            "P2b": trend_nb[m] + Aint17 * Fh17[m],
+            # negative control: F rolled in theta. Rolling moves empty bins,
+            # so the rolled F can be nan where m is True; those bins are
+            # dropped (the original took a plain median and got nan, which
+            # made the control silently "fail" every run - fixed 2026-09-06)
             "NEG": rint + Aint * np.roll(Fh, rng.integers(5, 55), axis=0)[m],
         }
         for nom, p in preds.items():
             e = np.abs(p - verdad) * 1000.0                   # um
+            ok = np.isfinite(e)
+            if ok.sum() < 100:
+                continue
             res[nom]["k"].append(k)
-            res[nom]["med"].append(np.median(e))
-            res[nom]["gap"].append(np.mean(e < np.abs(s) * 500.0))  # |e|<s/2
+            res[nom]["med"].append(np.median(e[ok]))
+            res[nom]["gap"].append(np.mean(e[ok] < np.abs(s[ok]) * 500.0))  # |e|<s/2
         if k == K[len(K) // 2]:
             res["_s_med"] = float(np.median(np.abs(s)) * 1000)
     return res
@@ -139,6 +196,7 @@ def resumen(R, titulo):
     for nom, lab in [("P0", "P0 espiral (suelo)"),
                      ("P1", "P1 interp vecinas"),
                      ("P2", "P2 campo held-out"),
+                     ("P2b", "P2b modo-17 held-out"),
                      ("NEG", "control barajado")]:
         med = np.array(R[nom]["med"]); gap = np.array(R[nom]["gap"])
         filas[nom] = (np.median(med), np.percentile(med, [25, 75]),
@@ -166,7 +224,7 @@ fig, ax = plt.subplots(1, 2, figsize=(13, 4.5), sharey=True)
 for A, R, tt in [(ax[0], R1, "brazo 1: 1 vuelta oculta"),
                  (ax[1], R2b, "brazo 2: 3 ocultas (vecinas +/-2)")]:
     for nom, st in [("P0", "k:"), ("P1", "g-"), ("P2", "b-"),
-                    ("NEG", "r--")]:
+                    ("P2b", "c-"), ("NEG", "r--")]:
         A.plot(R[nom]["k"], R[nom]["med"], st, label=nom, lw=1.5)
     A.axhline(100, color="gray", ls=":", lw=1)
     A.text(K[2], 105, "s/2 ~ 100 um", fontsize=8, color="gray")
@@ -176,9 +234,9 @@ ax[0].set_ylabel("mediana |error| (um)"); ax[0].legend(fontsize=8)
 plt.tight_layout(); plt.savefig("pl4_error_um.png", dpi=130)
 np.savez_compressed(
     "pl4_resultados_1218.npz", R2_sanidad=R2,
-    **{f"b1_{n}_{c}": np.array(R1[n][c]) for n in ["P0", "P1", "P2", "NEG"]
+    **{f"b1_{n}_{c}": np.array(R1[n][c]) for n in ["P0", "P1", "P2", "P2b", "NEG"]
        for c in ["k", "med", "gap"]},
-    **{f"b2_{n}_{c}": np.array(R2b[n][c]) for n in ["P0", "P1", "P2", "NEG"]
+    **{f"b2_{n}_{c}": np.array(R2b[n][c]) for n in ["P0", "P1", "P2", "P2b", "NEG"]
        for c in ["k", "med", "gap"]})
 print(f"\nficheros: pl4_error_um.png, pl4_resultados_1218.npz "
       f"[{time.time()-t0:.0f}s]")

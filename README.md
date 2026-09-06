@@ -2356,14 +2356,14 @@ brightness ≥60% of that column's known ridge median with a prominence
 floor, and continuity with neighbouring columns. Mass with no ridges is
 exported as a **declared range**, not carved into invented sheets.
 
-**Result (amended 30-08 — see the audit below):** 281 new crossings
-at full z-resolution, **since downgraded to candidates**; the
-**0.36 m of ribbon is no longer claimed** — plus 3,804 mush blocks bounding
-~667 winding-equivalents. Exam E3 passes (median pitch within 25% of the
-labelled one). **Exam E4 failed at stride 2** and is reported as such:
+**Result (amended 30-08 — see LOGBOOK):** 281 new crossingsat full z-resolution,
+**since downgraded to candidates**; the **0.36 m of ribbon is no longer claimed**
+— plus 3,804 mush blocks bounding ~667 winding-equivalents. Exam E3 passes 
+(median pitch within 25% of the labelled one). **Exam E4 failed at stride 2** and 
+is reported as such:
 with isolated laminae, one per column, the random control matched the
 real rate. Doubling the z-sampling gave the isolated ridges neighbours to
-confirm against and lifted the certified count 2.7×; the 1,697 that never
+confirm against and lifted the count 2.7×; the 1,697 that never
 found a neighbour stay candidates and are **not** exported as crossings.
 
 ### A design error, caught by its own exam

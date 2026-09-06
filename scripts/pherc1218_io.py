@@ -155,6 +155,21 @@ def open_ct(level=1, quiet=False):
     return vol
 
 
+def open_ct_root(quiet=False):
+    """The whole multi-resolution volume: root["1"] = 17.28 um (level 1),
+    root["0"] = 8.64 um (level 0, 2x the coordinates)."""
+    try:
+        import s3fs
+        import zarr
+    except ImportError:
+        sys.exit("[pherc1218_io] raw CT needs: pip install zarr s3fs")
+    fs = s3fs.S3FileSystem(anon=True)
+    root = zarr.open(s3fs.S3Map(VOLUME, s3=fs), mode="r")
+    if not quiet:
+        print(f"[pherc1218_io] CT root: levels {sorted(root.keys())}")
+    return root
+
+
 # ---- one call for the Colab cells ---------------------------------------
 def load_all(ct=False, quiet=False):
     """Everything the mode-15..19 cells expect, as a dict for globals()."""

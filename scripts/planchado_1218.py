@@ -287,3 +287,20 @@ plt.show()
 s0 = np.nanstd(IMG0); s1 = np.nanstd(IMG1)
 print(f"\nguardadas 3 figuras — relieve global: ±{s0:.2f} mm antes, "
       f"±{s1:.2f} mm después ({100*(1-s1/s0):.0f}% planchado)")
+
+# ---------- artefactos declarados en la página del modo 17 (añadido 06-09-2026:
+# ---------- el script nunca los escribía; el npz del repo estaba vacío) ----------
+import json
+np.savez_compressed("planchado_1218.npz",
+                    F=F, A=A, R2=R2, D=D, K0=K0, K1=K1, rk=rk,
+                    wtheta=wtheta, theta_deg=np.arange(60) * 6.0,
+                    zs=np.array(zs), pares=np.array(pares, float),
+                    relieve_antes_mm=s0, relieve_despues_mm=s1)
+json.dump({"K0": int(K0), "K1": int(K1), "nk": int(nk),
+           "R2_mediano": float(np.nanmedian(R2)),
+           "ratio_cuna_mediano": float(np.median([r for _, r in pares])),
+           "vueltas_examinadas": len(pares),
+           "cunas_theta_deg": [int(6 * w) for w in wtheta],
+           "relieve_antes_mm": float(s0), "relieve_despues_mm": float(s1)},
+          open("planchado_1218_results.json", "w"), indent=1)
+print("guardados planchado_1218.npz y planchado_1218_results.json")

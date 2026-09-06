@@ -10,7 +10,8 @@ Measures, on the 1218 masked volume plus the public ray/ring geometry:
      with a matched shuffled null (the "sponge check": absence must be
      the material's, not the sectioning's).
 
-Recorded run (18-19 Aug 2026, Google Colab):
+Recorded run (18-19 Aug 2026, Google Colab) — WITH THE SWAPPED CENTRE, see
+load_geometry(); to be re-run:
   sanity 88% of samples in material (2,918 profiles)
   coarse band: peak 4.96 mm at z = -12.5 vs shuffled null  -> empty band
   corrugation: 19.8 mm, 10.2x background, 3,363 sheets     -> MEASURED
@@ -34,14 +35,22 @@ RAW = ("https://raw.githubusercontent.com/Jinhojeong/"
        "vesuvius-surface-geometry-diagnostic/main/results/kollesis/")
 MM = 0.01728          # mm per level-1 voxel
 MAT = 50              # intensity threshold: material vs air
+DX, DY = -3, -1       # label frame -> raw-CT frame, voxels
 
 
 def load_geometry():
-    org = {}
+    # origins by NAME, in the CT frame. Until 2026-09-06 this read the file by
+    # column position; the file is "z, cy, cx", so x and y were swapped
+    # (~120 voxels, ~2 mm) and the (-3, -1) CT offset was missing. The
+    # recorded run above used that centre. Duplicate rows are averaged and
+    # missing planes take the nearest origin, as every other 1218 script does.
+    acc = {}
     with urllib.request.urlopen(RAW + "origins_merged.csv") as r:
         for row in csv.DictReader(io.TextIOWrapper(r)):
-            v = list(row.values())
-            org[int(float(v[0]))] = (float(v[1]), float(v[2]))
+            acc.setdefault(int(float(row["z"])), []).append(
+                (float(row["cx"]), float(row["cy"])))
+    org = {z: (float(np.mean([p[0] for p in v])) + DX,
+               float(np.mean([p[1] for p in v])) + DY) for z, v in acc.items()}
     with urllib.request.urlopen(RAW + "positions_merged.csv.gz") as r:
         rows = list(csv.DictReader(
             io.StringIO(gzip.decompress(r.read()).decode())))
@@ -50,6 +59,10 @@ def load_geometry():
         porz.setdefault(int(r_["z"]), []).append(
             (float(r_["theta_deg"]), int(r_["k"]), float(r_["r_l1_vox"])))
     zs = sorted(porz)
+    have = sorted(org)
+    for z in zs:
+        if z not in org:
+            org[z] = org[min(have, key=lambda q: abs(q - z))]
     return org, porz, zs
 
 

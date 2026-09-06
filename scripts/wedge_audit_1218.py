@@ -29,6 +29,16 @@ read from the labels' author's repository over HTTP. ~40 min at Z_STRIDE=2.
 
 OUTPUTS: lam3v3_cunas.npz, lam3v3_mapa.png, lam3v3_scatter.png
 """
+
+# --- standalone entry: outside the Colab notebook, load the crossing table
+# --- (and the CT when needed) here. Inside the notebook, where `rows` already
+# --- exists, this block does nothing. See scripts/pherc1218_io.py.
+if "rows" not in dir():
+    import os as _os, sys as _sys
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)) if "__file__" in dir() else "scripts")
+    from pherc1218_io import load_all
+    globals().update(load_all(ct=True))
+
 import numpy as np, matplotlib.pyplot as plt, csv, io, urllib.request
 import warnings, time
 from scipy.signal import find_peaks

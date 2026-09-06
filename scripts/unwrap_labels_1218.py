@@ -1,4 +1,14 @@
 
+
+# --- standalone entry: outside the Colab notebook, load the crossing table
+# --- (and the CT when needed) here. Inside the notebook, where `rows` already
+# --- exists, this block does nothing. See scripts/pherc1218_io.py.
+if "rows" not in dir():
+    import os as _os, sys as _sys
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)) if "__file__" in dir() else "scripts")
+    from pherc1218_io import load_all
+    globals().update(load_all(ct=False))
+
 import numpy as np, matplotlib.pyplot as plt, warnings
 warnings.filterwarnings("ignore", message="All-NaN")
 

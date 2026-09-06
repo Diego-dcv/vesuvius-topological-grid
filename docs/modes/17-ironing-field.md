@@ -78,6 +78,7 @@ ironing field, NEG the same field with its θ-dependence shuffled.
 |---|---|---|
 | P1 neighbours | **32 µm**, 88% in the right gap | **60 µm**, 68% |
 | P2 held-out field | 370 µm, 16% | 387 µm |
+| P2b held-out field, mode-17 flavour (crush shape removed, added 2026-09-06) | 302 µm, 19% | 318 µm |
 | P0 ideal spiral | 1717 µm, 5% | 1719 µm |
 | NEG shuffled | 1954 µm, 4% | 2232 µm |
 
@@ -112,3 +113,19 @@ point — and the sheet rebuilt label by label — in mode 18.
 
 ---
 
+
+
+---
+
+## Note (2026-09-06) — two fixes to the held-out script, verdicts unchanged
+
+1. The shuffled control (NEG) could return a non-number when the rolled field
+   landed on empty bins; on a clean re-run it printed "control negativo …
+   NO – REVISAR" every time. Empty bins are now dropped; the control degrades
+   as it should (1954 / 2232 µm, the values in the table).
+2. The sanity R² compared unlike things: this script fitted crush shape and
+   fold together (median R² per winding 0.88), while mode 17 fitted the fold
+   only, after removing each ray's running mean over z (W = 41). Both are now
+   printed; the mode-17 flavour reproduces 0.68 exactly. The 370 µm P2 is
+   therefore "shape + fold, held out"; the mode-17 field proper, held out, is
+   the new P2b row: 302 µm. Neighbours still win by an order of magnitude.

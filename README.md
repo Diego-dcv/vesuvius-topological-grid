@@ -1,4 +1,4 @@
-# Vesuvius-topological-grid
+# vesuvius-topological-grid
 
 **Geometry instruments for Herculaneum scrolls — no ML, no text reading, every claim with its exam and its checker.**
 
@@ -40,7 +40,7 @@ contributor's ground truth).
 | **Every label sent back to its winding** | Replicated exactly by the labels' author on the full 5.2 GB tree (85.8 %, median 2.6 voxels); the same pass corrected his published seam figure (82.9 → 88.8 %) | [mode 18](docs/modes/18-unwrap-per-point.md) |
 | **Unlabelled papyrus is there** | 9,034 predicted positions with raw-CT evidence of material; cross-checked by the labels' author: 6,616 survive at exact voxel, most of the rest are edge grazes within the declared tolerance | [mode 19](docs/modes/19-recovery-map.md) |
 | **Local sheet coherence in microns** | A hidden winding is recovered to 32 µm from its neighbours (60 µm with three hidden), held-out exam; our own global field does worse (370 µm) and the comparison was published against us | [mode 17](docs/modes/17-ironing-field.md) |
-| **328,143 hidden sheets placed at the normal pitch** | Judged by the labels one plane away: 35 µm median error, and never more sheets than predicted once split labels are merged (2 % of 240,000 packs); 97.6 % on material in the CT | [mode 20](docs/modes/20-hidden-sheets.md) |
+| **328,143 hidden papyrus crossings placed at the normal pitch** (crossings, not windings: folded zones are the declared limit) | Judged by the labels one plane away: 35 µm median error, and never more sheets than predicted once split labels are merged (2 % of 240,000 packs); 97.6 % on material in the CT | [mode 20](docs/modes/20-hidden-sheets.md) |
 | **Winding count and roll length agree with the per-voxel map** | 109–110 winding lanes (ours from the table, his from the voxel tree); loom length 8.4–9.4 m; labelled material ~3.2 m per plane by both routes | [metrology note](docs/modes/16-unrolled-ribbon-census.md) |
 
 ## PHerc. 1218 in numbers

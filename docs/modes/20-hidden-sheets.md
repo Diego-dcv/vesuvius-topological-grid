@@ -1,6 +1,6 @@
 # 20 — Hidden sheets at normal pitch: where the unlabelled papyrus is, sheet by sheet
 
-*Added 8 September 2026. Scripts: `layer_division_1218.py`, `layer_compression_1218.py`, `mass_count_1218.py`, `hidden_sheets_1218.py`, `fibre_parity_1218.py`, each with a `*_twin_1218.py` bench. Data: Jinhojeong's crossing table and origins for PHerc. 1218; CT levels 0 and 1 from the public bucket.*
+*Added 8 September 2026. Scripts: `layer_division_1218.py`, `layer_compression_1218.py`, `mass_count_1218.py`, `hidden_sheets_1218.py`, `fibre_parity_1218.py`, `fold_check_1218.py`, each with a `*_twin_1218.py` bench. Data: Jinhojeong's crossing table and origins for PHerc. 1218; CT levels 0 and 1 from the public bucket.*
 
 ## Where this comes from
 
@@ -39,6 +39,20 @@ Against the CT at 17 µm, 97.6 % of the predicted sheets sit on material; the la
 ![hidden sheets](../../figures/hidden_sheets_1218.png)
 
 *Left: papyrus length per plane along the roll's height — labelled (after merging split labels), hidden at normal pitch, and their sum. Right: hidden sheets per pack; most packs hide one.*
+
+## Limit: folds. Crossings are not windings
+
+The section below is the picture that Paul's standard asks for — the CT itself with the geometry on top — and it is also the picture that shows where this mode stops. It is one plane of PHerc. 1218 at 105 mm height, five rays 6° apart, labelled sheets in green and predicted hidden sheets in orange.
+
+![section with labelled and predicted sheets](../../figures/section_hidden_sheets_1218.png)
+
+*z = 6064 (105 mm), rays 162°–186°, 17 µm/voxel, 1 mm bar. Green: Jinhojeong's labelled sheets (split labels merged). Orange: sheets predicted at the normal pitch. 158 predicted crossings in this sector.*
+
+Along the straight stretches the picture is what the numbers say: the orange diamonds sit between the green dots, on papyrus, at the same spacing. But look at the rim (upper left) and at the crumpled patches: there the sheets are not straight, and a horizontal plane cuts an undulating sheet two, three or four times. Diego's image for it is a surfboard cutting several waves of the same water. Each cut is real papyrus — the CT check is not wrong — but neighbouring crossings on a ray can then be the *same* winding folded, not two windings. The 328,143 rows are therefore **crossings of papyrus, not windings**. In the body of the roll, where sheets run straight, the two coincide; in the folded zones they do not, and the count of windings between two labelled sheets there is unknown.
+
+We tried to separate the two from the table alone (`fold_check_1218.py`). A wave-fold pair moves with height: going up or down the plane, its two crossings approach, meet and vanish, whereas two windings keep their spacing. Tracking every crossing through the neighbouring planes and flagging pairs that close or vanish catches, on a twin with planted waves, 38–60 % of the fold crossings at the cost of 7–11 % of true windings flagged by mistake. That is not good enough to certify crossings one by one, and the reason is structural: once split labels are merged (they must be, 31 % of the table), a fold pair near its apex is already a single crossing, and the open part of the wave is indistinguishable from a missing label. A crease that runs the whole height of the roll (a Z-fold at a hinge) is not separable this way at all. The script is kept as a map of fold-prone zones, not as a certifier.
+
+The question belongs to the per-voxel label tree, where a wave is one surface and there is nothing to guess. That is the next step, and it is the labels' author's to take with the list above.
 
 ## What it means, and what it does not
 

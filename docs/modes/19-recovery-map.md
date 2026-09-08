@@ -140,3 +140,10 @@ here.
 
 ---
 
+
+
+---
+
+## Note (8 Sep 2026) — a floor in the lamina counter
+
+The wedge audit's ridge detector required peaks at least 6 voxels (~100 µm) apart, so laminae packed tighter than that could not be counted at any resolution. The "resolvable laminae" ratio of 0.34 carries that floor and should be read as a lower bound on what a counter without it would find. The floor was found on a synthetic twin before the follow-up experiment (`wedge_fine_1218.py`) ran; that experiment then stopped at its first exam because, floor or not, half the known sheets at 17 µm have no valley to detect. Mode 20 takes the question up by a different route.

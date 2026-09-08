@@ -1,4 +1,4 @@
-	#vesuvius-topological-grid
+	#Vesuvius-topological-grid#
 
 **Geometry instruments for Herculaneum scrolls — no ML, no text reading, every claim with its exam and its checker.**
 

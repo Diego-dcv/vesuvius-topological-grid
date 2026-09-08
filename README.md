@@ -1,4 +1,4 @@
-# vesuvius-topological-grid
+	#vesuvius-topological-grid
 
 **Geometry instruments for Herculaneum scrolls — no ML, no text reading, every claim with its exam and its checker.**
 
@@ -40,6 +40,7 @@ contributor's ground truth).
 | **Every label sent back to its winding** | Replicated exactly by the labels' author on the full 5.2 GB tree (85.8 %, median 2.6 voxels); the same pass corrected his published seam figure (82.9 → 88.8 %) | [mode 18](docs/modes/18-unwrap-per-point.md) |
 | **Unlabelled papyrus is there** | 9,034 predicted positions with raw-CT evidence of material; cross-checked by the labels' author: 6,616 survive at exact voxel, most of the rest are edge grazes within the declared tolerance | [mode 19](docs/modes/19-recovery-map.md) |
 | **Local sheet coherence in microns** | A hidden winding is recovered to 32 µm from its neighbours (60 µm with three hidden), held-out exam; our own global field does worse (370 µm) and the comparison was published against us | [mode 17](docs/modes/17-ironing-field.md) |
+| **328,143 hidden sheets placed at the normal pitch** | Judged by the labels one plane away: 35 µm median error, and never more sheets than predicted once split labels are merged (2 % of 240,000 packs); 97.6 % on material in the CT | [mode 20](docs/modes/20-hidden-sheets.md) |
 | **Winding count and roll length agree with the per-voxel map** | 109–110 winding lanes (ours from the table, his from the voxel tree); loom length 8.4–9.4 m; labelled material ~3.2 m per plane by both routes | [metrology note](docs/modes/16-unrolled-ribbon-census.md) |
 
 ## PHerc. 1218 in numbers
@@ -50,7 +51,8 @@ What the crossing table says about the scroll. **Measured** means an exam or a t
 - **Loom length: 8.4–9.4 m** (measured) — the length of the full spiral at the measured pitch (~0.2 mm/turn). This is the *loom*, not the papyrus.
 - **Labelled papyrus: ~3.2–3.3 m per plane** (measured, both routes); **~2.5 m** once split labels are merged. About 30 % of consecutive crossings are one label cut in two — measured at the table and at the voxel independently.
 - **The 5.13 m "ribbon" of mode 16 is a path length** over 78 well-traced windings on the median geometry, not labelled papyrus. It stays in the mode-16 page with that reading.
-- **Unnamed material: roughly 60 % of the loom** (measured by subtraction); the wedge audit says most of it is physically present (mass 0.85) but no longer resolvable as separate laminae at 17 µm.
+- **Unnamed material: roughly 60 % of the loom** (measured by subtraction); the wedge audit says most of it is physically present (mass 0.85). Of it, **0.81 m per plane sits in packs between labelled sheets, at the normal pitch** (measured, mode 20); the rest lies beyond the last labelled sheet on each ray.
+- **Sheet spacing: 164 µm median; 184 µm in the inner third, 151 µm in the outer third** (measured, 202 columns). Packs are not pressed: pitch and CT mass inside them match the free sheets.
 - **Crush ratio: median ~2:1**, varying 1.35–3.16 between heights; the ellipse is an average, not a section (measured).
 - **Where the scroll fails**: hinge axes lose material to voids, flattened faces to fusion; the core buckled as a column (S-shaped axis ~15–20 mm) with the crush on top (measured on the table and the CT).
 - **Expected, not yet measured**: the column count of the hidden work (Greek-prose band 47–98 columns), and the kollesis positions (three searches null).
@@ -81,6 +83,7 @@ What the crossing table says about the scroll. **Measured** means an exam or a t
 | 17 | One folding law for the whole scroll? | measured (held-out 0.58; neighbours beat the field, 32 vs 370 µm) | [17](docs/modes/17-ironing-field.md) |
 | 18 | Every label back to its origin | measured, **replicated by the labels' author** | [18](docs/modes/18-unwrap-per-point.md) |
 | 19 | Is the missing 40 % lost or unlabelled? | measured (9,034 positions, cross-checked); **281 "certified" crossings withdrawn** after a half-pitch audit, kept as candidates | [19](docs/modes/19-recovery-map.md) |
+| 20 | Where are the unlabelled sheets, one by one? | measured: packs between labelled sheets hold sheets at the normal pitch (judge: neighbouring plane, 35 µm); they account for a quarter of the missing papyrus, the rest lies beyond the last label on each ray; fibre texture, fibre parity, zone compression and CT mass tested and **null** on the way | [20](docs/modes/20-hidden-sheets.md) |
 
 ## Limits found on the way (they are results too)
 
@@ -226,6 +229,9 @@ python scripts/kollesis_detector.py test
 python scripts/pherc1218_io.py                       # self-check: 1,404,796 crossings, 323 planes, 60 rays
 python scripts/unroll_1218.py                        # mode 16 (needs nothing else)
 python scripts/planchado_heldout_um_1218.py          # mode 17 addendum
+python scripts/layer_division_1218.py                # mode 20: hidden sheets judged one plane away (~6 min)
+python scripts/hidden_sheets_1218.py                 # mode 20: the full list (CT check only if ct_root is open)
+python scripts/layer_division_twin_1218.py equal     # its twin (also: uneven; mass_count_twin, fibre_parity_twin)
 # modes needing the raw CT (wedge_audit, unwrap_texture, kollesis_search): pip install zarr s3fs
 # modes needing J's label points (vote_instance, winding_per_point):     pip install kagglehub
 ```

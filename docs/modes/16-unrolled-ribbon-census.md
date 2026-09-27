@@ -2,6 +2,8 @@
 
 *Moved unchanged from the README on 2026-09-06; the README now holds only the summary. Figures and scripts are referenced relative to the repository root.*
 
+> **Superseded figures (September 2026).** The winding count (109–110), the loom length (8.4–9.4 m) and the share of unlabelled papyrus (~60 %) on this page are no longer current. 109 is the highest crossing number on a ray, reached where rays cut hairpin folds, not a count of turns; a slice holds at most about 3.5 m of papyrus in the straight zone; about one third of it is unlabelled. See [the geometry of PHerc. 1218](../geometry_1218.md). The rest of this page is kept as it was.
+
 
 **What it does.** Rebuilds the scroll as a single continuous ribbon from the
 per-ray crossing table (60 rays × 313 slices; same source table as the

@@ -2,6 +2,8 @@
 
 *Added 8 September 2026. Scripts: `layer_division_1218.py`, `layer_compression_1218.py`, `mass_count_1218.py`, `hidden_sheets_1218.py`, `fibre_parity_1218.py`, `fold_check_1218.py`, each with a `*_twin_1218.py` bench. Data: Jinhojeong's crossing table and origins for PHerc. 1218; CT levels 0 and 1 from the public bucket.*
 
+
+> **Superseded reference (September 2026).** This page compares the labelled and hidden papyrus with a loom of 8.4–9.4 m. That loom does not fit in the scroll and is withdrawn: a slice holds at most about 3.5 m of papyrus in the straight zone. The hidden sheets themselves (0.81 m per plane, 35 µm from where the neighbouring plane sees them) are not affected. Against the new ceiling, labelled plus hidden papyrus comes close to it; this has not yet been checked height by height. See [the geometry of PHerc. 1218](../geometry_1218.md). The rest of this page is kept as it was.
 ## Where this comes from
 
 The census of PHerc. 1218 (mode 16 and its metrology addendum) left an uncomfortable number on the table: the roll's loom is 8.4–9.4 m long, but only about 3.2 m of it per plane carries a label. The wedge audit (mode 19) then showed that most of the unlabelled material is physically present — the CT sees papyrus where the labels see nothing — but at 17 µm it could not be resolved into separate sheets. The question this mode answers is the obvious next one: *where exactly are those sheets, and can we say so with a judge that is not ourselves?*

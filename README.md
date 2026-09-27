@@ -41,21 +41,28 @@ contributor's ground truth).
 | **Unlabelled papyrus is there** | 9,034 predicted positions with raw-CT evidence of material; cross-checked by the labels' author: 6,616 survive at exact voxel, most of the rest are edge grazes within the declared tolerance | [mode 19](docs/modes/19-recovery-map.md) |
 | **Local sheet coherence in microns** | A hidden winding is recovered to 32 µm from its neighbours (60 µm with three hidden), held-out exam; our own global field does worse (370 µm) and the comparison was published against us | [mode 17](docs/modes/17-ironing-field.md) |
 | **328,143 hidden papyrus crossings placed at the normal pitch** (crossings, not windings: folded zones are the declared limit) | Judged by the labels one plane away: 35 µm median error, and never more sheets than predicted once split labels are merged (2 % of 240,000 packs); 97.6 % on material in the CT | [mode 20](docs/modes/20-hidden-sheets.md) |
-| **Winding count and roll length agree with the per-voxel map** | 109–110 winding lanes (ours from the table, his from the voxel tree); loom length 8.4–9.4 m; labelled material ~3.2 m per plane by both routes | [metrology note](docs/modes/16-unrolled-ribbon-census.md) |
+| **Labelled papyrus agrees with the per-voxel map** | ~3.2 m per plane by both routes; both routes also reach 109–110 crossing "lanes", which are now read as the highest crossing number on a ray, not turns (see below) | [metrology note](docs/modes/16-unrolled-ribbon-census.md) |
 
 ## PHerc. 1218 in numbers
 
-What the crossing table says about the scroll. **Measured** means an exam or a third party stands behind it; **expected** means a forecast with no judge yet.
+What the scan and the crossing table say about the scroll, revised in September 2026 after cutting it top to bottom through its centre. **Measured** means an exam or a third party stands behind it; **expected** means a forecast with no judge yet. Details and all figures: [the geometry of PHerc. 1218](docs/geometry_1218.md).
 
-- **Winding lanes: 109–110** (measured, two routes). The table reaches ordinal k = 108.
-- **Loom length: 8.4–9.4 m** (measured) — the length of the full spiral at the measured pitch (~0.2 mm/turn). This is the *loom*, not the papyrus.
-- **Labelled papyrus: ~3.2–3.3 m per plane** (measured, both routes); **~2.5 m** once split labels are merged. About 30 % of consecutive crossings are one label cut in two — measured at the table and at the voxel independently.
+![Vertical cuts through the centre, before and after removing the fill of the umbilicus](figures/55Turns/gravilla_antes_despues.png)
+
+*Two vertical cuts through the centre, before and after removing the granular fill of the umbilicus. Right: fill per slice along the height (the peaks at 0 and 200 mm are the scanner support).*
+
+- **Three zones along the height** (measured, vertical cut): crumpled like an accordion from about 20 to 90 mm, straight from about 100 to 155 mm, crushed ends. Counts and lengths are taken in the straight zone; slices of the crumpled zone overstate the papyrus.
+- **Turns: about 55, range 52–58** (measured in the straight zone, along the short axis, where the counts upwards and downwards from the umbilicus agree). The count assumes a sheet spacing of about 0.17 mm.
+- **The 109–110 "winding lanes"** of the table and of the voxel tree are the highest crossing number on a ray. They are reached in the wings, where rays cut hairpin folds: an upper bound, not a count of turns.
+- **Papyrus per slice: at most about 3.5 m in the straight zone** (measured: slice area divided by sheet spacing). The 8.4–9.4 m "loom" given here before does not fit in the scroll and is withdrawn.
+- **Labelled papyrus: 62–68 % of that ceiling at every height** (measured; the two figures are independent and rise and fall together). About one third of the papyrus is unlabelled, not 60 % as stated before. Of it, **0.81 m per plane sits in packs between labelled sheets, at the normal pitch** (measured, mode 20). About 30 % of consecutive crossings are one label cut in two, measured at the table and at the voxel independently.
 - **The 5.13 m "ribbon" of mode 16 is a path length** over 78 well-traced windings on the median geometry, not labelled papyrus. It stays in the mode-16 page with that reading.
-- **Unnamed material: roughly 60 % of the loom** (measured by subtraction); the wedge audit says most of it is physically present (mass 0.85). Of it, **0.81 m per plane sits in packs between labelled sheets, at the normal pitch** (measured, mode 20); the rest lies beyond the last labelled sheet on each ray.
 - **Sheet spacing: 164 µm median; 184 µm in the inner third, 151 µm in the outer third** (measured, 202 columns). Packs are not pressed: pitch and CT mass inside them match the free sheets.
-- **Crush ratio: median ~2:1**, varying 1.35–3.16 between heights; the ellipse is an average, not a section (measured).
-- **Where the scroll fails**: hinge axes lose material to voids, flattened faces to fusion; the core buckled as a column (S-shaped axis ~15–20 mm) with the crush on top (measured on the table and the CT).
-- **Expected, not yet measured**: the column count of the hidden work (Greek-prose band 47–98 columns), and the kollesis positions (three searches null).
+- **How it was crushed** (measured): the sheets lie as a stack of parallel sheets around a flat central slit, at the same spacing on the short axis as everywhere else; they were not squeezed into ellipses. The outline ratio is about 2:1 on average, varying 1.35–3.16 between heights.
+- **The umbilicus** is an open channel partly filled with granular material, and it drifts 1–3 mm with height (measured, vertical cut and per-height search).
+- **Where the scroll fails**: hinge axes lose material to voids, flattened faces to fusion; the core buckled as a column (S-shaped axis) with the crush on top (measured on the table and the CT).
+- **Open**: fewer turns cross the short axis above 120 mm (55 at 110 mm, 46 at 140 mm) while the slice keeps its area and the spacing does not change. Not explained.
+- **Expected, not yet measured**: the column count of the hidden work (Greek-prose band 47–98 columns), and the kollesis positions (searches so far null).
 
 ## Status of every mode
 

@@ -1,6 +1,6 @@
 # The geometry of PHerc. 1218 — what the scroll looks like inside
 
-*September 2026. Figures in `figures/55Turns/`. Not final until the open points in section 7 are closed.*
+*September 2026. Figures in `figures/55Turns/`. Not final until the open points in section 6 are closed.*
 
 This page collects what was measured in September 2026 about the shape of PHerc. 1218: how many turns it has, how much papyrus it holds, how it was crushed and where it is damaged. It replaces several figures stated earlier in this repository; the corrections are listed in section 8.
 
@@ -58,7 +58,7 @@ The highest ceilings come from the crumpled zone and are inflated by it (section
 
 Turns were counted in the straight zone along the short axis of the section, where the sheets are flat and have no hairpins, starting from the umbilicus found at each height and counting upwards and downwards. Only waves of the size of one sheet (0.12-0.25 mm) are counted, so the two fibre layers of a sheet are not counted twice, and two sheets pressed together without a gap still count as two.
 
-- At 120 mm the upward and downward counts agree (53 and 51): **52 turns outside the umbilicus, plus about 3 estimated inside it: about 55 turns.** Reliable range 52-58.
+- At 120 mm the upward and downward counts agree (53 and 51): 52 turns outside the umbilicus, plus about 3 estimated inside it: **around 55 turns, not confirmed yet** (see section 6).
 - The mean of the upward and downward counts does not depend on where the centre is placed: 55, 52, 49 and 46 at 110, 120, 130 and 140 mm.
 
 ![A slice of the straight zone with the four cut lines](../figures/55Turns/comprobacion_cortes_recta_limpio.png)
@@ -87,18 +87,19 @@ A consequence of the stacked geometry, not an independent measurement: the origi
 
 ## 6. Open points
 
-1. **The count depends on the sheet spacing.** The counter and the ceiling both rest on a spacing of about 0.17 mm. If the fine bands of about 0.10 mm seen at the finest resolution were whole sheets, there would be 90-100 turns. An isolated sheet measures about 95 µm with fibre layers of about 50 µm, and fragments of PHerc. 1667 show 100-150 µm per sheet; both favour 0.17 mm, but the dependency is stated here.
-2. **Fewer turns cross the short axis higher up** (55 to 46 between 110 and 140 mm) while the slice keeps its area and the spacing is unchanged. Folding a sheet cannot remove crossings from a straight path out of the centre, so the cause is not known. One reading, not measured: the crumpled paper also folds towards the centre and the section widens while keeping its compactness.
+1. **The count is taken along one line at one height.** At the finest resolution (8.6 µm), vertical cuts of the straight zone at 120-124 mm show that its sheets are not straight at small scale: beyond about 4 mm from the umbilicus they fold along the height in chevrons and arcs of 1-2 mm. A straight counting line can then miss a sheet that runs almost horizontally or cross a folded one twice. Around 55 is therefore not confirmed; following each sheet in three dimensions (the per-voxel label tree) would settle it.
+2. **The count depends on the sheet spacing.** The counter and the ceiling both rest on a spacing of about 0.17 mm. If the fine bands of about 0.10 mm seen at the finest resolution were whole sheets, there would be 90-100 turns. In the other direction, a count by eye on the coarser vertical cut gives about 30 layers per side, which would mean sheets of about 0.3 mm. An isolated sheet measures about 95 µm with fibre layers of about 50 µm, and fragments of PHerc. 1667 show 100-150 µm per sheet; both favour 0.17 mm, but the dependency is stated here.
+3. **Fewer turns cross the short axis higher up** (55 to 46 between 110 and 140 mm) while the slice keeps its area and the spacing is unchanged. Folding a sheet cannot remove crossings from a straight path out of the centre, so the cause is not known. One reading, not measured: the crumpled paper also folds towards the centre and the section widens while keeping its compactness.
 
 ## 7. Figures in this repository that this page supersedes
 
 | earlier | now |
 |---|---|
-| 109 turns | 109 = highest crossing number on a ray (upper bound); turns ≈ 55 (52-58) in the straight zone |
+| 109 turns | 109 = highest crossing number on a ray (upper bound); turns around 55 in the straight zone, not confirmed yet |
 | loom of 8.4-9.4 m | papyrus ceiling ≈ 3.5 m per slice in the straight zone |
 | ~60 % of the papyrus unnamed | about one third unlabelled |
 | crush into scaled 2:1 ellipses (August twin) | stack of parallel sheets; the August twin's assumption is withdrawn |
 
-## Cells and scripts
+## Cells
 
-Colab cells (self-contained): `celda_colab_carrete.py`, `celda_colab_corte_largo.py`, `celda_colab_gravilla.py`, `celda_colab_contar_vueltas.py`, `celda_colab_pared_por_altura.py`, `celda_colab_etiquetas_limpio.py`.
+Self-contained Colab cells, in `scripts/colab/`: `celda_colab_carrete.py` (papyrus ceiling), `celda_colab_corte_largo.py` (vertical cuts, fill removed), `celda_colab_gravilla.py` (the fill of the umbilicus), `celda_colab_contar_vueltas.py` (turn count on the short axis), `celda_colab_pared_por_altura.py` (wall per height), `celda_colab_etiquetas_limpio.py` (labels on the cleaned slice), `celda_colab_corte_vertical_fino.py` (vertical cut at 8.6 µm).
